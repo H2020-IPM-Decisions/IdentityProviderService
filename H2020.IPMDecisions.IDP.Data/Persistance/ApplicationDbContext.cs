@@ -1,10 +1,11 @@
+using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistance
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -15,7 +16,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistance
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<IdentityUser>().ToTable("User");
+            builder.Entity<ApplicationUser>().ToTable("User");
             builder.Entity<IdentityRole>().ToTable("Role");
             builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaim");
             builder.Entity<IdentityUserRole<string>>().ToTable("UserRole");
