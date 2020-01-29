@@ -1,6 +1,11 @@
+using System;
+using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
+using H2020.IPMDecisions.IDP.Core.Profiles;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,8 +24,7 @@ namespace H2020.IPMDecisions.IDP.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .ConfigureMySqlContext(Configuration);
+            
             
             services
                 .AddControllers(setupAction =>
@@ -32,9 +36,12 @@ namespace H2020.IPMDecisions.IDP.API
                      setupAction.SerializerSettings.ContractResolver =
                      new CamelCasePropertyNamesContractResolver();
                  });
-                 
-            services
-                .ConfigureIdentity();
+
+            services.AddAutoMapper(typeof(MainProfile));
+
+            services.ConfigureMySqlContext(Configuration);
+
+            services.ConfigureIdentity();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

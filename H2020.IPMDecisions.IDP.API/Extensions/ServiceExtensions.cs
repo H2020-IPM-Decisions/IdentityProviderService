@@ -1,5 +1,5 @@
 using System;
-using H2020.IPMDecisions.IDP.Core.Models;
+using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistance;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

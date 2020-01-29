@@ -1,4 +1,4 @@
-using H2020.IPMDecisions.IDP.Core.Models;
+using H2020.IPMDecisions.IDP.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
