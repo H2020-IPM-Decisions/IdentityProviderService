@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace H2020.IPMDecisions.IDP.Data.Persistance.Migrations.MySqlMigrations
+namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
 {
     public partial class Initial : Migration
     {

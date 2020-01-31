@@ -45,7 +45,7 @@ cd H2020.IPMDecisions.IDP.API
 dotnet build
 ```
 
-### How to connect and re the database
+### How to connect and start the database
 
 Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json object `ConnectionStrings\MySqlDbConnection` with your MySql instance.
 The following command will create a database and add all the tables necessary to run the solution.
@@ -55,7 +55,14 @@ The instructions assume that you are in the **API project** of the repository.
 dotnet ef database update
 ```
 
-Open your MySQL instance and check that the database has been created and tables added/
+Open your MySQL instance and check that the database has been created and tables added.
+
+If new tables are added to the project, to add new migrations to the database run this commands:
+
+```console
+dotnet ef migrations add YourMessage --project ..\H2020.IPMDecisions.IDP.Data\H2020.IPMDecisions.IDP.Data.csproj
+dotnet ef database update
+```
 
 
 ### How to run the project

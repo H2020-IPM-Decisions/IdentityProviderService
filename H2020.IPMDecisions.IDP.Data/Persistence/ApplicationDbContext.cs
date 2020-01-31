@@ -1,12 +1,14 @@
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace H2020.IPMDecisions.IDP.Data.Persistance
-{
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+namespace H2020.IPMDecisions.IDP.Data.Persistence
+{   
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
+        public DbSet<ApplicationClient> ApplicationClient { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
