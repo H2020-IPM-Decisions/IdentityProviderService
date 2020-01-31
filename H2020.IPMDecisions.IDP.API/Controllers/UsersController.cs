@@ -5,20 +5,22 @@ using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
-{
+{    
     [ApiController]
     [Route("api/users")]
-    public class Users : ControllerBase
+    [Authorize]
+    public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
-        public Users(
+        public UsersController(
             UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {

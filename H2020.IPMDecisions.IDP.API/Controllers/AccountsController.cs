@@ -11,25 +11,24 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
     [Route("api/accounts")]
-    public class Accounts : ControllerBase
+    public class AccountsController : ControllerBase
     {
 
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
-        public Accounts(
+        public AccountsController(
             UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
-            this.userManager = userManager 
+            this.userManager = userManager
                 ?? throw new ArgumentNullException(nameof(userManager));
-            this.mapper = mapper ?? 
+            this.mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
-        }      
-        
+        }
+
         [AllowAnonymous]
-        [HttpPost(Name ="RegisterUser")]
-        [Route("Register")]
+        [HttpPost("Register", Name = "RegisterUser")]
         // POST: api/Accounts/Register
         public async Task<ActionResult<UserDto>> Register([FromBody] UserForRegistrationDto userForRegistration)
         {
@@ -50,5 +49,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             return BadRequest(result);
         }
+
+        // [AllowAnonymous]
+        // [HttpPost("authenticate", Name = "AuthenticateUser")]
+        // public async Task<IActionResult> Authenticate([FromBody]UserForAuthentificationDto userDto)
+        // {
+        //     // var user = _userService.Authenticate(user, user.Password);
+
+        //     // if (user == null)
+        //     //     return BadRequest(new { message = "Username or password is incorrect" });
+
+        //     // return Ok(user);
+        // }
     }
 }
