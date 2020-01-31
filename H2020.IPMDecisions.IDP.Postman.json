@@ -25,7 +25,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\tgell : '2sdsd'\n\t]",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -33,9 +33,13 @@
 							}
 						},
 						"url": {
-							"raw": "Get All Users",
+							"raw": "{{baseUrl}}/api/users",
 							"host": [
-								"Get All Users"
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
 							]
 						}
 					},
@@ -57,7 +61,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\tgell : '2sdsd'\n\t]",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -72,6 +76,77 @@
 							"path": [
 								"api",
 								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/a05ed738-43f6-46c3-bd77-a93da227aabc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"a05ed738-43f6-46c3-bd77-a93da227aabc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User by Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/1577cb7f-0358-4fcc-bad0-fd635fce352d",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1577cb7f-0358-4fcc-bad0-fd635fce352d"
 							]
 						}
 					},
@@ -102,13 +177,13 @@
 							"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user1@test.com\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/account/register",
+							"raw": "{{baseUrl}}/api/accounts/register",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"account",
+								"accounts",
 								"register"
 							]
 						}
@@ -141,13 +216,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/account/register",
+							"raw": "{{baseUrl}}/api/accounts/register",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"account",
+								"accounts",
 								"register"
 							]
 						}
@@ -160,7 +235,7 @@
 	],
 	"variable": [
 		{
-			"id": "8c2b195a-9741-4c34-ac84-51d732ce4984",
+			"id": "5d3695a9-1e2b-410b-b491-8ac62769258c",
 			"key": "baseUrl",
 			"value": "",
 			"type": "string"
