@@ -10,14 +10,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
-    [Route("api/account")]
-    public class Account : ControllerBase
+    [Route("api/accounts")]
+    public class Accounts : ControllerBase
     {
 
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
-        public Account(
+        public Accounts(
             UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
@@ -41,11 +41,14 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             {
                 //ToDo Generate Email token and return
 
-                var authorToReturn = this.mapper.Map<UserDto>(userEntity);
-                return Ok(authorToReturn);
+                var userToReturn = this.mapper.Map<UserDto>(userEntity);
+
+                return CreatedAtRoute("GetUserById",
+                new { userId = userToReturn.Id },
+                userToReturn);
             }
 
-            return BadRequest();
+            return BadRequest(result);
         }
     }
 }
