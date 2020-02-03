@@ -1,11 +1,10 @@
-using System;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
 using H2020.IPMDecisions.IDP.Core.Profiles;
+using H2020.IPMDecisions.IDP.Data.Core;
+using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,8 +23,6 @@ namespace H2020.IPMDecisions.IDP.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            
-            
             services
                 .AddControllers(setupAction =>
                 {
@@ -39,8 +36,10 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.AddAutoMapper(typeof(MainProfile));
 
-            services.ConfigureMySqlContext(Configuration);
+            services.AddScoped<IDataService, DataService>();
 
+            services.ConfigureMySqlContext(Configuration);
+            
             services.ConfigureIdentity();
         }
 
