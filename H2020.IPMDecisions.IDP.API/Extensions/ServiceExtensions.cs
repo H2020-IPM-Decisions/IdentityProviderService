@@ -53,25 +53,42 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
         public static void ConfigureJwtAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            services.AddAuthentication(opt =>
+            var authorizationSecretKey = config["JwtSettings:AuthorizationServerSecret"];
+            var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
+
+            services.AddAuthentication(options =>
             {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
             {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
-                {
+                {                    
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-
-                    ValidIssuer = "https://localhost:5001",
-                    ValidAudience = "https://localhost:5001",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+                    
+                    ValidIssuer = authorizationServerUrl,
+                    ValidAudience = authorizationServerUrl,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey))
                 };
-            });            
+            });
+        }
+
+        public static void ConfigureCors(this IServiceCollection services, IConfiguration config)
+        {
+            var allowedHosts = config["AllowedHosts"];
+            services.AddCors(options =>
+            {
+                options.AddPolicy("ApiGatewayCORS", builder =>
+                {
+                    builder.WithOrigins(allowedHosts);
+                });
+            });
         }
     }
 }

@@ -23,6 +23,8 @@ namespace H2020.IPMDecisions.IDP.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.ConfigureCors(Configuration);
+
             services
                 .AddControllers(setupAction =>
                 {
@@ -33,7 +35,7 @@ namespace H2020.IPMDecisions.IDP.API
                      setupAction.SerializerSettings.ContractResolver =
                      new CamelCasePropertyNamesContractResolver();
                  });
-
+                 
             services.ConfigureIdentity();
 
             services.ConfigureJwtAuthentication(Configuration);
@@ -53,6 +55,7 @@ namespace H2020.IPMDecisions.IDP.API
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("ApiGatewayCORS");
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
