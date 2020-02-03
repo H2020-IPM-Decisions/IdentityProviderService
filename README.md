@@ -42,6 +42,9 @@ You can build the tool using the following commands. The instructions assume tha
 
 ```console
 cd H2020.IPMDecisions.IDP.API
+
+cp appsettingsTemplate.json appsettings.json
+
 dotnet build
 ```
 
@@ -64,6 +67,14 @@ dotnet ef migrations add YourMessage --project ..\H2020.IPMDecisions.IDP.Data\H2
 dotnet ef database update
 ```
 
+### How to setup JsonWebToken (JWT) provider
+
+Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json section `JwtSettings` with the your server information.
+1. TokenLifetimeMinutes
+2. AuthorizationServerClientId"
+3. AuthorizationServerSecret
+4. AuthorizationServerUrl
+5. ApiGatewayServerUrl
 
 ### How to run the project
 
