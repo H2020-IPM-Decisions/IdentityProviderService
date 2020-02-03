@@ -1,29 +1,18 @@
-using System;
 using System.ComponentModel.DataAnnotations;
+using H2020.IPMDecisions.IDP.Core.Entities;
 
-namespace H2020.IPMDecisions.IDP.Core.Entities
+namespace H2020.IPMDecisions.IDP.Core.Dtos
 {
-    public class ApplicationClient
+    public class ApplicationClientForCreationDto
     {
-        [Key]
-        public Guid Id { get; set; }
-
-        [Required]
-        [MaxLength(80)]
-        public string Base64Secret { get; set; }
-
-        [Required]
-        [MaxLength(100)]
+        [Required(ErrorMessage = "Name is required")]
+        [MaxLength(100, ErrorMessage = "Name max length 100 characters")]
         public string Name { get; set; }
-
         [Required]
         public ApplicationClientType ApplicationClientType { get; set; }
-
         [Required]
         public bool Enabled { get; set; }
-
         [Required]
         public int RefreshTokenLifeTime { get; set; }
     }
-
 }

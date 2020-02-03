@@ -3,14 +3,16 @@ using System;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200203124353_ChangeIdToGuid")]
+    partial class ChangeIdToGuid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +23,8 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("char(32)")
+                        .HasMaxLength(32);
 
                     b.Property<int>("ApplicationClientType")
                         .HasColumnType("int");
@@ -39,8 +42,8 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                         .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
                         .HasMaxLength(100);
 
-                    b.Property<int>("RefreshTokenLifeTime")
-                        .HasColumnType("int");
+                    b.Property<double>("RefreshTokenLifeTime")
+                        .HasColumnType("double");
 
                     b.HasKey("Id");
 

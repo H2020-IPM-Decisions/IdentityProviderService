@@ -8,9 +8,10 @@ namespace H2020.IPMDecisions.IDP.Data.Core.Repositories
 {
     public interface IRepositoryBase<T>
     {
-        Task<List<T>> GetAll();
         void Create(T entity);
-        void Update(T entity);
         void Delete(T entity);
+        Task<List<T>> FindAllAsync();
+        Task<T> FindByIdAsync(Guid id);
+        void Update(T entity);
     }
 }
