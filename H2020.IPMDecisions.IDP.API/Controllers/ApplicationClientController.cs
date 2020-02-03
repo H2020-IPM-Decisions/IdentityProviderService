@@ -59,15 +59,14 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var applicationClientEntity = this.mapper.Map<ApplicationClient>(clientForCreationDto);
 
-            applicationClientEntity.Id = Guid.NewGuid();
             var key = new byte[32];
             RandomNumberGenerator.Create().GetBytes(key);
             applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
             
+            this.dataService.ApplicationClients.Create(applicationClientEntity);
             await this.dataService.CompleteAsync();
 
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity);
-
             return Ok(clientToReturn);
         }
     }

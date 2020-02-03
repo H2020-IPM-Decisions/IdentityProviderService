@@ -34,13 +34,15 @@ namespace H2020.IPMDecisions.IDP.API
                      new CamelCasePropertyNamesContractResolver();
                  });
 
+            services.ConfigureIdentity();
+
+            services.ConfigureJwtAuthentication(Configuration);
+
             services.AddAutoMapper(typeof(MainProfile));
 
             services.AddScoped<IDataService, DataService>();
 
             services.ConfigureMySqlContext(Configuration);
-            
-            services.ConfigureIdentity();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

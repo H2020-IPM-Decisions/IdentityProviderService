@@ -1,10 +1,13 @@
 using System;
+using System.Text;
 using H2020.IPMDecisions.IDP.Core.Entities;
-using H2020.IPMDecisions.IDP.Data.Persistance;
+using H2020.IPMDecisions.IDP.Data.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace H2020.IPMDecisions.IDP.API.Extensions
 {
@@ -23,9 +26,9 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
-           services.AddIdentity<ApplicationUser, IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+             .AddEntityFrameworkStores<ApplicationDbContext>()
+             .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -40,11 +43,35 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
 
-                options.SignIn.RequireConfirmedEmail = true;
+                // ToDo When Email confirmation available
+                // options.SignIn.RequireConfirmedEmail = true;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
 
                 options.User.RequireUniqueEmail = true;
             });
+        }
+
+        public static void ConfigureJwtAuthentication(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = "https://localhost:5001",
+                    ValidAudience = "https://localhost:5001",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+                };
+            });            
         }
     }
 }

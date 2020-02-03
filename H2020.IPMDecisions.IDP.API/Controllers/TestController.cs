@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Data.Core;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Text;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -39,16 +44,28 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpPost("Authenticate", Name = "AuthenticateUser2")]
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthentificationDto userDto)
         {
-            var isValidClient = await ValidateClient();
+            var isValidClient = await ValidateApplicationClientAsync();
+            if (!isValidClient.Item1) return BadRequest(new { message = isValidClient.Item2 });
 
-            if (!isValidClient.Item1) return BadRequest(isValidClient.Item2);
+            var isAuthorize = await ValidateUserAuthenticationAsync(userDto);
+            if (!isAuthorize.Item1) return BadRequest(new { message = isAuthorize.Item2 });
 
-            IActionResult isAuthorize = await ValidateUserAuthenticationAsync(userDto);
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
+            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-            return isAuthorize;
+            var tokeOptions = new JwtSecurityToken(
+                issuer: "https://localhost:5001",
+                audience: "https://localhost:5001",
+                claims: new List<Claim>(),
+                expires: DateTime.Now.AddMinutes(5),
+                signingCredentials: signinCredentials
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+            return Ok(new { Token = tokenString });
         }
 
-        private async Task<Tuple<bool, string>> ValidateClient()
+        private async Task<Tuple<bool, string>> ValidateApplicationClientAsync()
         {
             var clientId = Request.Headers["client_id"];
             if (string.IsNullOrEmpty(clientId)) return Tuple.Create(false,"Client Id is not set") ;
@@ -69,30 +86,28 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Tuple.Create(true, "");
         }
 
-        private async Task<IActionResult> ValidateUserAuthenticationAsync(UserForAuthentificationDto userDto)
+        private async Task<Tuple<bool, string, ApplicationUser>> ValidateUserAuthenticationAsync(UserForAuthentificationDto userDto)
         {
             var user = await this.userManager.FindByNameAsync(userDto.Username);
 
-            if (user == null) return BadRequest(new { message = "Username or password is incorrect" });
+            if (user == null) return Tuple.Create(false, "Username or password is incorrect", user);
 
             // ToDo When Email confirmation available
-            //if (!user.EmailConfirmed) return BadRequest(new { message = "Email not confirmed" });
+            //if (!user.EmailConfirmed) return Tuple.Create(false, "Email not confirmed"", user);"
 
             var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
             if (result.Succeeded)
             {
-                var userToReturn = this.mapper.Map<UserDto>(user);
-                // ToDo generate JWT here and return
-                return Ok(userToReturn);
+                return Tuple.Create(true, "", user);
             }
             else if (result.IsLockedOut)
             {
-                return BadRequest(new { message = "Username lockout" });
+                return Tuple.Create(false, "User is lockout", user);
             }
             else
             {
-                return BadRequest(new { message = "Username or password is incorrect" });
+                return Tuple.Create(false, "Username or password is incorrect", user);
             }
         }
 
