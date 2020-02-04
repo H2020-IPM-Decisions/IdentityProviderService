@@ -36,11 +36,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> GetUsers()
         {
             var users = await this.userManager.Users.ToListAsync();
-            if (users.Count() == 0) return NotFound();
+            if (users.Count == 0) return NotFound();
 
-            var userToReturn = this.mapper.Map<List<UserDto>>(users);
+            var usersToReturn = this.mapper.Map<List<UserDto>>(users);
 
-            return Ok(userToReturn);
+            return Ok(usersToReturn);
         }
 
         [HttpGet("{userId:guid}", Name = "GetUserById")]
