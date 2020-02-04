@@ -60,6 +60,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpDelete("{userId:guid}", Name = "DeleteUser")]
+        // DELETE: api/users/1
         public async Task<IActionResult> DeleteUser([FromRoute] Guid userId)
         {
             var userToDelete = await this.userManager.FindByIdAsync(userId.ToString());

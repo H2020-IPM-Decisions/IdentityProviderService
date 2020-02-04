@@ -33,13 +33,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users",
+							"raw": "{{baseUrl}}/api/applicationclient",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users"
+								"applicationclient"
 							]
 						}
 					},
@@ -228,14 +228,356 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Authenticate User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"user2\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user2@test.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts/authenticate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Application Client Controller",
+			"item": [
+				{
+					"name": "Get All Application Clients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclient",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclient"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Application Client",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclient/08d7a8c6-57d2-4c33-8144-955a92e1d267",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclient",
+								"08d7a8c6-57d2-4c33-8144-955a92e1d267"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Application Client",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"My API Client 2\",\n        \"applicationClientType\": 0,\n        \"enabled\": true,\n        \"refreshTokenLifeTime\": 90\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclient",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclient"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Application Client",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"My Authorization Server\",\n        \"applicationClientType\": 1,\n        \"enabled\": true,\n        \"refreshTokenLifeTime\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclient/08d7a95c-de5f-4b1a-8970-f862469c5603",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclient",
+								"08d7a95c-de5f-4b1a-8970-f862469c5603"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Partial Update Application Client",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n      \"op\": \"replace\",\n      \"path\": \"/name\",\n      \"value\": \"New name\"\n    },\n    {\n      \"op\": \"replace\",\n      \"path\": \"/enabled\",\n      \"value\": \"true\"\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclient/08d7a95f-8a47-47e8-8f11-0f68555461e4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclient",
+								"08d7a95f-8a47-47e8-8f11-0f68555461e4"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Test Controller",
+			"item": [
+				{
+					"name": "Get Protected",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODA3NDU3NDksImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo1MDAxIn0.0-vCDSiq-NuUySlv9o82QK9VnVcLi92WTeujl95Mw40",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/test/protected",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"test",
+								"protected"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "grant_type",
+								"value": "password",
+								"type": "text"
+							},
+							{
+								"key": "client_id",
+								"value": "08d7a8c6-57d2-4c33-8144-955a92e1d267",
+								"type": "text"
+							},
+							{
+								"key": "client_secret",
+								"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user1@test.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/test/authenticate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"test",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1ODA4MTI5MTcsImV4cCI6MTU4MDgxNzcxNywiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6InlvdXJBcGlHYXRlV2F5U2VydmVyVXJsIn0.kO0OKtQQqugzQQmRSN60NTSfFi67YreTlDP_zra9WZE",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "ef9793a8-0453-40b5-91bf-c714fd7c908c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "9be5bd14-9900-4509-877c-f78e0a244e83",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"id": "5d3695a9-1e2b-410b-b491-8ac62769258c",
+			"id": "cdf0c96d-d238-4d2a-b17d-3247b6b344b7",
 			"key": "baseUrl",
 			"value": "",
 			"type": "string"

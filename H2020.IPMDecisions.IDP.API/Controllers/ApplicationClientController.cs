@@ -67,7 +67,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             await this.dataService.CompleteAsync();
 
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity);
-            return Ok(clientToReturn);
+            return CreatedAtRoute("GetApplicationClientById",
+                 new { id = clientToReturn.Id },
+                 clientToReturn);
         }       
 
         [HttpDelete("{id:guid}", Name = "DeleteApplicationClient")]
@@ -108,7 +110,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 await this.dataService.CompleteAsync();
 
                 var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientToAdd);
-                return Ok(clientToReturn);
+                return CreatedAtRoute("GetApplicationClientById",
+                 new { id = id },
+                 clientToReturn);
             }
 
             var clientToPatch = this.mapper.Map<ApplicationClientForUpdateDto>(clientFromRepository);
@@ -124,6 +128,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             await this.dataService.CompleteAsync();
                         
             return NoContent();
+        }
+
+        [HttpGet("{id:guid}", Name = "GetApplicationClientById")]
+        // GET: api/applicationclient/1
+        public async Task<IActionResult> Get([FromRoute] Guid id)
+        {
+            var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
+            if (clientFromRepository == null) return NotFound();
+
+            var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientFromRepository);
+            return Ok(clientToReturn);
         }
 
         private static void CreateClientSecret(ApplicationClient applicationClientEntity)
