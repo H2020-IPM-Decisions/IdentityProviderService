@@ -70,11 +70,10 @@ dotnet ef database update
 ### How to setup JsonWebToken (JWT) provider
 
 Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json section `JwtSettings` with the your server information.
-1. TokenLifetimeMinutes
-2. AuthorizationServerClientId"
-3. AuthorizationServerSecret
-4. AuthorizationServerUrl
-5. ApiGatewayServerUrl
+1. TokenLifetimeMinutes: Valid lifetime of the JWT in minutes.
+2. AuthorizationServerSecret: This parameter holds a secret key to sign the JWT.
+3. AuthorizationServerUrl: This parameter holds who is issuing the certificate, the IDP service
+4. ApiGatewayServerUrl: This parameter holds which client URL can use this IDP service
 
 ### How to run the project
 
