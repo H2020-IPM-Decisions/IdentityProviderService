@@ -7,11 +7,14 @@ using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("/api/applicationclient")]
     public class ApplicationClientController : ControllerBase
@@ -58,16 +61,76 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return BadRequest(string.Format("Client already exits with name: {0}", clientForCreationDto.Name));
 
             var applicationClientEntity = this.mapper.Map<ApplicationClient>(clientForCreationDto);
+            CreateClientSecret(applicationClientEntity);
 
-            var key = new byte[32];
-            RandomNumberGenerator.Create().GetBytes(key);
-            applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
-            
             this.dataService.ApplicationClients.Create(applicationClientEntity);
             await this.dataService.CompleteAsync();
 
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity);
             return Ok(clientToReturn);
+        }       
+
+        [HttpDelete("{id:guid}", Name = "DeleteApplicationClient")]
+        //DELETE :  api/applicationclient/1
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            var clientToDelete = await this.dataService.ApplicationClients.FindByIdAsync(id);
+
+            if (clientToDelete == null) return NotFound();
+
+            this.dataService.ApplicationClients.Delete(clientToDelete);
+            await this.dataService.CompleteAsync();
+
+            return NoContent();
+        }
+
+        [HttpPatch("{id:guid}", Name = "PartialUpdateApplicationClient")]
+        //Patch :  api/applicationclient/1
+        public async Task<IActionResult> PartialUpdate(
+            [FromRoute] Guid id,
+            JsonPatchDocument<ApplicationClientForUpdateDto> patchDocument)
+        {
+            var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
+
+            if (clientFromRepository == null)
+            {
+                var clientDto = new ApplicationClientForUpdateDto();
+                patchDocument.ApplyTo(clientDto, ModelState);
+
+                if (!TryValidateModel(clientDto))
+                    return ValidationProblem(ModelState);
+
+                var clientToAdd = this.mapper.Map<ApplicationClient>(clientDto);
+                clientToAdd.Id = id;
+                CreateClientSecret(clientToAdd);
+
+                this.dataService.ApplicationClients.Create(clientToAdd);
+                await this.dataService.CompleteAsync();
+
+                var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientToAdd);
+                return Ok(clientToReturn);
+            }
+
+            var clientToPatch = this.mapper.Map<ApplicationClientForUpdateDto>(clientFromRepository);
+            // ToDo need validation
+            patchDocument.ApplyTo(clientToPatch, ModelState);
+
+            if (!TryValidateModel(clientToPatch))
+                return ValidationProblem(ModelState);
+
+            this.mapper.Map(clientToPatch, clientFromRepository);
+
+            this.dataService.ApplicationClients.Update(clientFromRepository);
+            await this.dataService.CompleteAsync();
+                        
+            return NoContent();
+        }
+
+        private static void CreateClientSecret(ApplicationClient applicationClientEntity)
+        {
+            var key = new byte[32];
+            RandomNumberGenerator.Create().GetBytes(key);
+            applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
         }
     }
 }

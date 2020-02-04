@@ -9,10 +9,12 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
         {
             // Entities to Dtos
             CreateMap<ApplicationClient, ApplicationClientDto>();
+            CreateMap<ApplicationClient, ApplicationClientForUpdateDto>();
 
             // Dtos to Entities
             CreateMap<ApplicationClientDto, ApplicationClient>();
             CreateMap<ApplicationClientForCreationDto, ApplicationClient>();
+            CreateMap<ApplicationClientForUpdateDto, ApplicationClient>();
         }
     }
 }

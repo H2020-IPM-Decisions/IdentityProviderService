@@ -52,7 +52,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
 
         public void Update(ApplicationClient entity)
         {
-            throw new NotImplementedException();
+            this.context.ApplicationClient.Update(entity);
         }
     }
 }

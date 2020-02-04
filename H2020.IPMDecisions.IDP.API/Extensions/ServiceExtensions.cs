@@ -55,6 +55,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
         {
             var authorizationSecretKey = config["JwtSettings:AuthorizationServerSecret"];
             var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
+            var audienceServerUrl = config["JwtSettings:ApiGatewayServerUrl"];
 
             services.AddAuthentication(options =>
             {
@@ -73,7 +74,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                     ValidateIssuerSigningKey = true,
                     
                     ValidIssuer = authorizationServerUrl,
-                    ValidAudience = authorizationServerUrl,
+                    ValidAudience = audienceServerUrl,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey))
                 };
             });

@@ -3,16 +3,15 @@ using H2020.IPMDecisions.IDP.Core.Entities;
 
 namespace H2020.IPMDecisions.IDP.Core.Dtos
 {
-    public class ApplicationClientForCreationDto
+    public class ApplicationClientForCreationDto : ApplicationClientForManipulationDto
     {
         [Required(ErrorMessage = "Name is required")]
-        [MaxLength(100, ErrorMessage = "Name max length 100 characters")]
-        public string Name { get; set; }
+        public override string Name { get => base.Name; set => base.Name = value; }
         [Required]
-        public ApplicationClientType ApplicationClientType { get; set; }
+        public override ApplicationClientType ApplicationClientType { get => base.ApplicationClientType; set => base.ApplicationClientType = value; }
         [Required]
-        public bool Enabled { get; set; }
+        public override bool Enabled { get => base.Enabled; set => base.Enabled = value; }
         [Required]
-        public int RefreshTokenLifeTime { get; set; }
+        public override int RefreshTokenLifeTime { get => base.RefreshTokenLifeTime; set => base.RefreshTokenLifeTime = value; }
     }
 }
