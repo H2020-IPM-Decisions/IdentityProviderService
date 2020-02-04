@@ -33,13 +33,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclient",
+							"raw": "{{baseUrl}}/api/users",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"applicationclient"
+								"users"
 							]
 						}
 					},
@@ -139,14 +139,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/1577cb7f-0358-4fcc-bad0-fd635fce352d",
+							"raw": "{{baseUrl}}/api/users/5189ad0f-a3ef-41f4-97a6-44cf0b50bf26",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"1577cb7f-0358-4fcc-bad0-fd635fce352d"
+								"5189ad0f-a3ef-41f4-97a6-44cf0b50bf26"
 							]
 						}
 					},
@@ -429,6 +429,326 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Role Controller",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\" : \"New Role\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/0f8eb613-b83e-49e5-ac82-3c02f5b71548",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"0f8eb613-b83e-49e5-ac82-3c02f5b71548"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/0f8eb613-b83e-49e5-ac82-3c02f5b71546",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"0f8eb613-b83e-49e5-ac82-3c02f5b71546"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "User Roles Controller",
+			"item": [
+				{
+					"name": "Add Roles to user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n\t{\n\t\"name\" : \"New Role\"\n\t},\n\t{\n\t\"name\" : \"OtherRole\"\n\t}\n]\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Roles from user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Options Controller",
+					"request": {
+						"method": "OPTIONS",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Roles from user",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n\t{\n\t\"name\" : \"ExtraRole\"\n\t}\n\t,\n\t{\n\t\"name\" : \"OtherRole\"\n\t}\n]\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "Test Controller",
 			"item": [
 				{
@@ -526,13 +846,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/test/authenticate",
+							"raw": "{{baseUrl}}/api/accounts/authenticate",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"test",
+								"accounts",
 								"authenticate"
 							]
 						}
@@ -548,7 +868,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1ODA4MTI5MTcsImV4cCI6MTU4MDgxNzcxNywiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6InlvdXJBcGlHYXRlV2F5U2VydmVyVXJsIn0.kO0OKtQQqugzQQmRSN60NTSfFi67YreTlDP_zra9WZE",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1ODA4MjUxMTIsImV4cCI6MTU4MDgyOTkxMiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6InlvdXJBcGlHYXRlV2F5U2VydmVyVXJsIn0.AHCrAF6XA18ln9kkyoWBbbQ69sfSRB4LWTwHeZIo1ns",
 				"type": "string"
 			}
 		]
@@ -577,7 +897,7 @@
 	],
 	"variable": [
 		{
-			"id": "cdf0c96d-d238-4d2a-b17d-3247b6b344b7",
+			"id": "c4f9c469-0c03-4f06-9f4c-6b0ec631a94b",
 			"key": "baseUrl",
 			"value": "",
 			"type": "string"
