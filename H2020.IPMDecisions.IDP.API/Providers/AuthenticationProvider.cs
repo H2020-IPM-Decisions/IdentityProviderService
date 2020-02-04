@@ -12,29 +12,56 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using static H2020.IPMDecisions.IDP.API.Providers.Constants.Strings;
 
 namespace H2020.IPMDecisions.IDP.API.Providers
 {
     public static class AuthenticationProvider
     {
-        public static string GenerateToken(IConfiguration config,
-            ApplicationClient client,
+        public static async Task<List<Claim>> GetValidClaims(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             ApplicationUser user)
+        {
+            IdentityOptions _options = new IdentityOptions();
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, await JtiGenerator()),
+                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64),
+                new Claim(_options.ClaimsIdentity.UserIdClaimType, user.Id.ToString()),
+                new Claim(_options.ClaimsIdentity.UserNameClaimType, user.UserName)
+            };
+
+            var userClaims = await userManager.GetClaimsAsync(user);
+            claims.AddRange(userClaims);
+
+            var userRoles = await userManager.GetRolesAsync(user);
+            foreach (var userRole in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
+                var role = await roleManager.FindByNameAsync(userRole);
+                if (role != null)
+                {
+                    var roleClaims = await roleManager.GetClaimsAsync(role);
+                    foreach (Claim roleClaim in roleClaims)
+                    {
+                        claims.Add(roleClaim);
+                    }
+                }
+            }
+            return claims;
+        }
+
+        public static string GenerateToken(IConfiguration config,
+                List<Claim> claims)
         {
             var tokenLifetimeMinutes = config["JwtSettings:TokenLifetimeMinutes"];
             var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
             var audienceServerUrl = config["JwtSettings:ApiGatewayServerUrl"];
+            var authorizationSecretKey = config["JwtSettings:AuthorizationServerSecret"];
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.Base64Secret));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim>
-            {
-                // new Claim(JwtRegisteredClaimNames.Sub, ""),
-                // new Claim(ClaimTypes.Name, ""),
-                // new Claim(ClaimTypes.Role, "SuperAdmin")
-            };
 
             var tokeOptions = new JwtSecurityToken(
                 issuer: authorizationServerUrl,
@@ -145,6 +172,15 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
             }
         }
+
+        #region Helpers
+        private static Func<Task<string>> JtiGenerator =>
+                 () => Task.FromResult(Guid.NewGuid().ToString());
+
+        private static long ToUnixEpochDate(DateTime date)
+          => (long)Math.Round((date.ToUniversalTime() -
+                               new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                              .TotalSeconds);
+        #endregion
     }
-    
 }

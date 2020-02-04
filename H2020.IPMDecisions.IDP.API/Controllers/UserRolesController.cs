@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
     [Route("api/user/{userId:guid}/roles")]
+    [Authorize(Roles = "SuperAdmin")]
     public class UserRolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> roleManager;
@@ -53,7 +55,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var userToReturn = this.mapper.Map<UserDto>(user);
             return Ok(userToReturn);
         }
-
 
         [HttpDelete("", Name = "RemoveRolesFromUser")]
         public async Task<IActionResult> Delete(

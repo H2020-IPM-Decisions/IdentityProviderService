@@ -22,13 +22,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         private readonly IMapper mapper;
         private readonly IDataService dataService;
         private readonly IConfiguration config;
+        private readonly RoleManager<IdentityRole> roleManager;
 
         public AccountsController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IMapper mapper,
             IDataService dataService,
-            IConfiguration config)
+            IConfiguration config, 
+            RoleManager<IdentityRole> roleManager)
         {
             this.userManager = userManager
                 ?? throw new ArgumentNullException(nameof(userManager));
@@ -40,6 +42,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.config = config 
                 ?? throw new ArgumentNullException(nameof(config));
+            this.roleManager = roleManager 
+                ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
         [AllowAnonymous]
@@ -75,7 +79,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var isAuthorize = await AuthenticationProvider.ValidateUserAuthenticationAsync(this.userManager, this.signInManager, userDto);
             if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
-            var token = AuthenticationProvider.GenerateToken(this.config, isValidClient.Result, isAuthorize.Result);
+            var claims = await AuthenticationProvider.GetValidClaims(this.userManager, this.roleManager, isAuthorize.Result);
+            var token = AuthenticationProvider.GenerateToken(this.config, claims);
+            
             return Ok(new { Token = token });
         }
 

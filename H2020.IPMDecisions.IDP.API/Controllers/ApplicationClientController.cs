@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "SuperAdmin")]
     [ApiController]
     [Route("/api/applicationclient")]
     public class ApplicationClientController : ControllerBase

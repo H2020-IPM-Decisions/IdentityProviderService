@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
-
+    [Authorize(Roles = "SuperAdmin")]
     [Route("/api/roles")]
     public class RolesController : ControllerBase
     {
@@ -64,7 +64,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 var roleToReturn = this.mapper.Map<RoleDto>(roleEntity);
 
                 return CreatedAtRoute("GetRoleById",
-                 new { id = roleEntity.Id}, 
+                 new { id = roleEntity.Id },
                  roleToReturn);
             }
             return BadRequest(result);

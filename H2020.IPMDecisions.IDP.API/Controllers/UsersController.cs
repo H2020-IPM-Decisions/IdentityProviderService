@@ -14,7 +14,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 {    
     [ApiController]
     [Route("api/users")]
-    [Authorize]
+    [Authorize(Roles = "SuperAdmin")]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
