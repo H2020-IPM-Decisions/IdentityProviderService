@@ -70,12 +70,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthentificationDto userDto)
         {
             var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
-            if (!isValidClient.Item1) return BadRequest(new { message = isValidClient.Item2 });
+            if (!isValidClient.IsSuccessful) return BadRequest(new { message = isValidClient.ResponseMessage });
 
             var isAuthorize = await AuthenticationProvider.ValidateUserAuthenticationAsync(this.userManager, this.signInManager, userDto);
-            if (!isAuthorize.Item1) return BadRequest(new { message = isAuthorize.Item2 });
+            if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
-            var token = AuthenticationProvider.GenerateToken(this.config, isValidClient.Item3);
+            var token = AuthenticationProvider.GenerateToken(this.config, isValidClient.Result, isAuthorize.Result);
             return Ok(new { Token = token });
         }
 

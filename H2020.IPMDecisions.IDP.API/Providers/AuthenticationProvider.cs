@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
@@ -11,13 +12,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using static H2020.IPMDecisions.IDP.API.Providers.Constants.Strings;
 
 namespace H2020.IPMDecisions.IDP.API.Providers
 {
     public static class AuthenticationProvider
     {
         public static string GenerateToken(IConfiguration config,
-            ApplicationClient client)
+            ApplicationClient client,
+            ApplicationUser user)
         {
             var tokenLifetimeMinutes = config["JwtSettings:TokenLifetimeMinutes"];
             var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
@@ -26,10 +29,17 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.Base64Secret));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
+            var claims = new List<Claim>
+            {
+                // new Claim(JwtRegisteredClaimNames.Sub, ""),
+                // new Claim(ClaimTypes.Name, ""),
+                // new Claim(ClaimTypes.Role, "SuperAdmin")
+            };
+
             var tokeOptions = new JwtSecurityToken(
                 issuer: authorizationServerUrl,
                 audience: audienceServerUrl,
-                claims: new List<Claim>(),
+                claims: claims,
                 notBefore: DateTime.Now,
                 expires: DateTime.Now.AddMinutes(double.Parse(tokenLifetimeMinutes)),
                 signingCredentials: signinCredentials
@@ -40,44 +50,76 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             return tokenString;
         }
 
-        public static async Task<Tuple<bool, string, ApplicationClient>> ValidateApplicationClientAsync(
-            HttpRequest request, 
+        public static async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(
+            HttpRequest request,
             IDataService dataService)
         {
-            ApplicationClient client = null;
+            var response = new AuthenticationProviderResult<ApplicationClient>()
+            {
+                IsSuccessful = false,
+                ResponseMessage = "",
+                Result = null
+            };
             var clientId = request.Headers["client_id"];
             if (string.IsNullOrEmpty(clientId))
-                return Tuple.Create(false, "Client Id is not set", client);
+            {
+                response.ResponseMessage = "Client Id is not set";
+                return response;
+            }
 
-            client = await dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
+            var client = await dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
             if (client == null)
-                return Tuple.Create(false, "Invalid client Id", client);
+            {
+                response.ResponseMessage = "Invalid client Id";
+                return response;
+            }
 
             if (!client.Enabled)
-                return Tuple.Create(false, "Client is inactive", client);
+            {
+                response.ResponseMessage = "Client is inactive";
+                return response;
+            }
 
             if (client.ApplicationClientType == ApplicationClientType.Confidential)
             {
                 var clientSecret = request.Headers["client_secret"];
                 if (string.IsNullOrEmpty(clientSecret))
-                    return Tuple.Create(false, "Client secret is not set", client);
+                {
+                    response.ResponseMessage = "Client secret is not set";
+                    return response;
+                };
 
                 if (client.Base64Secret != clientSecret)
-                    return Tuple.Create(false, "Client secret do not match", client);
+                {
+                    response.ResponseMessage = "Client secret do not match";
+                    return response;
+                }
             }
 
-            return Tuple.Create(true, "", client);
+            response.IsSuccessful = true;
+            response.Result = client;
+            return response;
         }
 
-        public static async Task<Tuple<bool, string, ApplicationUser>> ValidateUserAuthenticationAsync(
+        public static async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             UserForAuthentificationDto userDto)
         {
+            var response = new AuthenticationProviderResult<ApplicationUser>()
+            {
+                IsSuccessful = false,
+                ResponseMessage = "",
+                Result = null
+            };
+
             var user = await userManager.FindByNameAsync(userDto.Username);
 
             if (user == null)
-                return Tuple.Create(false, "Username or password is incorrect", user);
+            {
+                response.ResponseMessage = "Username or password is incorrect";
+                return response;
+            }
 
             // ToDo When Email confirmation available
             //if (!user.EmailConfirmed) 
@@ -86,11 +128,23 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             var result = await signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
             if (result.Succeeded)
-                return Tuple.Create(true, "", user);
+            {
+                response.IsSuccessful = true;
+                response.Result = user;
+                return response;
+            }
+
             else if (result.IsLockedOut)
-                return Tuple.Create(false, "User is lockout", user);
+            {
+                response.ResponseMessage = "User is lockout";
+                return response;
+            }
             else
-                return Tuple.Create(false, "Username or password is incorrect", user);
+            {
+                response.ResponseMessage = "Username or password is incorrect";
+                return response;
+            }
         }
     }
+    
 }
