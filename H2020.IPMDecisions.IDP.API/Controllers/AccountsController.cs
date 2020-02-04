@@ -78,5 +78,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var token = AuthenticationProvider.GenerateToken(this.config, isValidClient.Item3);
             return Ok(new { Token = token });
         }
+
+        [HttpOptions]
+        public IActionResult Options()
+        {
+            Response.Headers.Add("Allow", "OPTIONS,POST");
+            return Ok();
+        }
     }
 }

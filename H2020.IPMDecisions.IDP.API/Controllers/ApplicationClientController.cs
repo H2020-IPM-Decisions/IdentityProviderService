@@ -141,6 +141,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(clientToReturn);
         }
 
+        [HttpOptions]
+        public IActionResult Options()
+        {
+            Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE,PATCH");
+            return Ok();
+        }
+
         private static void CreateClientSecret(ApplicationClient applicationClientEntity)
         {
             var key = new byte[32];

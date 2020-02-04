@@ -74,6 +74,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(result);
         }
 
+        [HttpOptions]
+        public IActionResult Options()
+        {
+            Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
+            return Ok();
+        }
+
 
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(

@@ -56,7 +56,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // POST: api/Roles
         public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto)
         {
-
             var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
             var result = await this.roleManager.CreateAsync(roleEntity);
 
@@ -84,5 +83,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(result);
         }
 
+        [HttpOptions]
+        public IActionResult Options()
+        {
+            Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
+            return Ok();
+        }
     }
 }
