@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
@@ -11,16 +14,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
-    [Route("api/users/{userId:guid}/roles")]
+    [Route("api/users/{userId:guid}/claims")]
     [Authorize(Roles = "SuperAdmin")]
-    public class UserRolesController : ControllerBase
+    public class UserClaimsController : ControllerBase
     {
-        private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
-        public UserRolesController(
-            RoleManager<IdentityRole> roleManager,
+        public UserClaimsController(
             UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
@@ -28,77 +29,75 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(userManager));
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
-            this.roleManager = roleManager
-             ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
-        [HttpPost("", Name = "AssignRolesToUser")]
-        // POST: api/users/1/roles
+        [HttpPost("", Name = "AssignClaimsToUser")]
+        // POST: api/users/1/Claims
         public async Task<IActionResult> Post(
             [FromRoute] Guid userId,
-            [FromBody] List<RoleForCreationDto> rolesDto)
+            [FromBody] List<ClaimForCreationDto> claimsDto)
         {
             var user = await this.userManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound();
 
-            foreach (var role in rolesDto)
-            {
-                var roleEntity = await this.roleManager.FindByNameAsync(role.Name);
+            var currentUserClaims = await this.userManager.GetClaimsAsync(user);
 
-                if (roleEntity == null)
+            foreach (var claim in claimsDto)
+            {
+                if (!currentUserClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
                 {
-                    roleEntity = this.mapper.Map<IdentityRole>(role);
-                    await this.roleManager.CreateAsync(roleEntity);
-                };
-                await this.userManager.AddToRoleAsync(user, roleEntity.Name);
+                    await this.userManager.AddClaimAsync(user, CreateClaim(claim.Type, claim.Value));
+                }
             }
 
             var userToReturn = this.mapper.Map<UserDto>(user);
             return Ok(userToReturn);
         }
 
-        [HttpDelete("", Name = "RemoveRolesFromUser")]
-        // DELETE: api/users/1/roles
+        [HttpDelete("", Name = "RemoveClaimsFromUser")]
+        // DELETE: api/users/1/Claims
         public async Task<IActionResult> Delete(
             [FromRoute] Guid userId,
-            [FromBody] List<RoleForDeletionDto> rolesDto)
+            [FromBody] List<ClaimForDeletionDto> claimsDto)
         {
             var user = await this.userManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound();
 
-            foreach (var role in rolesDto)
+            foreach (var claim in claimsDto)
             {
-                var roleEntity = await this.roleManager.FindByNameAsync(role.Name);
-
-                if (roleEntity != null)
-                {
-                    await this.userManager.RemoveFromRoleAsync(user, roleEntity.Name);
-                };
+                await this.userManager.RemoveClaimAsync(user, CreateClaim(claim.Type, claim.Value));
             }
             var userToReturn = this.mapper.Map<UserDto>(user);
             return Ok(userToReturn);
         }
 
-        [HttpGet("", Name = "GetRolesFromUser")]
-        // GET: api/users/1/roles
+        [HttpGet("", Name = "GetClaimsFromUser")]
+        // GET: api/users/1/Claims
         public async Task<IActionResult> Get(
             [FromRoute] Guid userId)
         {
             var user = await this.userManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound();
 
-            var rolesToReturn = await this.userManager.GetRolesAsync(user);
-            if (rolesToReturn.Count == 0) return NotFound();
+            var claimsToReturn = await this.userManager.GetClaimsAsync(user);
+            if (claimsToReturn.Count == 0) return NotFound();
 
-            return Ok(rolesToReturn);
+            return Ok(claimsToReturn);
         }
 
         [HttpOptions]
-        // OPTIONS: api/users/1/roles
+        // OPTIONS: api/users/1/Claims
         public IActionResult Options()
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
             return Ok();
         }
+
+        #region helpers
+        private static Claim CreateClaim(string type, string value)
+        {
+            return new Claim(type, value, ClaimValueTypes.String);
+        }
+        #endregion
     }
 }
