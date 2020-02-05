@@ -174,7 +174,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user1@test.com\"\n}"
+							"raw": "{\n\t\"username\" : \"usernorole\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"usernorole@test.com\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/accounts/register",
@@ -600,7 +600,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{\n\t\"name\" : \"New Role\"\n\t},\n\t{\n\t\"name\" : \"OtherRole\"\n\t}\n]\n",
+							"raw": "[\n\t{\n\t\"name\" : \"SuperAdmin\"\n\t},\n\t{\n\t\"name\" : \"OtherRole\"\n\t}\n]\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -608,13 +608,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"user",
+								"users",
 								"380f0a69-a009-4c34-8496-9a43c2e069be",
 								"roles"
 							]
@@ -651,13 +651,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"user",
+								"users",
 								"380f0a69-a009-4c34-8496-9a43c2e069be",
 								"roles"
 							]
@@ -691,13 +691,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"user",
+								"users",
 								"380f0a69-a009-4c34-8496-9a43c2e069be",
 								"roles"
 							]
@@ -731,15 +731,184 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/user/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"user",
+								"users",
 								"380f0a69-a009-4c34-8496-9a43c2e069be",
 								"roles"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "User Claims Controller",
+			"item": [
+				{
+					"name": "Add Claims to user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n\t{\n\t\t\"type\" : \"MyClaim1\",\n\t\t\"Value\" : \"Claim\"\n\t},\n\t{\n\t\t\"type\" : \"MyClaim2\",\n\t\t\"Value\" : \"Claim2\"\n\t}\n\t,\n\t{\n\t\t\"type\" : \"MyClaim2\",\n\t\t\"Value\" : \"Claim2a\"\n\t}\n]\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/claims",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"claims"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get claims from user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/claims",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"claims"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Options Controller",
+					"request": {
+						"method": "OPTIONS",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/claims",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"claims"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove claimsfrom user",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n\t{\n\t\t\"type\" : \"MyClaim2\",\n\t\t\"Value\" : \"Claim2a\"\n\t}\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/claims",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"claims"
 							]
 						}
 					},
@@ -752,21 +921,57 @@
 			"name": "Test Controller",
 			"item": [
 				{
-					"name": "Get Protected",
+					"name": "Not Protected",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODA3NDU3NDksImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo1MDAxIn0.0-vCDSiq-NuUySlv9o82QK9VnVcLi92WTeujl95Mw40",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/test/notprotected",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"test",
+								"notprotected"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Protected",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
 						"method": "GET",
 						"header": [
 							{
@@ -805,9 +1010,12 @@
 					"response": []
 				},
 				{
-					"name": "Authenticate",
+					"name": "SuperAdmin",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -819,26 +1027,11 @@
 								"key": "Accept",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "grant_type",
-								"value": "password",
-								"type": "text"
-							},
-							{
-								"key": "client_id",
-								"value": "08d7a8c6-57d2-4c33-8144-955a92e1d267",
-								"type": "text"
-							},
-							{
-								"key": "client_secret",
-								"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujA",
-								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user1@test.com\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -846,14 +1039,100 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/accounts/authenticate",
+							"raw": "{{baseUrl}}/api/test/SuperAdmin",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"accounts",
-								"authenticate"
+								"test",
+								"SuperAdmin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ExtraRole",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/test/ExtraRole",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"test",
+								"ExtraRole"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BothRoles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/test/BothRoles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"test",
+								"BothRoles"
 							]
 						}
 					},
@@ -861,6 +1140,116 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Authenticate No Role",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "grant_type",
+						"type": "text",
+						"value": "password"
+					},
+					{
+						"key": "client_id",
+						"type": "text",
+						"value": "08d7a8c6-57d2-4c33-8144-955a92e1d267"
+					},
+					{
+						"key": "client_secret",
+						"type": "text",
+						"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujA"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"usernorole\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"usernorole@test.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/accounts/authenticate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"accounts",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authenticate SuperAdmin",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "grant_type",
+						"value": "password",
+						"type": "text"
+					},
+					{
+						"key": "client_id",
+						"value": "08d7a8c6-57d2-4c33-8144-955a92e1d267",
+						"type": "text"
+					},
+					{
+						"key": "client_secret",
+						"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user1@test.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/accounts/authenticate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"accounts",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -868,7 +1257,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1ODA4MjUxMTIsImV4cCI6MTU4MDgyOTkxMiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6InlvdXJBcGlHYXRlV2F5U2VydmVyVXJsIn0.AHCrAF6XA18ln9kkyoWBbbQ69sfSRB4LWTwHeZIo1ns",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsImp0aSI6IjM5YmQwMWUzLTgzNTMtNGQwOS1hMjc5LWIxYTEwMTk0MDBkOSIsImlhdCI6MTU4MDg5MzE3NSwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzODBmMGE2OS1hMDA5LTRjMzQtODQ5Ni05YTQzYzJlMDY5YmUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdXBlckFkbWluIiwibmJmIjoxNTgwODkzMTc1LCJleHAiOjE1ODA4OTc5NzUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLCJhdWQiOiJ5b3VyQXBpR2F0ZVdheVNlcnZlclVybCJ9.YYNb6YMU4N4l3dVRfYsxRLZcWR2sfMj-CUfTmjbpRfE",
 				"type": "string"
 			}
 		]
@@ -897,7 +1286,7 @@
 	],
 	"variable": [
 		{
-			"id": "c4f9c469-0c03-4f06-9f4c-6b0ec631a94b",
+			"id": "cb75b018-8066-46f3-8629-178e2fe03a42",
 			"key": "baseUrl",
 			"value": "",
 			"type": "string"
