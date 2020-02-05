@@ -84,6 +84,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpOptions]
+        // OPTIONS: api/Roles
         public IActionResult Options()
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");

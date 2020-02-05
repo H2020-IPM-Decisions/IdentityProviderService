@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
-    [Route("api/user/{userId:guid}/roles")]
+    [Route("api/users/{userId:guid}/roles")]
     [Authorize(Roles = "SuperAdmin")]
     public class UserRolesController : ControllerBase
     {
@@ -33,6 +33,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpPost("", Name = "AssignRolesToUser")]
+        // POST: api/users/1/roles
         public async Task<IActionResult> Post(
             [FromRoute] Guid userId,
             [FromBody] List<RoleForCreationDto> rolesDto)
@@ -57,6 +58,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpDelete("", Name = "RemoveRolesFromUser")]
+        // DELETE: api/users/1/roles
         public async Task<IActionResult> Delete(
             [FromRoute] Guid userId,
             [FromBody] List<RoleForDeletionDto> rolesDto)
@@ -78,6 +80,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpGet("", Name = "GetRolesFromUser")]
+        // GET: api/users/1/roles
         public async Task<IActionResult> Get(
             [FromRoute] Guid userId)
         {
@@ -89,6 +92,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpOptions]
+        // OPTIONS: api/users/1/roles
         public IActionResult Options()
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");

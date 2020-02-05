@@ -71,6 +71,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Authenticate", Name = "AuthenticateUser")]
+        // POST: api/Accounts/Authenticate
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthentificationDto userDto)
         {
             var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);

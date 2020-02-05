@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
@@ -52,7 +51,8 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             return claims;
         }
 
-        public static string GenerateToken(IConfiguration config,
+        public static string GenerateToken(
+                IConfiguration config,
                 List<Claim> claims)
         {
             var tokenLifetimeMinutes = config["JwtSettings:TokenLifetimeMinutes"];
@@ -61,19 +61,18 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             var authorizationSecretKey = config["JwtSettings:AuthorizationServerSecret"];
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey));
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-            var tokeOptions = new JwtSecurityToken(
+            var tokenOptions = new JwtSecurityToken(
                 issuer: authorizationServerUrl,
                 audience: audienceServerUrl,
-                claims: claims,
+                claims,
                 notBefore: DateTime.Now,
                 expires: DateTime.Now.AddMinutes(double.Parse(tokenLifetimeMinutes)),
-                signingCredentials: signinCredentials
+                signingCredentials
             );
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
             return tokenString;
         }
 
@@ -131,7 +130,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
         public static async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            UserForAuthentificationDto userDto)
+            UserForAuthenticationDto userDto)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -160,7 +159,6 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 response.Result = user;
                 return response;
             }
-
             else if (result.IsLockedOut)
             {
                 response.ResponseMessage = "User is lockout";

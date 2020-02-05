@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace H2020.IPMDecisions.IDP.Core.Dtos
 {
-    public class UserForAuthentificationDto
+    public class UserForAuthenticationDto
     {
         [Required]
         public string Username { get; set; }

@@ -87,7 +87,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpPatch("{id:guid}", Name = "PartialUpdateApplicationClient")]
-        //Patch :  api/applicationclient/1
+        //PATCH :  api/applicationclient/1
         public async Task<IActionResult> PartialUpdate(
             [FromRoute] Guid id,
             JsonPatchDocument<ApplicationClientForUpdateDto> patchDocument)
@@ -142,17 +142,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpOptions]
+        // OPTIONS: api/applicationclient
         public IActionResult Options()
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE,PATCH");
             return Ok();
         }
 
+        #region helpers
         private static void CreateClientSecret(ApplicationClient applicationClientEntity)
         {
             var key = new byte[32];
             RandomNumberGenerator.Create().GetBytes(key);
             applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
         }
+        #endregion
     }
 }

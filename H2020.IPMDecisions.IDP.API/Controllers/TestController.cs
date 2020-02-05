@@ -13,34 +13,41 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [Route("/api/test")]
     public class TestController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly IMapper mapper;
-        private readonly IDataService dataService;
-        private readonly IConfiguration config;
 
-        public TestController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IMapper mapper,
-            IDataService dataService,
-            IConfiguration config)
+        public TestController()
         {
-            this.dataService = dataService
-                ?? throw new System.ArgumentNullException(nameof(dataService));
-            this.config = config 
-                ?? throw new ArgumentNullException(nameof(config));
-            this.userManager = userManager
-                ?? throw new ArgumentNullException(nameof(userManager));
-            this.signInManager = signInManager
-                ?? throw new ArgumentNullException(nameof(signInManager));
-            this.mapper = mapper
-                ?? throw new ArgumentNullException(nameof(mapper));
-        }      
+        }
+
+        [HttpGet("notprotected")]
+        public string NotProtected()
+        {
+            return "No token needed!";
+        }
 
         [Authorize]
         [HttpGet("protected")]
         public string Protected()
+        {
+            return "Only if you have a valid token!";
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("SuperAdmin")]
+        public string ProtectedSuperAdmin()
+        {
+            return "Only if you have a valid token!";
+        }
+
+        [Authorize(Roles = "ExtraRole")]
+        [HttpGet("ExtraRole")]
+        public string ProtectedExtraRole()
+        {
+            return "Only if you have a valid token!";
+        }
+
+        [Authorize(Roles = "SuperAdmin, ExtraRole")]
+        [HttpGet("BothRoles")]
+        public string ProtectedBothRoles()
         {
             return "Only if you have a valid token!";
         }

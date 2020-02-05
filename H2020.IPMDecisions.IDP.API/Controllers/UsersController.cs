@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
@@ -11,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
-{    
+{
     [ApiController]
     [Route("api/users")]
     [Authorize(Roles = "SuperAdmin")]
@@ -75,6 +74,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [HttpOptions]
+        // OPTIONS: api/users
         public IActionResult Options()
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
