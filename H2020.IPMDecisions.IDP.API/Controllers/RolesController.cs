@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Helpers;
@@ -38,7 +39,16 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (roles.Count == 0) return NotFound();
 
             var rolesToReturn = this.mapper.Map<List<RoleDto>>(roles);
-            return Ok(rolesToReturn);
+
+            var rolesToReturnWithLinks = rolesToReturn.Select(role =>
+            {
+                var userAsDictionary = role.ShapeData() as IDictionary<string, object>;
+                var userLinks = CreateLinksForRole((Guid)userAsDictionary["Id"]);
+                userAsDictionary.Add("links", userLinks);
+                return userAsDictionary;
+            });
+
+            return Ok(rolesToReturnWithLinks);
         }
 
         [HttpGet("{roleId:guid}", Name = "GetRole")]

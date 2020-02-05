@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -39,11 +40,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> GetApplicationClients()
         {
             var applicationClients = await this.dataService.ApplicationClients.FindAllAsync();
-
-            var applicationClientsToReturn = this.mapper.Map<List<ApplicationClientDto>>(applicationClients);
             if (applicationClients.Count == 0) return NotFound();
 
-            return Ok(applicationClients);
+            var applicationClientsToReturn = this.mapper.Map<List<ApplicationClientDto>>(applicationClients);           
+
+            var applicationClientsToReturnWithLinks = applicationClientsToReturn.Select(client =>
+            {
+                var userAsDictionary = client.ShapeData() as IDictionary<string, object>;
+                var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"]);
+                userAsDictionary.Add("links", userLinks);
+                return userAsDictionary;
+            });
+
+            return Ok(applicationClientsToReturnWithLinks);
         }
 
         [HttpPost]

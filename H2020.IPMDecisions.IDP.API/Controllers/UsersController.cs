@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Helpers;
@@ -40,7 +41,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var usersToReturn = this.mapper.Map<List<UserDto>>(users);
 
-            return Ok(usersToReturn);
+            var usersToReturnWithLinks = usersToReturn.Select(user =>
+            {
+                var userAsDictionary = user.ShapeData() as IDictionary<string, object>;
+                var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"]);
+                userAsDictionary.Add("links", userLinks);
+                return userAsDictionary;
+            });
+
+            return Ok(usersToReturnWithLinks);
         }
 
         [HttpGet("{userId:guid}", Name = "GetUser")]
@@ -55,7 +64,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var userToReturn = this.mapper.Map<UserDto>(user)
                 .ShapeData()
-                as IDictionary<string, object>; ;
+                as IDictionary<string, object>;
 
             userToReturn.Add("links", links);
 
