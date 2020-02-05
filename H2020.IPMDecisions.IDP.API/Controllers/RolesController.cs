@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using H2020.IPMDecisions.IDP.API.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -40,14 +41,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(rolesToReturn);
         }
 
-        [HttpGet("{id:guid}", Name = "GetRoleById")]
+        [HttpGet("{roleId:guid}", Name = "GetRole")]
         // GET: api/Roles/5
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(Guid roleId)
         {
-            var roleEntity = await this.roleManager.FindByIdAsync(id.ToString());
+            var roleEntity = await this.roleManager.FindByIdAsync(roleId.ToString());
 
             if (roleEntity == null) return NotFound();
-            var roleToReturn = this.mapper.Map<RoleDto>(roleEntity);
+
+            var links = CreateLinksForRole(roleId);
+            var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
+                .ShapeData()
+                as IDictionary<string, object>;
+            roleToReturn.Add("links", links);
 
             return Ok(roleToReturn);
         }
@@ -61,20 +67,26 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             if (result.Succeeded)
             {
-                var roleToReturn = this.mapper.Map<RoleDto>(roleEntity);
+                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
 
-                return CreatedAtRoute("GetRoleById",
-                 new { id = roleEntity.Id },
+                var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
+                    .ShapeData()
+                    as IDictionary<string, object>; ;
+
+                roleToReturn.Add("links", links);
+
+                return CreatedAtRoute("GetRole",
+                 new { roleId = roleToReturn["Id"] },
                  roleToReturn);
             }
             return BadRequest(result);
         }
 
-        [HttpDelete("{id:guid}", Name = "DeleteRole")]
+        [HttpDelete("{roleId:guid}", Name = "DeleteRole")]
         // DELETE: api/Roles/5
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid roleId)
         {
-            var roleEntity = await this.roleManager.FindByIdAsync(id.ToString());
+            var roleEntity = await this.roleManager.FindByIdAsync(roleId.ToString());
             if (roleEntity == null) return NotFound();
 
             var result = await this.roleManager.DeleteAsync(roleEntity);
@@ -90,5 +102,26 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
             return Ok();
         }
+
+        #region helpers
+        private IEnumerable<LinkDto> CreateLinksForRole(
+            Guid roleId)
+        {
+            var links = new List<LinkDto>();
+
+            links.Add(new LinkDto(
+                Url.Link("GetRole", new { roleId }),
+                "self",
+                "GET"));
+
+
+            links.Add(new LinkDto(
+                Url.Link("DeleteRole", new { roleId }),
+                "delete_role",
+                "DELETE"));
+
+            return links;
+        }
+        #endregion
     }
 }
