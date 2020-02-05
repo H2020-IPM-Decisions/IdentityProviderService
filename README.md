@@ -96,4 +96,4 @@ For the versions available, see the [tags on this repository](https://github.com
 
 ## Authors
 
-* **ADAS Software** - *Initial work* - [ADAS](https://www.adas.uk/)
+* **ADAS Modelling and Informatics** - *Initial work* - [ADAS](https://www.adas.uk/)
