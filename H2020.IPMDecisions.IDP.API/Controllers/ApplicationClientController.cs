@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using H2020.IPMDecisions.IDP.API.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
@@ -40,6 +41,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var applicationClients = await this.dataService.ApplicationClients.FindAllAsync();
 
             var applicationClientsToReturn = this.mapper.Map<List<ApplicationClientDto>>(applicationClients);
+            if (applicationClients.Count == 0) return NotFound();
 
             return Ok(applicationClients);
         }
@@ -53,7 +55,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var regex = new Regex("^[a-zA-Z0-9 ]*$");
             if (!regex.IsMatch(clientForCreationDto.Name))
-                return BadRequest("Special characteres are not allowed in the client name.");
+                return BadRequest("Special characters are not allowed in the client name.");
 
             var client = await this.dataService.ApplicationClients.FindByNameAsync(clientForCreationDto.Name);
 
@@ -66,9 +68,14 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             this.dataService.ApplicationClients.Create(applicationClientEntity);
             await this.dataService.CompleteAsync();
 
-            var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity);
-            return CreatedAtRoute("GetApplicationClientById",
-                 new { id = clientToReturn.Id },
+            var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
+            var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
+                .ShapeData()
+                as IDictionary<string, object>; ;
+            clientToReturn.Add("links", links);
+
+            return CreatedAtRoute("GetApplicationClient",
+                 new { id = clientToReturn["Id"] },
                  clientToReturn);
         }       
 
@@ -110,7 +117,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 await this.dataService.CompleteAsync();
 
                 var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientToAdd);
-                return CreatedAtRoute("GetApplicationClientById",
+                return CreatedAtRoute("GetApplicationClient",
                  new { id = id },
                  clientToReturn);
             }
@@ -130,14 +137,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id:guid}", Name = "GetApplicationClientById")]
+        [HttpGet("{id:guid}", Name = "GetApplicationClient")]
         // GET: api/applicationclient/1
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
             var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
             if (clientFromRepository == null) return NotFound();
 
-            var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientFromRepository);
+            var links = CreateLinksForApplicationClient(id);
+            var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientFromRepository)
+                .ShapeData()
+                as IDictionary<string, object>; ;
+            clientToReturn.Add("links", links);
+
             return Ok(clientToReturn);
         }
 
@@ -155,6 +167,29 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var key = new byte[32];
             RandomNumberGenerator.Create().GetBytes(key);
             applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
+        }
+        private IEnumerable<LinkDto> CreateLinksForApplicationClient(
+            Guid id)
+        {
+            var links = new List<LinkDto>();
+
+            links.Add(new LinkDto(
+                Url.Link("GetApplicationClient", new { id }),
+                "self",
+                "GET"));
+
+
+            links.Add(new LinkDto(
+                Url.Link("DeleteApplicationClient", new { id }),
+                "delete_application_client",
+                "DELETE"));
+
+            links.Add(new LinkDto(
+                Url.Link("PartialUpdateApplicationClient", new { id }),
+                "update_application_client",
+                "PATCH"));
+
+            return links;
         }
         #endregion
     }
