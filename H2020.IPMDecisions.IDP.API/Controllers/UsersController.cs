@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using H2020.IPMDecisions.IDP.API.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +43,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(usersToReturn);
         }
 
-        [HttpGet("{userId:guid}", Name = "GetUserById")]
+        [HttpGet("{userId:guid}", Name = "GetUser")]
         // GET: api/users/1
         public async Task<IActionResult> GetUser([FromRoute] Guid userId)
         {
@@ -50,10 +51,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             if (user == null) return NotFound();
 
-            var userToReturn = this.mapper.Map<UserDto>(user);
+            var links = CreateLinksForUser(userId);
 
-            // Forbid HATEOS implementation
-            // var links = CreateLinksForUser(userToReturn.Id);
+            var userToReturn = this.mapper.Map<UserDto>(user)
+                .ShapeData()
+                as IDictionary<string, object>; ;
+
+            userToReturn.Add("links", links);
 
             return Ok(userToReturn);
         }
@@ -84,20 +88,49 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(
-            Guid authorId)
+            Guid userId)
         {
             var links = new List<LinkDto>();
 
             links.Add(new LinkDto(
-                Url.Link("GetAuthor", new { authorId }),
+                Url.Link("GetUser", new { userId }),
                 "self",
                 "GET"));
 
+            links.Add(new LinkDto(
+                Url.Link("DeleteUser", new { userId }),
+                "delete_user",
+                "DELETE"));
 
             links.Add(new LinkDto(
-                    Url.Link("DeleteAuthor", new { authorId }),
-                    "delete_author",
-                    "DELETE"));
+                Url.Link("GetRolesFromUser", new { userId }),
+                "roles",
+                "GET"));
+
+            links.Add(new LinkDto(
+                Url.Link("AssignRolesToUser", new { userId }),
+                "assign_roles_to_user",
+                "POST"));
+
+            links.Add(new LinkDto(
+                Url.Link("RemoveRolesFromUser", new { userId }),
+                "remove_roles_to_user",
+                "DELETE"));
+
+            links.Add(new LinkDto(
+                Url.Link("GetClaimsFromUser", new { userId }),
+                "claims",
+                "GET"));
+
+            links.Add(new LinkDto(
+                Url.Link("AssignClaimsToUser", new { userId }),
+                "assign_claims_to_user",
+                "POST"));
+
+            links.Add(new LinkDto(
+                Url.Link("RemoveClaimsFromUser", new { userId }),
+                "remove_claims_to_user",
+                "DELETE"));
 
             return links;
         }
