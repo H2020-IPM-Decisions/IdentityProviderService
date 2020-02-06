@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
@@ -53,9 +55,9 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
         public static void ConfigureJwtAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            var authorizationSecretKey = config["JwtSettings:AuthorizationServerSecret"];
+            var jwtSecretKey = config["JwtSettings:SecretKey"];
             var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
-            var audienceServerUrl = config["JwtSettings:ApiGatewayServerUrl"];
+            var audiencesServerUrl = Audiences(config["JwtSettings:ValidAudiencesUrls"]);
 
             services.AddAuthentication(options =>
             {
@@ -67,15 +69,15 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
-                {                    
+                {
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    
+
                     ValidIssuer = authorizationServerUrl,
-                    ValidAudience = audienceServerUrl,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey))
+                    ValidAudiences = audiencesServerUrl,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey))
                 };
             });
         }
@@ -85,11 +87,17 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             var allowedHosts = config["AllowedHosts"];
             services.AddCors(options =>
             {
-                options.AddPolicy("ApiGatewayCORS", builder =>
+                options.AddPolicy("IdentityProviderCORS", builder =>
                 {
                     builder.WithOrigins(allowedHosts);
                 });
             });
+        }
+
+        public static IEnumerable<string> Audiences(string audiences)
+        {
+            var listOfAudiences = audiences.Split(';').ToList();
+            return listOfAudiences;
         }
     }
 }

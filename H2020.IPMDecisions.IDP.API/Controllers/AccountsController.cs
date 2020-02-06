@@ -81,7 +81,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
             var claims = await AuthenticationProvider.GetValidClaims(this.userManager, this.roleManager, isAuthorize.Result);
-            var token = AuthenticationProvider.GenerateToken(this.config, claims);
+            var token = AuthenticationProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
             
             return Ok(new { Token = token });
         }

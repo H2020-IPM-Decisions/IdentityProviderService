@@ -73,7 +73,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var applicationClientEntity = this.mapper.Map<ApplicationClient>(clientForCreationDto);
             CreateClientSecret(applicationClientEntity);
-
+            
             this.dataService.ApplicationClients.Create(applicationClientEntity);
             await this.dataService.CompleteAsync();
 

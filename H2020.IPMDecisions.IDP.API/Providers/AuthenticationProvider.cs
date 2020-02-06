@@ -53,12 +53,12 @@ namespace H2020.IPMDecisions.IDP.API.Providers
 
         public static string GenerateToken(
                 IConfiguration config,
-                List<Claim> claims)
+                List<Claim> claims,
+                string audienceServerUrl)
         {
             var tokenLifetimeMinutes = config["JwtSettings:TokenLifetimeMinutes"];
             var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
-            var audienceServerUrl = config["JwtSettings:ApiGatewayServerUrl"];
-            var authorizationSecretKey = config["JwtSettings:AuthorizationServerSecret"];
+            var authorizationSecretKey = config["JwtSettings:SecretKey"];
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
