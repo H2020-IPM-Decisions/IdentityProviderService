@@ -1,8 +1,10 @@
 using System;
 using System.Threading.Tasks;
+using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Data.Core.Repositories;
 using H2020.IPMDecisions.IDP.Data.Persistence.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistence
 {
@@ -21,8 +23,26 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
                 return applicationClients;
             }
         }
-        public DataService(ApplicationDbContext context)
+        private IApplicationUserRepository applicationUsers;
+        public IApplicationUserRepository ApplicationUsers
         {
+            get
+            {
+                if (applicationUsers == null)
+                {
+                    applicationUsers = new ApplicationUserRepository(this.Context, this.userManager);
+                }
+                return applicationUsers;
+            }
+        }
+        private readonly UserManager<ApplicationUser> userManager;
+
+        public DataService(
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
+        {
+            this.userManager = userManager 
+            ?? throw new ArgumentNullException(nameof(userManager));
             this.Context = context
                 ?? throw new ArgumentNullException(nameof(context));
         }

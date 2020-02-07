@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using H2020.IPMDecisions.IDP.Core.ResourceParameters;
+using System.Text.Json;
+using H2020.IPMDecisions.IDP.Data.Core;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -18,26 +18,47 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [Authorize(Roles = "SuperAdmin")]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
+        private readonly IDataService dataService;
 
         public UsersController(
-            UserManager<ApplicationUser> userManager,
-            IMapper mapper)
+            IMapper mapper,
+            IDataService dataService)
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
-            this.userManager = userManager
-                ?? throw new System.ArgumentNullException(nameof(userManager));
+            this.dataService = dataService 
+                ?? throw new ArgumentNullException(nameof(dataService));
         }
 
         [HttpGet("", Name = "GetUsers")]
         [HttpHead]
         // GET: api/users
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] ApplicationUserResourceParameter resourceParameter)
         {
-            var users = await this.userManager.Users.ToListAsync();
+            var users = await this.dataService.ApplicationUsers.FindAllAsync(resourceParameter);
             if (users.Count == 0) return NotFound();
+
+            var previousPageLink = users.HasPrevious ?
+                CreateUsersResourceUri(resourceParameter,
+                ResourceUriType.PreviousPage) : null;
+
+            var nextPageLink = users.HasNext ?
+                CreateUsersResourceUri(resourceParameter,
+                ResourceUriType.NextPage) : null;
+
+            var paginationMetaData = new
+            {
+                totalCount = users.TotalCount,
+                pageSize = users.PageSize,
+                currentPage = users.CurrentPage,
+                totalPages = users.TotalPages,
+                previousPageLink,
+                nextPageLink
+            };
+
+            Response.Headers.Add("X-Pagination",
+                JsonSerializer.Serialize(paginationMetaData));
 
             var usersToReturn = this.mapper.Map<List<UserDto>>(users);
 
@@ -50,13 +71,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             });
 
             return Ok(usersToReturnWithLinks);
-        }
+        }       
 
         [HttpGet("{userId:guid}", Name = "GetUser")]
         // GET: api/users/1
         public async Task<IActionResult> GetUser([FromRoute] Guid userId)
         {
-            var user = await this.userManager.FindByIdAsync(userId.ToString());
+            var user = await this.dataService.ApplicationUsers.FindByIdAsync(userId);
 
             if (user == null) return NotFound();
 
@@ -75,11 +96,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // DELETE: api/users/1
         public async Task<IActionResult> DeleteUser([FromRoute] Guid userId)
         {
-            var userToDelete = await this.userManager.FindByIdAsync(userId.ToString());
+            var userToDelete = await this.dataService.ApplicationUsers.FindByIdAsync(userId);
 
             if (userToDelete == null) return NotFound();
 
-            var result = await this.userManager.DeleteAsync(userToDelete);
+            var result = await this.dataService.ApplicationUsers.DeleteAsync(userToDelete);
 
             if (result.Succeeded) return NoContent();
 
@@ -142,6 +163,40 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 "DELETE"));
 
             return links;
+        }
+
+        private string CreateUsersResourceUri(
+               ApplicationUserResourceParameter resourceParameters,
+               ResourceUriType type)
+        {
+            switch (type)
+            {
+                case ResourceUriType.PreviousPage:
+                    return Url.Link("GetUsers",
+                    new
+                    {
+                        pageNumber = resourceParameters.PageNumber - 1,
+                        pageSize = resourceParameters.PageSize,
+                        searchQuery = resourceParameters.SearchQuery
+                    });
+                case ResourceUriType.NextPage:
+                    return Url.Link("GetUsers",
+                    new
+                    {
+                        pageNumber = resourceParameters.PageNumber + 1,
+                        pageSize = resourceParameters.PageSize,
+                        searchQuery = resourceParameters.SearchQuery
+                    });
+                case ResourceUriType.Current:
+                default:
+                    return Url.Link("GetUsers",
+                    new
+                    {
+                        pageNumber = resourceParameters.PageNumber,
+                        pageSize = resourceParameters.PageSize,
+                        searchQuery = resourceParameters.SearchQuery
+                    });
+            }
         }
         #endregion
     }

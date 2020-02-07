@@ -1,8 +1,10 @@
 namespace H2020.IPMDecisions.IDP.Core.ResourceParameters
 {
-    public class ApplicationUserResourceParameter : BaseResourceParameter
+    public class ApplicationClientResourceParameter: BaseResourceParameter
     {
-        const int maxPageSize = 40;
+
+        public bool? IsEnabled { get; set; }
+        const int maxPageSize = 20;
         private int _pageSize = 10;
         public int PageSize
         {

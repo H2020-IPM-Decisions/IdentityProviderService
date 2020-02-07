@@ -46,11 +46,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (applicationClients.Count() == 0) return NotFound();
 
             var previousPageLink = applicationClients.HasPrevious ?
-                CreateAuthorsResourceUri(resourceParameter,
+                CreateApplicationClientResourceUri(resourceParameter,
                 ResourceUriType.PreviousPage) : null;
 
             var nextPageLink = applicationClients.HasNext ?
-                CreateAuthorsResourceUri(resourceParameter,
+                CreateApplicationClientResourceUri(resourceParameter,
                 ResourceUriType.NextPage) : null;
 
             var paginationMetaData = new
@@ -202,7 +202,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
         }
 
-        private string CreateAuthorsResourceUri(
+        private string CreateApplicationClientResourceUri(
                ApplicationClientResourceParameter resourceParameters,
                ResourceUriType type)
         {

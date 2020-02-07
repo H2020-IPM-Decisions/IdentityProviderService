@@ -16,8 +16,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [Route("api/accounts")]
     public class AccountsController : ControllerBase
     {
-
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IMapper mapper;
         private readonly IDataService dataService;
@@ -25,15 +23,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         private readonly RoleManager<IdentityRole> roleManager;
 
         public AccountsController(
-            UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IMapper mapper,
             IDataService dataService,
             IConfiguration config, 
             RoleManager<IdentityRole> roleManager)
         {
-            this.userManager = userManager
-                ?? throw new ArgumentNullException(nameof(userManager));
             this.signInManager = signInManager
                 ?? throw new ArgumentNullException(nameof(signInManager));
             this.mapper = mapper
@@ -53,7 +48,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             var userEntity = this.mapper.Map<ApplicationUser>(userForRegistration);
 
-            var result = await this.userManager.CreateAsync(userEntity, userForRegistration.Password);
+            var result = await this.dataService.ApplicationUsers.CreateAsync(userEntity, userForRegistration.Password);
 
             if (result.Succeeded)
             {
@@ -77,10 +72,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
             if (!isValidClient.IsSuccessful) return BadRequest(new { message = isValidClient.ResponseMessage });
 
-            var isAuthorize = await AuthenticationProvider.ValidateUserAuthenticationAsync(this.userManager, this.signInManager, userDto);
+            var isAuthorize = await AuthenticationProvider.ValidateUserAuthenticationAsync(this.dataService, this.signInManager, userDto);
             if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
-            var claims = await AuthenticationProvider.GetValidClaims(this.userManager, this.roleManager, isAuthorize.Result);
+            var claims = await AuthenticationProvider.GetValidClaims(this.dataService, this.roleManager, isAuthorize.Result);
             var token = AuthenticationProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
             
             return Ok(new { Token = token });

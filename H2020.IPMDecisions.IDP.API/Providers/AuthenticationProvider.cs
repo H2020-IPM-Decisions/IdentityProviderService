@@ -17,7 +17,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
     public static class AuthenticationProvider
     {
         public static async Task<List<Claim>> GetValidClaims(
-            UserManager<ApplicationUser> userManager,
+            IDataService dataService,
             RoleManager<IdentityRole> roleManager,
             ApplicationUser user)
         {
@@ -31,10 +31,10 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 new Claim(_options.ClaimsIdentity.UserNameClaimType, user.UserName)
             };
 
-            var userClaims = await userManager.GetClaimsAsync(user);
+            var userClaims = await dataService.ApplicationUsers.GetClaimsAsync(user);
             claims.AddRange(userClaims);
 
-            var userRoles = await userManager.GetRolesAsync(user);
+            var userRoles = await dataService.ApplicationUsers.GetRolesAsync(user);
             foreach (var userRole in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, userRole));
@@ -128,7 +128,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
         }
 
         public static async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(
-            UserManager<ApplicationUser> userManager,
+            IDataService dataService,
             SignInManager<ApplicationUser> signInManager,
             UserForAuthenticationDto userDto)
         {
@@ -139,7 +139,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 Result = null
             };
 
-            var user = await userManager.FindByNameAsync(userDto.Username);
+            var user = await dataService.ApplicationUsers.FindByNameAsync(userDto.Username);
 
             if (user == null)
             {
