@@ -23,26 +23,32 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
                 return applicationClients;
             }
         }
-        private IApplicationUserRepository applicationUsers;
-        public IApplicationUserRepository ApplicationUsers
+
+        private IUserManagerExtensionRepository userManagerExtensions;
+        public IUserManagerExtensionRepository UserManagerExtensions
         {
             get
             {
-                if (applicationUsers == null)
+                if (userManagerExtensions == null)
                 {
-                    applicationUsers = new ApplicationUserRepository(this.Context, this.userManager);
+                    userManagerExtensions = new UserManagerExtensionRepository(this.UserManager);
                 }
-                return applicationUsers;
+                return userManagerExtensions;
             }
         }
-        private readonly UserManager<ApplicationUser> userManager;
+        
+        public UserManager<ApplicationUser> UserManager { get; }
+        public RoleManager<IdentityRole> RoleManager { get; }       
 
         public DataService(
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
-            this.userManager = userManager 
-            ?? throw new ArgumentNullException(nameof(userManager));
+            this.UserManager = userManager 
+                ?? throw new ArgumentNullException(nameof(userManager));
+            this.RoleManager = roleManager 
+                ?? throw new ArgumentNullException(nameof(roleManager));
             this.Context = context
                 ?? throw new ArgumentNullException(nameof(context));
         }

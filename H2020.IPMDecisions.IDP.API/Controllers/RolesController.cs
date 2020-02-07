@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using H2020.IPMDecisions.IDP.Data.Core;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -17,15 +18,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [Route("/api/roles")]
     public class RolesController : ControllerBase
     {
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly IDataService dataService;
         private readonly IMapper mapper;
 
         public RolesController(
-            RoleManager<IdentityRole> roleManager,
+            IDataService dataService,
             IMapper mapper)
         {
-            this.roleManager = roleManager
-                ?? throw new ArgumentNullException(nameof(roleManager));
+            this.dataService = dataService 
+                ?? throw new ArgumentNullException(nameof(dataService));
             this.mapper = mapper
                 ?? throw new System.ArgumentNullException(nameof(mapper));
         }
@@ -35,7 +36,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/Roles
         public async Task<IActionResult> Get()
         {
-            var roles = await this.roleManager.Roles.ToListAsync();
+            var roles = await this.dataService.RoleManager.Roles.ToListAsync();
             if (roles.Count == 0) return NotFound();
 
             var rolesToReturn = this.mapper.Map<List<RoleDto>>(roles);
@@ -55,7 +56,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/Roles/5
         public async Task<IActionResult> Get(Guid roleId)
         {
-            var roleEntity = await this.roleManager.FindByIdAsync(roleId.ToString());
+            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(roleId.ToString());
 
             if (roleEntity == null) return NotFound();
 
@@ -73,7 +74,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto)
         {
             var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
-            var result = await this.roleManager.CreateAsync(roleEntity);
+            var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
 
             if (result.Succeeded)
             {
@@ -96,10 +97,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // DELETE: api/Roles/5
         public async Task<IActionResult> Delete(Guid roleId)
         {
-            var roleEntity = await this.roleManager.FindByIdAsync(roleId.ToString());
+            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(roleId.ToString());
             if (roleEntity == null) return NotFound();
 
-            var result = await this.roleManager.DeleteAsync(roleEntity);
+            var result = await this.dataService.RoleManager.DeleteAsync(roleEntity);
             if (result.Succeeded) return NoContent();
 
             return BadRequest(result);

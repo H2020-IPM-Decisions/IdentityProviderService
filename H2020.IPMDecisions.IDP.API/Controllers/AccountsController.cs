@@ -20,14 +20,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         private readonly IMapper mapper;
         private readonly IDataService dataService;
         private readonly IConfiguration config;
-        private readonly RoleManager<IdentityRole> roleManager;
 
         public AccountsController(
             SignInManager<ApplicationUser> signInManager,
             IMapper mapper,
             IDataService dataService,
-            IConfiguration config, 
-            RoleManager<IdentityRole> roleManager)
+            IConfiguration config)
         {
             this.signInManager = signInManager
                 ?? throw new ArgumentNullException(nameof(signInManager));
@@ -37,8 +35,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.config = config 
                 ?? throw new ArgumentNullException(nameof(config));
-            this.roleManager = roleManager 
-                ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
         [AllowAnonymous]
@@ -48,7 +44,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             var userEntity = this.mapper.Map<ApplicationUser>(userForRegistration);
 
-            var result = await this.dataService.ApplicationUsers.CreateAsync(userEntity, userForRegistration.Password);
+            var result = await this.dataService.UserManager.CreateAsync(userEntity, userForRegistration.Password);
 
             if (result.Succeeded)
             {
@@ -75,7 +71,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var isAuthorize = await AuthenticationProvider.ValidateUserAuthenticationAsync(this.dataService, this.signInManager, userDto);
             if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
-            var claims = await AuthenticationProvider.GetValidClaims(this.dataService, this.roleManager, isAuthorize.Result);
+            var claims = await AuthenticationProvider.GetValidClaims(this.dataService, isAuthorize.Result);
             var token = AuthenticationProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
             
             return Ok(new { Token = token });

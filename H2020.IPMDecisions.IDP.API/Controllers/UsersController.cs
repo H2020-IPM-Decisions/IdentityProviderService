@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using System.Text.Json;
 using H2020.IPMDecisions.IDP.Data.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -36,7 +37,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/users
         public async Task<IActionResult> GetUsers([FromQuery] ApplicationUserResourceParameter resourceParameter)
         {
-            var users = await this.dataService.ApplicationUsers.FindAllAsync(resourceParameter);
+            var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
             if (users.Count == 0) return NotFound();
 
             var previousPageLink = users.HasPrevious ?
@@ -77,7 +78,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/users/1
         public async Task<IActionResult> GetUser([FromRoute] Guid userId)
         {
-            var user = await this.dataService.ApplicationUsers.FindByIdAsync(userId);
+            // var user = await this.dataService.ApplicationUsers.FindByIdAsync(userId);
+            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
 
             if (user == null) return NotFound();
 
@@ -96,11 +98,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // DELETE: api/users/1
         public async Task<IActionResult> DeleteUser([FromRoute] Guid userId)
         {
-            var userToDelete = await this.dataService.ApplicationUsers.FindByIdAsync(userId);
+            var userToDelete = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
 
             if (userToDelete == null) return NotFound();
 
-            var result = await this.dataService.ApplicationUsers.DeleteAsync(userToDelete);
+            var result = await this.dataService.UserManager.DeleteAsync(userToDelete);
 
             if (result.Succeeded) return NoContent();
 

@@ -18,7 +18,6 @@ namespace H2020.IPMDecisions.IDP.API.Providers
     {
         public static async Task<List<Claim>> GetValidClaims(
             IDataService dataService,
-            RoleManager<IdentityRole> roleManager,
             ApplicationUser user)
         {
             IdentityOptions _options = new IdentityOptions();
@@ -31,17 +30,17 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 new Claim(_options.ClaimsIdentity.UserNameClaimType, user.UserName)
             };
 
-            var userClaims = await dataService.ApplicationUsers.GetClaimsAsync(user);
+            var userClaims = await dataService.UserManager.GetClaimsAsync(user);
             claims.AddRange(userClaims);
 
-            var userRoles = await dataService.ApplicationUsers.GetRolesAsync(user);
+            var userRoles = await dataService.UserManager.GetRolesAsync(user);
             foreach (var userRole in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, userRole));
-                var role = await roleManager.FindByNameAsync(userRole);
+                var role = await dataService.RoleManager.FindByNameAsync(userRole);
                 if (role != null)
                 {
-                    var roleClaims = await roleManager.GetClaimsAsync(role);
+                    var roleClaims = await dataService.RoleManager.GetClaimsAsync(role);
                     foreach (Claim roleClaim in roleClaims)
                     {
                         claims.Add(roleClaim);
@@ -139,7 +138,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 Result = null
             };
 
-            var user = await dataService.ApplicationUsers.FindByNameAsync(userDto.Username);
+            var user = await dataService.UserManager.FindByNameAsync(userDto.Username);
 
             if (user == null)
             {
