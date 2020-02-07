@@ -56,8 +56,8 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
         public static void ConfigureJwtAuthentication(this IServiceCollection services, IConfiguration config)
         {
             var jwtSecretKey = config["JwtSettings:SecretKey"];
-            var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
-            var audiencesServerUrl = Audiences(config["JwtSettings:ValidAudiencesUrls"]);
+            var issuerServerUrl = config["JwtSettings:IssuerServerUrl"];
+            var audiencesServersUrl = Audiences(config["JwtSettings:ValidAudiencesUrls"]);
 
             services.AddAuthentication(options =>
             {
@@ -75,8 +75,8 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = authorizationServerUrl,
-                    ValidAudiences = audiencesServerUrl,
+                    ValidIssuer = issuerServerUrl,
+                    ValidAudiences = audiencesServersUrl,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey))
                 };
             });

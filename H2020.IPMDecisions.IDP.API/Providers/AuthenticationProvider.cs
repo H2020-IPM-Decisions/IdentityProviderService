@@ -57,14 +57,14 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 string audienceServerUrl)
         {
             var tokenLifetimeMinutes = config["JwtSettings:TokenLifetimeMinutes"];
-            var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
-            var authorizationSecretKey = config["JwtSettings:SecretKey"];
+            var issuerServerUrl = config["JwtSettings:IssuerServerUrl"];
+            var jwtSecretKey = config["JwtSettings:SecretKey"];
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
             var tokenOptions = new JwtSecurityToken(
-                issuer: authorizationServerUrl,
+                issuer: issuerServerUrl,
                 audience: audienceServerUrl,
                 claims,
                 notBefore: DateTime.Now,
