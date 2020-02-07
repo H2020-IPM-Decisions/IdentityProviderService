@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Data.Core.Repositories;
 using H2020.IPMDecisions.IDP.Data.Persistence.Repositories;
@@ -10,7 +11,11 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
 {
     public class DataService : IDataService
     {
-        public ApplicationDbContext Context { get; set; }
+        private readonly ApplicationDbContext context;
+        private readonly IPropertyMappingService propertyMappingService;
+        public UserManager<ApplicationUser> UserManager { get; }
+        public RoleManager<IdentityRole> RoleManager { get; }
+
         private IApplicationClientRepository applicationClients;
         public IApplicationClientRepository ApplicationClients
         {
@@ -18,7 +23,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
             {
                 if (applicationClients == null)
                 {
-                    applicationClients = new ApplicationClientRepository(this.Context);
+                    applicationClients = new ApplicationClientRepository(this.context, this.propertyMappingService);
                 }
                 return applicationClients;
             }
@@ -31,38 +36,38 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
             {
                 if (userManagerExtensions == null)
                 {
-                    userManagerExtensions = new UserManagerExtensionRepository(this.UserManager);
+                    userManagerExtensions = new UserManagerExtensionRepository(this.UserManager, this.propertyMappingService);
                 }
                 return userManagerExtensions;
             }
-        }
-        
-        public UserManager<ApplicationUser> UserManager { get; }
-        public RoleManager<IdentityRole> RoleManager { get; }       
+        }      
 
         public DataService(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IPropertyMappingService propertyMappingService)
         {
             this.UserManager = userManager 
                 ?? throw new ArgumentNullException(nameof(userManager));
             this.RoleManager = roleManager 
                 ?? throw new ArgumentNullException(nameof(roleManager));
-            this.Context = context
+            this.propertyMappingService = propertyMappingService 
+                ?? throw new ArgumentNullException(nameof(propertyMappingService));
+            this.context = context
                 ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task CompleteAsync()
         {
-            if (this.Context != null)
-                await this.Context.SaveChangesAsync();
+            if (this.context != null)
+                await this.context.SaveChangesAsync();
         }
 
         public void Dispose()
         {
-            if (this.Context != null)
-                this.Context.Dispose();
+            if (this.context != null)
+                this.context.Dispose();
         }
     }
 }

@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
+using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Data.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +16,18 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
     public class ApplicationClientRepository : IApplicationClientRepository
     {
         private readonly IApplicationDbContext context;
+        private IPropertyMappingService propertyMappingService;
 
         public ApplicationClientRepository(IApplicationDbContext context)
         {
             this.context = context;
+        }
+
+        public ApplicationClientRepository(
+            IApplicationDbContext context, 
+            IPropertyMappingService propertyMappingService) : this(context)
+        {
+            this.propertyMappingService = propertyMappingService;
         }
 
         public void Create(ApplicationClient entity)
@@ -55,6 +65,13 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 collection = collection.Where(ac =>
                     ac.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
                     || ac.Url.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(resourceParameter.OrderBy))
+            {
+                var applicationClientPropertyMappingDictionary = 
+                    this.propertyMappingService.GetPropertyMapping<ApplicationClientDto,ApplicationClient>();
+                
             }
 
             return await PagedList<ApplicationClient>.CreateAsync(
