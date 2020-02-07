@@ -36,20 +36,25 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 .ToListAsync<ApplicationClient>();
         }
 
-        public async Task<IEnumerable<ApplicationClient>> FindAllAsync(BaseResourceParameter resourceParameter)
+        public async Task<IEnumerable<ApplicationClient>> FindAllAsync(ApplicationClientResourceParameter resourceParameter)
         {
-            if (string.IsNullOrEmpty(resourceParameter.SearchQuery))
-            {
-                return await FindAllAsync();
-            }
+            if (resourceParameter is null)
+                throw new ArgumentNullException(nameof(resourceParameter));
 
             var collection = this.context.ApplicationClient as IQueryable<ApplicationClient>;
 
-            var searchQuery = resourceParameter.SearchQuery.Trim();
+            if (resourceParameter.IsEnabled != null)
+            {
+                collection = collection.Where(ac => ac.Enabled == resourceParameter.IsEnabled);
+            }
 
-            collection = collection.Where(ac => 
-                ac.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-                || ac.Url.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(resourceParameter.SearchQuery))
+            {
+                var searchQuery = resourceParameter.SearchQuery.Trim();
+                collection = collection.Where(ac =>
+                    ac.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                    || ac.Url.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+            }            
 
             return await collection.ToListAsync<ApplicationClient>();
         }
