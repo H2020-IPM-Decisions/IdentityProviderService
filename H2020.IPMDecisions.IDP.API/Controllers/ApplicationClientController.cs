@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Text.Json;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -43,6 +44,27 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             var applicationClients = await this.dataService.ApplicationClients.FindAllAsync(resourceParameter);
             if (applicationClients.Count() == 0) return NotFound();
+
+            var previousPageLink = applicationClients.HasPrevious ?
+                CreateAuthorsResourceUri(resourceParameter,
+                ResourceUriType.PreviousPage) : null;
+
+            var nextPageLink = applicationClients.HasNext ?
+                CreateAuthorsResourceUri(resourceParameter,
+                ResourceUriType.NextPage) : null;
+
+            var paginationMetaData = new
+            {
+                totalCount = applicationClients.TotalCount,
+                pageSize = applicationClients.PageSize,
+                currentPage = applicationClients.CurrentPage,
+                totalPages = applicationClients.TotalPages,
+                previousPageLink,
+                nextPageLink
+            };
+
+            Response.Headers.Add("X-Pagination",
+                JsonSerializer.Serialize(paginationMetaData));
 
             var applicationClientsToReturn = this.mapper.Map<List<ApplicationClientDto>>(applicationClients);           
 
@@ -179,6 +201,44 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             RandomNumberGenerator.Create().GetBytes(key);
             applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
         }
+
+        private string CreateAuthorsResourceUri(
+               ApplicationClientResourceParameter resourceParameters,
+               ResourceUriType type)
+        {
+            switch (type)
+            {
+                case ResourceUriType.PreviousPage:
+                    return Url.Link("GetApplicationClients",
+                    new
+                    {
+                        pageNumber = resourceParameters.PageNumber - 1,
+                        pageSize = resourceParameters.PageSize,
+                        isEnabled = resourceParameters.IsEnabled,
+                        searchQuery = resourceParameters.SearchQuery
+                    });
+                case ResourceUriType.NextPage:
+                    return Url.Link("GetApplicationClients",
+                    new
+                    {
+                        pageNumber = resourceParameters.PageNumber + 1,
+                        pageSize = resourceParameters.PageSize,
+                        isEnabled = resourceParameters.IsEnabled,
+                        searchQuery = resourceParameters.SearchQuery
+                    });
+                case ResourceUriType.Current:
+                default:
+                    return Url.Link("GetApplicationClients",
+                    new
+                    {
+                        pageNumber = resourceParameters.PageNumber,
+                        pageSize = resourceParameters.PageSize,
+                        isEnabled = resourceParameters.IsEnabled,
+                        searchQuery = resourceParameters.SearchQuery
+                    });
+            }
+        }
+
         private IEnumerable<LinkDto> CreateLinksForApplicationClient(
             Guid id)
         {
