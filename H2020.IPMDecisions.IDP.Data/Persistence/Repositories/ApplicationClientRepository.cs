@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Data.Core.Repositories;
@@ -36,7 +37,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 .ToListAsync<ApplicationClient>();
         }
 
-        public async Task<IEnumerable<ApplicationClient>> FindAllAsync(ApplicationClientResourceParameter resourceParameter)
+        public async Task<PagedList<ApplicationClient>> FindAllAsync(ApplicationClientResourceParameter resourceParameter)
         {
             if (resourceParameter is null)
                 throw new ArgumentNullException(nameof(resourceParameter));
@@ -54,9 +55,12 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 collection = collection.Where(ac =>
                     ac.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
                     || ac.Url.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
-            }            
+            }
 
-            return await collection.ToListAsync<ApplicationClient>();
+            return await PagedList<ApplicationClient>.CreateAsync(
+                collection, 
+                resourceParameter.PageNumber, 
+                resourceParameter.PageSize);
         }
 
         public async Task<ApplicationClient> FindByIdAsync(Guid id)
