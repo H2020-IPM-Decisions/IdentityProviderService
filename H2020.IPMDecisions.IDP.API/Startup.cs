@@ -1,6 +1,7 @@
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
 using H2020.IPMDecisions.IDP.Core.Profiles;
+using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -39,6 +40,8 @@ namespace H2020.IPMDecisions.IDP.API
             services.ConfigureIdentity();
 
             services.ConfigureJwtAuthentication(Configuration);
+
+            services.AddTransient<IPropertyMappingService, PropertyMappingService>();
 
             services.AddAutoMapper(typeof(MainProfile));
 

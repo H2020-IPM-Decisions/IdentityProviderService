@@ -5,10 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers

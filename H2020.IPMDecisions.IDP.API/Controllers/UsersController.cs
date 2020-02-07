@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using System.Text.Json;
 using H2020.IPMDecisions.IDP.Data.Core;
-using Microsoft.EntityFrameworkCore;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
