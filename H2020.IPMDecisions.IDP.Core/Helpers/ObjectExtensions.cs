@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
 
-namespace H2020.IPMDecisions.IDP.API.Helpers
+namespace H2020.IPMDecisions.IDP.Core.Helpers
 {
     public static class ObjectExtensions
     {
