@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
@@ -41,6 +42,15 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 collection = collection.Where(u =>
                     u.UserName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
                     || u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(resourceParameter.OrderBy))
+            {
+                var propertyMappingDictionary =
+                    this.propertyMappingService.GetPropertyMapping<UserDto, ApplicationUser>();
+
+                collection = collection.ApplySort(resourceParameter.OrderBy, propertyMappingDictionary);
+
             }
 
             return await PagedList<ApplicationUser>.CreateAsync(

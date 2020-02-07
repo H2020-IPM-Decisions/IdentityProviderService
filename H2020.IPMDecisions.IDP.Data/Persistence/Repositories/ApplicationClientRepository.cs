@@ -24,7 +24,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
         }
 
         public ApplicationClientRepository(
-            IApplicationDbContext context, 
+            IApplicationDbContext context,
             IPropertyMappingService propertyMappingService) : this(context)
         {
             this.propertyMappingService = propertyMappingService;
@@ -69,14 +69,16 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
 
             if (!string.IsNullOrEmpty(resourceParameter.OrderBy))
             {
-                var applicationClientPropertyMappingDictionary = 
-                    this.propertyMappingService.GetPropertyMapping<ApplicationClientDto,ApplicationClient>();
-                
+                var propertyMappingDictionary =
+                    this.propertyMappingService.GetPropertyMapping<ApplicationClientDto, ApplicationClient>();
+
+                collection = collection.ApplySort(resourceParameter.OrderBy, propertyMappingDictionary);
+
             }
 
             return await PagedList<ApplicationClient>.CreateAsync(
-                collection, 
-                resourceParameter.PageNumber, 
+                collection,
+                resourceParameter.PageNumber,
                 resourceParameter.PageSize);
         }
 
