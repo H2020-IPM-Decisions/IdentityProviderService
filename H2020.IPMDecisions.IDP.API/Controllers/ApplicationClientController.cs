@@ -8,6 +8,7 @@ using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -37,10 +38,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpGet("", Name = "GetApplicationClients")]
         [HttpHead]
         // GET: api/applicationclient
-        public async Task<IActionResult> GetApplicationClients()
+        public async Task<IActionResult> GetApplicationClients(
+            [FromQuery] ApplicationClientResourceParameter resourceParameter)
         {
-            var applicationClients = await this.dataService.ApplicationClients.FindAllAsync();
-            if (applicationClients.Count == 0) return NotFound();
+            var applicationClients = await this.dataService.ApplicationClients.FindAllAsync(resourceParameter);
+            if (applicationClients.Count() == 0) return NotFound();
 
             var applicationClientsToReturn = this.mapper.Map<List<ApplicationClientDto>>(applicationClients);           
 
