@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace H2020.IPMDecisions.IDP.API.Extensions
 {
@@ -82,6 +83,28 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             });
         }
 
+        public static void ConfigureSwagger(this IServiceCollection services){
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "H2020 IPM Decisions - Identity Provider API", 
+                    Version = "v1",
+                    Description = "Identity Provider for the H2020 IPM Decisions project",
+                    // TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "ADAS Modelling and Informatics Team",
+                        Email = "software@adas.co.uk",
+                        Url = new Uri("https://www.adas.uk/"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under GNU General Public License v3.0",
+                        Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.txt"),
+                    } });
+            });
+        }
+
         public static void ConfigureCors(this IServiceCollection services, IConfiguration config)
         {
             var allowedHosts = config["AllowedHosts"];
@@ -99,5 +122,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             var listOfAudiences = audiences.Split(';').ToList();
             return listOfAudiences;
         }
+
+        
     }
 }

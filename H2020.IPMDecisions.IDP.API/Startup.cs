@@ -51,10 +51,7 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.ConfigureMySqlContext(Configuration);
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "H2020 IPM Decisions - Identity Provider API", Version = "v1" });
-            });
+            services.ConfigureSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
