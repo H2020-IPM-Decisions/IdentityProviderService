@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Json;
+using H2020.IPMDecisions.IDP.Core.Services;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -25,15 +26,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     {
         private readonly IDataService dataService;
         private readonly IMapper mapper;
+        private readonly IPropertyMappingService propertyMappingService;
 
         public ApplicationClientController(
             IDataService dataService, 
-            IMapper mapper)
+            IMapper mapper,
+            IPropertyMappingService propertyMappingService)
         {
             this.dataService = dataService
                 ?? throw new System.ArgumentNullException(nameof(dataService));
             this.mapper = mapper 
                 ?? throw new ArgumentNullException(nameof(mapper));
+            this.propertyMappingService = propertyMappingService 
+                ?? throw new ArgumentNullException(nameof(propertyMappingService));
         }
 
         [HttpGet("", Name = "GetApplicationClients")]
@@ -42,6 +47,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> GetApplicationClients(
             [FromQuery] ApplicationClientResourceParameter resourceParameter)
         {
+            if (!propertyMappingService.ValidMappingExistsFor<ApplicationClientDto, ApplicationClient>(resourceParameter.OrderBy))
+            {
+                return BadRequest();
+            }
+
             var applicationClients = await this.dataService.ApplicationClients.FindAllAsync(resourceParameter);
             if (applicationClients.Count() == 0) return NotFound();
 

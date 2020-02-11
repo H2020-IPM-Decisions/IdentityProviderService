@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using System.Text.Json;
 using H2020.IPMDecisions.IDP.Data.Core;
+using H2020.IPMDecisions.IDP.Core.Services;
+using H2020.IPMDecisions.IDP.Core.Entities;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -20,15 +22,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     {
         private readonly IMapper mapper;
         private readonly IDataService dataService;
+        private readonly IPropertyMappingService propertyMappingService;
 
         public UsersController(
             IMapper mapper,
-            IDataService dataService)
+            IDataService dataService,
+            IPropertyMappingService propertyMappingService)
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
             this.dataService = dataService 
                 ?? throw new ArgumentNullException(nameof(dataService));
+            this.propertyMappingService = propertyMappingService 
+                ?? throw new ArgumentNullException(nameof(propertyMappingService));
         }
 
         [HttpGet("", Name = "GetUsers")]
@@ -36,6 +42,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/users
         public async Task<IActionResult> GetUsers([FromQuery] ApplicationUserResourceParameter resourceParameter)
         {
+            if (!propertyMappingService.ValidMappingExistsFor<UserDto, ApplicationUser>(resourceParameter.OrderBy))
+            {
+                return BadRequest();
+            }
+            
             var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
             if (users.Count == 0) return NotFound();
 
@@ -176,6 +187,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetUsers",
                     new
                     {
+                        orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber - 1,
                         pageSize = resourceParameters.PageSize,
                         searchQuery = resourceParameters.SearchQuery
@@ -184,6 +196,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetUsers",
                     new
                     {
+                        orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber + 1,
                         pageSize = resourceParameters.PageSize,
                         searchQuery = resourceParameters.SearchQuery
@@ -193,6 +206,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetUsers",
                     new
                     {
+                        orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber,
                         pageSize = resourceParameters.PageSize,
                         searchQuery = resourceParameters.SearchQuery
