@@ -76,11 +76,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("X-Pagination",
                 JsonSerializer.Serialize(paginationMetaData));
 
-            var applicationClientsToReturn = this.mapper.Map<List<ApplicationClientDto>>(applicationClients);           
+            var applicationClientsToReturn = this.mapper
+                .Map<IEnumerable<ApplicationClientDto>>(applicationClients)
+                .ShapeData(resourceParameter.Fields);           
 
             var applicationClientsToReturnWithLinks = applicationClientsToReturn.Select(client =>
             {
-                var userAsDictionary = client.ShapeData() as IDictionary<string, object>;
+                var userAsDictionary = client as IDictionary<string, object>;
                 var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"]);
                 userAsDictionary.Add("links", userLinks);
                 return userAsDictionary;
@@ -113,7 +115,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
-                .ShapeData()
+                .ShapeData("")
                 as IDictionary<string, object>; ;
             clientToReturn.Add("links", links);
 
@@ -182,14 +184,14 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [HttpGet("{id:guid}", Name = "GetApplicationClient")]
         // GET: api/applicationclient/1
-        public async Task<IActionResult> Get([FromRoute] Guid id)
+        public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
         {
             var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
             if (clientFromRepository == null) return NotFound();
 
             var links = CreateLinksForApplicationClient(id);
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientFromRepository)
-                .ShapeData()
+                .ShapeData(fields)
                 as IDictionary<string, object>; ;
             clientToReturn.Add("links", links);
 

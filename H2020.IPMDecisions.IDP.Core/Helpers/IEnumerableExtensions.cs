@@ -5,10 +5,10 @@ using System.Reflection;
 
 namespace H2020.IPMDecisions.IDP.Core.Helpers
 {
-    public static class ObjectExtensions
+    public static class IEnumerableExtensions
     {
-        public static ExpandoObject ShapeData<TSource>(
-            this TSource source,
+        public static IEnumerable<ExpandoObject> ShapeData<TSource>(
+            this IEnumerable<TSource> source,
             string fields)
         {
             if (source is null)
@@ -16,20 +16,14 @@ namespace H2020.IPMDecisions.IDP.Core.Helpers
                 throw new System.ArgumentNullException(nameof(source));
             }
 
-            var dataShapedObject = new ExpandoObject();
+            var expandoObjectList = new List<ExpandoObject>();
+            var propertyInfoList = new List<PropertyInfo>();
+
             if (string.IsNullOrWhiteSpace(fields))
             {
                 var propertyInfos = typeof(TSource)
                     .GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                foreach (var propertyInfo in propertyInfos)
-                {
-                    var propertyValue = propertyInfo.GetValue(source);
-                    ((IDictionary<string, object>)dataShapedObject)
-                        .Add(propertyInfo.Name, propertyValue);
-                }
-
-                return dataShapedObject;
+                propertyInfoList.AddRange(propertyInfos);
             }
             else
             {
@@ -44,13 +38,23 @@ namespace H2020.IPMDecisions.IDP.Core.Helpers
 
                     if (propertyInfo == null)
                         throw new Exception($"Property {propertyName} wasn't found on {typeof(TSource)}");
+                    propertyInfoList.Add(propertyInfo);
+                }
+            }
 
-                    var propertyValue = propertyInfo.GetValue(source);
+            foreach (TSource sourceObject in source)
+            {
+                var dataShapedObject = new ExpandoObject();
+                foreach (var propertyInfo in propertyInfoList)
+                {
+                    var propertyValue = propertyInfo.GetValue(sourceObject);
                     ((IDictionary<string, object>)dataShapedObject)
                         .Add(propertyInfo.Name, propertyValue);
                 }
-                return dataShapedObject;
+
+                expandoObjectList.Add(dataShapedObject);
             }
+            return expandoObjectList;
         }
     }
 }

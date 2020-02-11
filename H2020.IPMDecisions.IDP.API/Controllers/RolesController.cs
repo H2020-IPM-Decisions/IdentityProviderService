@@ -34,7 +34,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpGet("", Name = "GetRoles")]
         [HttpHead]
         // GET: api/Roles
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] string fields)
         {
             var roles = await this.dataService.RoleManager.Roles.ToListAsync();
             if (roles.Count == 0) return NotFound();
@@ -43,7 +43,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var rolesToReturnWithLinks = rolesToReturn.Select(role =>
             {
-                var userAsDictionary = role.ShapeData() as IDictionary<string, object>;
+                var userAsDictionary = role.ShapeData(fields) as IDictionary<string, object>;
                 var userLinks = CreateLinksForRole((Guid)userAsDictionary["Id"]);
                 userAsDictionary.Add("links", userLinks);
                 return userAsDictionary;
@@ -54,7 +54,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [HttpGet("{roleId:guid}", Name = "GetRole")]
         // GET: api/Roles/5
-        public async Task<IActionResult> Get(Guid roleId)
+        public async Task<IActionResult> Get(Guid roleId, [FromQuery] string fields)
         {
             var roleEntity = await this.dataService.RoleManager.FindByIdAsync(roleId.ToString());
 
@@ -62,7 +62,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var links = CreateLinksForRole(roleId);
             var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                .ShapeData()
+                .ShapeData(fields)
                 as IDictionary<string, object>;
             roleToReturn.Add("links", links);
 
@@ -71,7 +71,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [HttpPost("", Name = "CreateRole")]
         // POST: api/Roles
-        public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto)
+        public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto, [FromQuery] string fields)
         {
             var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
             var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
@@ -81,7 +81,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
 
                 var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                    .ShapeData()
+                    .ShapeData(fields)
                     as IDictionary<string, object>; ;
 
                 roleToReturn.Add("links", links);

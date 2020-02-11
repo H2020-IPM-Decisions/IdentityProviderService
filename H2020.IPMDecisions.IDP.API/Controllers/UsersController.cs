@@ -71,11 +71,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("X-Pagination",
                 JsonSerializer.Serialize(paginationMetaData));
 
-            var usersToReturn = this.mapper.Map<List<UserDto>>(users);
+            var usersToReturn = this.mapper
+                .Map<IEnumerable<UserDto>>(users)
+                .ShapeData(resourceParameter.Fields);
 
             var usersToReturnWithLinks = usersToReturn.Select(user =>
             {
-                var userAsDictionary = user.ShapeData() as IDictionary<string, object>;
+                var userAsDictionary = user as IDictionary<string, object>;
                 var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"]);
                 userAsDictionary.Add("links", userLinks);
                 return userAsDictionary;
@@ -86,7 +88,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [HttpGet("{userId:guid}", Name = "GetUser")]
         // GET: api/users/1
-        public async Task<IActionResult> GetUser([FromRoute] Guid userId)
+        public async Task<IActionResult> GetUser([FromRoute] Guid userId, [FromQuery] string fields)
         {
             // var user = await this.dataService.ApplicationUsers.FindByIdAsync(userId);
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
@@ -96,7 +98,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var links = CreateLinksForUser(userId);
 
             var userToReturn = this.mapper.Map<UserDto>(user)
-                .ShapeData()
+                .ShapeData(fields)
                 as IDictionary<string, object>;
 
             userToReturn.Add("links", links);
@@ -187,6 +189,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetUsers",
                     new
                     {
+                        fields = resourceParameters.Fields,
                         orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber - 1,
                         pageSize = resourceParameters.PageSize,
@@ -196,6 +199,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetUsers",
                     new
                     {
+                        fields = resourceParameters.Fields,
                         orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber + 1,
                         pageSize = resourceParameters.PageSize,
@@ -206,6 +210,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetUsers",
                     new
                     {
+                        fields = resourceParameters.Fields,
                         orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber,
                         pageSize = resourceParameters.PageSize,
