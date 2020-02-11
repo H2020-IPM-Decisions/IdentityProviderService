@@ -47,13 +47,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> GetUsers([FromQuery] ApplicationUserResourceParameter resourceParameter)
         {
             if (!propertyMappingService.ValidMappingExistsFor<UserDto, ApplicationUser>(resourceParameter.OrderBy))
-            {
                 return BadRequest();
-            }
             if (!propertyCheckerService.TypeHasProperties<UserDto>(resourceParameter.Fields, true))
-            {
                 return BadRequest();
-            }
             
             var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
             if (users.Count == 0) return NotFound();
@@ -86,7 +82,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var usersToReturnWithLinks = usersToReturn.Select(user =>
             {
                 var userAsDictionary = user as IDictionary<string, object>;
-                var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"]);
+                var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"], resourceParameter.Fields);
                 userAsDictionary.Add("links", userLinks);
                 return userAsDictionary;
             });
@@ -99,14 +95,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> GetUser([FromRoute] Guid userId, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<UserDto>(fields))
-            {
                 return BadRequest();
-            }
+
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
 
             if (user == null) return NotFound();
 
-            var links = CreateLinksForUser(userId);
+            var links = CreateLinksForUser(userId, fields);
 
             var userToReturn = this.mapper.Map<UserDto>(user)
                 .ShapeData(fields)
@@ -143,14 +138,25 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(
-            Guid userId)
+            Guid userId,
+            string fields)
         {
             var links = new List<LinkDto>();
 
-            links.Add(new LinkDto(
+            if (string.IsNullOrWhiteSpace(fields))
+            {
+                links.Add(new LinkDto(
                 Url.Link("GetUser", new { userId }),
                 "self",
                 "GET"));
+            }
+            else
+            {
+                links.Add(new LinkDto(
+                Url.Link("GetUser", new { userId, fields }),
+                "self",
+                "GET"));
+            }
 
             links.Add(new LinkDto(
                 Url.Link("DeleteUser", new { userId }),

@@ -28,11 +28,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             IMapper mapper,
             IPropertyCheckerService propertyCheckerService)
         {
-            this.dataService = dataService 
+            this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.mapper = mapper
                 ?? throw new System.ArgumentNullException(nameof(mapper));
-            this.propertyCheckerService = propertyCheckerService 
+            this.propertyCheckerService = propertyCheckerService
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
@@ -42,9 +42,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Get([FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
-            {
                 return BadRequest();
-            }
+
             var roles = await this.dataService.RoleManager.Roles.ToListAsync();
             if (roles.Count == 0) return NotFound();
 
@@ -55,7 +54,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var rolesToReturnWithLinks = rolesToReturn.Select(role =>
             {
                 var userAsDictionary = role as IDictionary<string, object>;
-                var userLinks = CreateLinksForRole((Guid)userAsDictionary["Id"]);
+                var userLinks = CreateLinksForRole((Guid)userAsDictionary["Id"], fields);
                 userAsDictionary.Add("links", userLinks);
                 return userAsDictionary;
             });
@@ -68,14 +67,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Get(Guid roleId, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
-            {
                 return BadRequest();
-            }
+
             var roleEntity = await this.dataService.RoleManager.FindByIdAsync(roleId.ToString());
 
             if (roleEntity == null) return NotFound();
 
-            var links = CreateLinksForRole(roleId);
+            var links = CreateLinksForRole(roleId, fields);
             var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
                 .ShapeData(fields)
                 as IDictionary<string, object>;
@@ -89,16 +87,14 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
-            {
                 return BadRequest();
-            }
 
             var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
             var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
 
             if (result.Succeeded)
             {
-                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
+                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id), fields);
 
                 var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
                     .ShapeData(fields)
@@ -136,15 +132,25 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         #region helpers
         private IEnumerable<LinkDto> CreateLinksForRole(
-            Guid roleId)
+            Guid roleId,
+            string fields)
         {
             var links = new List<LinkDto>();
 
-            links.Add(new LinkDto(
-                Url.Link("GetRole", new { roleId }),
-                "self",
-                "GET"));
-
+            if (string.IsNullOrWhiteSpace(fields))
+            {
+                links.Add(new LinkDto(
+                    Url.Link("GetRole", new { roleId }),
+                    "self",
+                    "GET"));
+            }
+            else
+            {
+                links.Add(new LinkDto(
+                    Url.Link("GetRole", new { roleId, fields }),
+                    "self",
+                    "GET"));
+            }
 
             links.Add(new LinkDto(
                 Url.Link("DeleteRole", new { roleId }),

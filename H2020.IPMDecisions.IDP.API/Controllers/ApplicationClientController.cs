@@ -52,13 +52,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromQuery] ApplicationClientResourceParameter resourceParameter)
         {
             if (!propertyMappingService.ValidMappingExistsFor<ApplicationClientDto, ApplicationClient>(resourceParameter.OrderBy))
-            {
                 return BadRequest();
-            }
             if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(resourceParameter.Fields, true))
-            {
                 return BadRequest();
-            }
 
             var applicationClients = await this.dataService.ApplicationClients.FindAllAsync(resourceParameter);
             if (applicationClients.Count() == 0) return NotFound();
@@ -91,7 +87,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var applicationClientsToReturnWithLinks = applicationClientsToReturn.Select(client =>
             {
                 var userAsDictionary = client as IDictionary<string, object>;
-                var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"]);
+                var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"], resourceParameter.Fields);
                 userAsDictionary.Add("links", userLinks);
                 return userAsDictionary;
             });
@@ -106,16 +102,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromBody] ApplicationClientForCreationDto clientForCreationDto, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields, true))
-            {
                 return BadRequest();
-            }
 
             var regex = new Regex("^[a-zA-Z0-9 ]*$");
             if (!regex.IsMatch(clientForCreationDto.Name))
                 return BadRequest("Special characters are not allowed in the client name.");
 
             var client = await this.dataService.ApplicationClients.FindByNameAsync(clientForCreationDto.Name);
-
             if (client != null)
                 return BadRequest(string.Format("Client already exits with name: {0}", clientForCreationDto.Name));
 
@@ -125,7 +118,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             this.dataService.ApplicationClients.Create(applicationClientEntity);
             await this.dataService.CompleteAsync();
 
-            var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
+            var links = CreateLinksForApplicationClient(applicationClientEntity.Id, fields);
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
                 .ShapeData(fields)
                 as IDictionary<string, object>; ;
@@ -199,13 +192,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields))
-            {
                 return BadRequest();
-            }
+
             var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
             if (clientFromRepository == null) return NotFound();
 
-            var links = CreateLinksForApplicationClient(id);
+            var links = CreateLinksForApplicationClient(id, fields);
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientFromRepository)
                 .ShapeData(fields)
                 as IDictionary<string, object>; ;
@@ -271,15 +263,30 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         private IEnumerable<LinkDto> CreateLinksForApplicationClient(
-            Guid id)
+            Guid id,
+            string fields)
         {
             var links = new List<LinkDto>();
+
+            if (string.IsNullOrWhiteSpace(fields))
+            {
+                links.Add(new LinkDto(
+                Url.Link("GetApplicationClient", new { id }),
+                "self",
+                "GET"));
+            }
+            else
+            {
+                links.Add(new LinkDto(
+                 Url.Link("GetApplicationClient", new { id, fields }),
+                 "self",
+                 "GET"));
+            }
 
             links.Add(new LinkDto(
                 Url.Link("GetApplicationClient", new { id }),
                 "self",
                 "GET"));
-
 
             links.Add(new LinkDto(
                 Url.Link("DeleteApplicationClient", new { id }),
