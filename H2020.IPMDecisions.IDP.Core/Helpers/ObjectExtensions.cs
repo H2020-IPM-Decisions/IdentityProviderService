@@ -9,7 +9,7 @@ namespace H2020.IPMDecisions.IDP.Core.Helpers
     {
         public static ExpandoObject ShapeData<TSource>(
             this TSource source,
-            string fields)
+            string fields = "")
         {
             if (source is null)
             {

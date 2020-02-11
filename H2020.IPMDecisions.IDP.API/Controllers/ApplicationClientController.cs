@@ -99,11 +99,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Route("")]
         // POST: api/applicationclient
         public async Task<ActionResult<ApplicationClientDto>> Post(
-            [FromBody] ApplicationClientForCreationDto clientForCreationDto, [FromQuery] string fields)
+            [FromBody] ApplicationClientForCreationDto clientForCreationDto)
         {
-            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields, true))
-                return BadRequest();
-
             var regex = new Regex("^[a-zA-Z0-9 ]*$");
             if (!regex.IsMatch(clientForCreationDto.Name))
                 return BadRequest("Special characters are not allowed in the client name.");
@@ -118,9 +115,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             this.dataService.ApplicationClients.Create(applicationClientEntity);
             await this.dataService.CompleteAsync();
 
-            var links = CreateLinksForApplicationClient(applicationClientEntity.Id, fields);
+            var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
-                .ShapeData(fields)
+                .ShapeData()
                 as IDictionary<string, object>; ;
             clientToReturn.Add("links", links);
 
@@ -264,7 +261,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         private IEnumerable<LinkDto> CreateLinksForApplicationClient(
             Guid id,
-            string fields)
+            string fields = "")
         {
             var links = new List<LinkDto>();
 

@@ -84,20 +84,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [HttpPost("", Name = "CreateRole")]
         // POST: api/Roles
-        public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto, [FromQuery] string fields)
+        public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto)
         {
-            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
-                return BadRequest();
-
             var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
             var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
 
             if (result.Succeeded)
             {
-                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id), fields);
+                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
 
                 var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                    .ShapeData(fields)
+                    .ShapeData()
                     as IDictionary<string, object>; ;
 
                 roleToReturn.Add("links", links);
@@ -133,7 +130,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         #region helpers
         private IEnumerable<LinkDto> CreateLinksForRole(
             Guid roleId,
-            string fields)
+            string fields = "")
         {
             var links = new List<LinkDto>();
 

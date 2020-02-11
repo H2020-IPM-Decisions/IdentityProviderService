@@ -139,7 +139,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(
             Guid userId,
-            string fields)
+            string fields = "")
         {
             var links = new List<LinkDto>();
 
