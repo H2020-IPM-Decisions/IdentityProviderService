@@ -59,32 +59,24 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var applicationClients = await this.dataService.ApplicationClients.FindAllAsync(resourceParameter);
             if (applicationClients.Count() == 0) return NotFound();
 
-            var previousPageLink = applicationClients.HasPrevious ?
-                CreateApplicationClientResourceUri(resourceParameter,
-                ResourceUriType.PreviousPage) : null;
-
-            var nextPageLink = applicationClients.HasNext ?
-                CreateApplicationClientResourceUri(resourceParameter,
-                ResourceUriType.NextPage) : null;
-
             var paginationMetaData = new
             {
                 totalCount = applicationClients.TotalCount,
                 pageSize = applicationClients.PageSize,
                 currentPage = applicationClients.CurrentPage,
-                totalPages = applicationClients.TotalPages,
-                previousPageLink,
-                nextPageLink
+                totalPages = applicationClients.TotalPages
             };
 
             Response.Headers.Add("X-Pagination",
                 JsonSerializer.Serialize(paginationMetaData));
 
-            var applicationClientsToReturn = this.mapper
+            var links = CreateLinksForApplicationClients(resourceParameter, applicationClients.HasNext, applicationClients.HasPrevious);
+
+            var shapedClientsToReturn = this.mapper
                 .Map<IEnumerable<ApplicationClientDto>>(applicationClients)
                 .ShapeData(resourceParameter.Fields);           
 
-            var applicationClientsToReturnWithLinks = applicationClientsToReturn.Select(client =>
+            var shapedClientsToReturnWithLinks = shapedClientsToReturn.Select(client =>
             {
                 var userAsDictionary = client as IDictionary<string, object>;
                 var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"], resourceParameter.Fields);
@@ -92,7 +84,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return userAsDictionary;
             });
 
-            return Ok(applicationClientsToReturnWithLinks);
+            var applicationClientsToReturn = new
+            {
+                value = shapedClientsToReturnWithLinks,
+                links
+            };
+
+            return Ok(applicationClientsToReturn);
         }
 
         [HttpPost]
@@ -229,6 +227,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetApplicationClients",
                     new
                     {
+                        fields = resourceParameters.Fields,
                         orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber - 1,
                         pageSize = resourceParameters.PageSize,
@@ -239,6 +238,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetApplicationClients",
                     new
                     {
+                        fields = resourceParameters.Fields,
                         orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber + 1,
                         pageSize = resourceParameters.PageSize,
@@ -250,6 +250,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetApplicationClients",
                     new
                     {
+                        fields = resourceParameters.Fields,
                         orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber,
                         pageSize = resourceParameters.PageSize,
@@ -257,6 +258,35 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                         searchQuery = resourceParameters.SearchQuery
                     });
             }
+        }
+
+        private IEnumerable<LinkDto> CreateLinksForApplicationClients(
+            ApplicationClientResourceParameter resourceParameters,
+            bool hasNextPage,
+            bool hasPreviousPage)
+        {
+            var links = new List<LinkDto>();
+
+            links.Add(new LinkDto(
+                CreateApplicationClientResourceUri(resourceParameters, ResourceUriType.Current),
+                "self",
+                "GET"));
+
+            if (hasNextPage)
+            {
+                links.Add(new LinkDto(
+                CreateApplicationClientResourceUri(resourceParameters, ResourceUriType.NextPage),
+                "next_page",
+                "GET"));
+            }
+            if (hasPreviousPage)
+            {
+                links.Add(new LinkDto(
+               CreateApplicationClientResourceUri(resourceParameters, ResourceUriType.PreviousPage),
+               "previous_page",
+               "GET"));
+            }
+            return links;
         }
 
         private IEnumerable<LinkDto> CreateLinksForApplicationClient(

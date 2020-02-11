@@ -33,11 +33,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
-            this.dataService = dataService 
+            this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
-            this.propertyMappingService = propertyMappingService 
+            this.propertyMappingService = propertyMappingService
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
-            this.propertyCheckerService = propertyCheckerService 
+            this.propertyCheckerService = propertyCheckerService
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
@@ -50,36 +50,28 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return BadRequest();
             if (!propertyCheckerService.TypeHasProperties<UserDto>(resourceParameter.Fields, true))
                 return BadRequest();
-            
+
             var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
             if (users.Count == 0) return NotFound();
-
-            var previousPageLink = users.HasPrevious ?
-                CreateUsersResourceUri(resourceParameter,
-                ResourceUriType.PreviousPage) : null;
-
-            var nextPageLink = users.HasNext ?
-                CreateUsersResourceUri(resourceParameter,
-                ResourceUriType.NextPage) : null;
 
             var paginationMetaData = new
             {
                 totalCount = users.TotalCount,
                 pageSize = users.PageSize,
                 currentPage = users.CurrentPage,
-                totalPages = users.TotalPages,
-                previousPageLink,
-                nextPageLink
+                totalPages = users.TotalPages
             };
 
             Response.Headers.Add("X-Pagination",
                 JsonSerializer.Serialize(paginationMetaData));
 
-            var usersToReturn = this.mapper
+            var links = CreateLinksForUsers(resourceParameter, users.HasNext, users.HasPrevious);
+
+            var shapedUsersToReturn = this.mapper
                 .Map<IEnumerable<UserDto>>(users)
                 .ShapeData(resourceParameter.Fields);
 
-            var usersToReturnWithLinks = usersToReturn.Select(user =>
+            var shapedUsersToReturnWithLinks = shapedUsersToReturn.Select(user =>
             {
                 var userAsDictionary = user as IDictionary<string, object>;
                 var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"], resourceParameter.Fields);
@@ -87,8 +79,14 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return userAsDictionary;
             });
 
-            return Ok(usersToReturnWithLinks);
-        }       
+            var usersToReturn = new
+            {
+                value = shapedUsersToReturnWithLinks,
+                links
+            };
+
+            return Ok(usersToReturn);
+        }
 
         [HttpGet("{userId:guid}", Name = "GetUser")]
         // GET: api/users/1
@@ -193,6 +191,35 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 "remove_claims_to_user",
                 "DELETE"));
 
+            return links;
+        }
+
+        private IEnumerable<LinkDto> CreateLinksForUsers(
+            ApplicationUserResourceParameter resourceParameters,
+            bool hasNextPage,
+            bool hasPreviousPage)
+        {
+            var links = new List<LinkDto>();
+
+            links.Add(new LinkDto(
+                CreateUsersResourceUri(resourceParameters, ResourceUriType.Current),
+                "self",
+                "GET"));
+
+            if (hasNextPage)
+            {
+                links.Add(new LinkDto(
+                CreateUsersResourceUri(resourceParameters, ResourceUriType.NextPage),
+                "next_page",
+                "GET"));
+            }
+            if (hasPreviousPage)
+            {
+                links.Add(new LinkDto(
+               CreateUsersResourceUri(resourceParameters, ResourceUriType.PreviousPage),
+               "previous_page",
+               "GET"));
+            }
             return links;
         }
 
