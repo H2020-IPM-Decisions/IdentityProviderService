@@ -212,6 +212,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetApplicationClients",
                     new
                     {
+                        orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber - 1,
                         pageSize = resourceParameters.PageSize,
                         isEnabled = resourceParameters.IsEnabled,
@@ -221,6 +222,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetApplicationClients",
                     new
                     {
+                        orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber + 1,
                         pageSize = resourceParameters.PageSize,
                         isEnabled = resourceParameters.IsEnabled,
@@ -231,6 +233,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return Url.Link("GetApplicationClients",
                     new
                     {
+                        orderBy = resourceParameters.OrderBy,
                         pageNumber = resourceParameters.PageNumber,
                         pageSize = resourceParameters.PageSize,
                         isEnabled = resourceParameters.IsEnabled,
