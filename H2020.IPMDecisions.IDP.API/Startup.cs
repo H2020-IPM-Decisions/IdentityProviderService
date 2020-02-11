@@ -42,6 +42,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.ConfigureJwtAuthentication(Configuration);
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+            services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
 
             services.AddAutoMapper(typeof(MainProfile));
 

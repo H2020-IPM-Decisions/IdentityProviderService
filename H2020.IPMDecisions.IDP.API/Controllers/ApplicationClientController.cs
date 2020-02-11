@@ -27,11 +27,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         private readonly IDataService dataService;
         private readonly IMapper mapper;
         private readonly IPropertyMappingService propertyMappingService;
+        private readonly IPropertyCheckerService propertyCheckerService;
 
         public ApplicationClientController(
             IDataService dataService, 
             IMapper mapper,
-            IPropertyMappingService propertyMappingService)
+            IPropertyMappingService propertyMappingService,
+            IPropertyCheckerService propertyCheckerService)
         {
             this.dataService = dataService
                 ?? throw new System.ArgumentNullException(nameof(dataService));
@@ -39,6 +41,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(mapper));
             this.propertyMappingService = propertyMappingService 
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
+            this.propertyCheckerService = propertyCheckerService 
+                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
         [HttpGet("", Name = "GetApplicationClients")]
@@ -48,6 +52,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromQuery] ApplicationClientResourceParameter resourceParameter)
         {
             if (!propertyMappingService.ValidMappingExistsFor<ApplicationClientDto, ApplicationClient>(resourceParameter.OrderBy))
+            {
+                return BadRequest();
+            }
+            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(resourceParameter.Fields, true))
             {
                 return BadRequest();
             }
@@ -95,8 +103,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Route("")]
         // POST: api/applicationclient
         public async Task<ActionResult<ApplicationClientDto>> Post(
-            [FromBody] ApplicationClientForCreationDto clientForCreationDto)
+            [FromBody] ApplicationClientForCreationDto clientForCreationDto, [FromQuery] string fields)
         {
+            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields, true))
+            {
+                return BadRequest();
+            }
 
             var regex = new Regex("^[a-zA-Z0-9 ]*$");
             if (!regex.IsMatch(clientForCreationDto.Name))
@@ -115,7 +127,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
-                .ShapeData("")
+                .ShapeData(fields)
                 as IDictionary<string, object>; ;
             clientToReturn.Add("links", links);
 
@@ -186,6 +198,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/applicationclient/1
         public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
         {
+            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields))
+            {
+                return BadRequest();
+            }
             var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
             if (clientFromRepository == null) return NotFound();
 

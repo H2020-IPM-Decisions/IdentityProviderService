@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using H2020.IPMDecisions.IDP.Data.Core;
+using H2020.IPMDecisions.IDP.Core.Services;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -20,15 +21,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     {
         private readonly IDataService dataService;
         private readonly IMapper mapper;
+        private readonly IPropertyCheckerService propertyCheckerService;
 
         public RolesController(
             IDataService dataService,
-            IMapper mapper)
+            IMapper mapper,
+            IPropertyCheckerService propertyCheckerService)
         {
             this.dataService = dataService 
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.mapper = mapper
                 ?? throw new System.ArgumentNullException(nameof(mapper));
+            this.propertyCheckerService = propertyCheckerService 
+                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
         [HttpGet("", Name = "GetRoles")]
@@ -36,14 +41,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/Roles
         public async Task<IActionResult> Get([FromQuery] string fields)
         {
+            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
+            {
+                return BadRequest();
+            }
             var roles = await this.dataService.RoleManager.Roles.ToListAsync();
             if (roles.Count == 0) return NotFound();
 
-            var rolesToReturn = this.mapper.Map<List<RoleDto>>(roles);
+            var rolesToReturn = this.mapper
+                .Map<IEnumerable<RoleDto>>(roles)
+                .ShapeData(fields);
 
             var rolesToReturnWithLinks = rolesToReturn.Select(role =>
             {
-                var userAsDictionary = role.ShapeData(fields) as IDictionary<string, object>;
+                var userAsDictionary = role as IDictionary<string, object>;
                 var userLinks = CreateLinksForRole((Guid)userAsDictionary["Id"]);
                 userAsDictionary.Add("links", userLinks);
                 return userAsDictionary;
@@ -56,6 +67,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/Roles/5
         public async Task<IActionResult> Get(Guid roleId, [FromQuery] string fields)
         {
+            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
+            {
+                return BadRequest();
+            }
             var roleEntity = await this.dataService.RoleManager.FindByIdAsync(roleId.ToString());
 
             if (roleEntity == null) return NotFound();
@@ -73,6 +88,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // POST: api/Roles
         public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto, [FromQuery] string fields)
         {
+            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
+            {
+                return BadRequest();
+            }
+
             var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
             var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
 

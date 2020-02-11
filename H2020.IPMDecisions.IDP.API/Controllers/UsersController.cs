@@ -23,11 +23,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         private readonly IMapper mapper;
         private readonly IDataService dataService;
         private readonly IPropertyMappingService propertyMappingService;
+        private readonly IPropertyCheckerService propertyCheckerService;
 
         public UsersController(
             IMapper mapper,
             IDataService dataService,
-            IPropertyMappingService propertyMappingService)
+            IPropertyMappingService propertyMappingService,
+            IPropertyCheckerService propertyCheckerService)
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
@@ -35,6 +37,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.propertyMappingService = propertyMappingService 
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
+            this.propertyCheckerService = propertyCheckerService 
+                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
         [HttpGet("", Name = "GetUsers")]
@@ -43,6 +47,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> GetUsers([FromQuery] ApplicationUserResourceParameter resourceParameter)
         {
             if (!propertyMappingService.ValidMappingExistsFor<UserDto, ApplicationUser>(resourceParameter.OrderBy))
+            {
+                return BadRequest();
+            }
+            if (!propertyCheckerService.TypeHasProperties<UserDto>(resourceParameter.Fields, true))
             {
                 return BadRequest();
             }
@@ -90,7 +98,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // GET: api/users/1
         public async Task<IActionResult> GetUser([FromRoute] Guid userId, [FromQuery] string fields)
         {
-            // var user = await this.dataService.ApplicationUsers.FindByIdAsync(userId);
+            if (!propertyCheckerService.TypeHasProperties<UserDto>(fields))
+            {
+                return BadRequest();
+            }
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
 
             if (user == null) return NotFound();
