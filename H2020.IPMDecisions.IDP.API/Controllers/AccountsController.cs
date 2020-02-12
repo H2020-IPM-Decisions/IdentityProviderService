@@ -1,6 +1,8 @@
 using System;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using AutoMapper;
+using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.API.Providers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
@@ -39,7 +41,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(config));
         }
 
-        [Consumes("application/json")]
+        [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [AllowAnonymous]
@@ -65,11 +67,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(result);
         }
 
-        [Consumes("application/json")]
+        [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [AllowAnonymous]
         [HttpPost("authenticate", Name = "AuthenticateUser")]
+        [RequiredClientHeader()]
         // POST: api/Accounts/authenticate
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
         {

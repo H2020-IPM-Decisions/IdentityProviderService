@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -102,10 +103,26 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                         Name = "Use under GNU General Public License v3.0",
                         Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.txt"),
                     }});
-                c.DescribeAllParametersInCamelCase();                
+                c.DescribeAllParametersInCamelCase();
+
+                c.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = @"JWT Authorization header using the Bearer scheme. 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      Example: 'Bearer 12345abcdef'",
+                });
+
+                c.OperationFilter<SecurityRequirementsOperationFilter>();
+                c.OperationFilter<AddRequiredClientHeaderParameter>();
+                
             });
 
-            services.AddSwaggerGenNewtonsoftSupport();
+            services.AddSwaggerGenNewtonsoftSupport();            
         }
 
         public static void ConfigureCors(this IServiceCollection services, IConfiguration config)
@@ -125,7 +142,5 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             var listOfAudiences = audiences.Split(';').ToList();
             return listOfAudiences;
         }
-
-        
     }
 }

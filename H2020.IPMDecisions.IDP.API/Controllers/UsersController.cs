@@ -13,16 +13,14 @@ using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces("application/json")]
     [ApiController]
     [Route("api/users")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController : ControllerBase
     {
         private readonly IMapper mapper;
@@ -44,8 +42,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
             this.propertyCheckerService = propertyCheckerService
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
-        }
-
+        }   
+        
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetUsers")]
