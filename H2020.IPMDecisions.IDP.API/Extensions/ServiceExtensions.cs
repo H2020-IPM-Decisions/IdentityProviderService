@@ -101,8 +101,11 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                     {
                         Name = "Use under GNU General Public License v3.0",
                         Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.txt"),
-                    } });
+                    }});
+                c.DescribeAllParametersInCamelCase();                
             });
+
+            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         public static void ConfigureCors(this IServiceCollection services, IConfiguration config)

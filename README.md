@@ -67,13 +67,13 @@ dotnet ef migrations add YourMessage --project ..\H2020.IPMDecisions.IDP.Data\H2
 dotnet ef database update
 ```
 
-### How to setup JsonWebToken (JWT) provider
+### How to set-up the JsonWebToken (JWT) provider
 
 Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json section `JwtSettings` with the your server information.
 1. TokenLifetimeMinutes: Valid lifetime of the JWT in minutes.
-2. AuthorizationServerSecret: This parameter holds a secret key to sign the JWT.
-3. AuthorizationServerUrl: This parameter holds who is issuing the certificate, the IDP service
-4. ApiGatewayServerUrl: This parameter holds which client URL can use this IDP service
+2. SecretKey: This parameter holds a secret key to sign the JWT. Your resource API should have the same secret in the JWT properties.
+3. IssuerServerUrl: This parameter holds who is issuing the certificate, usually will be this server. Your resource API should have the same issuer url in the JWT properties.
+4. ValidAudiencesUrls: This parameter holds which clients URLs can use this IDP service. The different URLS should be separated by a semicolon **";"**. At least one of the client URL should be added into your resource API JWT properties.
 
 ### How to run the project
 
@@ -84,6 +84,14 @@ As explained above, the develop branch is an active development branch.
 dotnet run
 ```
 The solution will start in the default ports (https://localhost:5001;http://localhost:5000) defined in the file. `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json`
+
+### How to set-up CORS policy
+
+Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json section `AllowedHosts` with the host that you would like to allow to consume the API.
+The different URLS should be separated by a semicolon **";"**. If you would like to allow any origin, write an asterisk on the string **"*"**
+
+### API Discovery
+A [Swagger UI](https://swagger.io/) has been added to help the discovery of the API endpoints and the data transfer models (DTOs) needed for the use of the API. To access the User Interface, navigate to https://localhost:5001/swagger
 
 ### How to interact with the project
 
