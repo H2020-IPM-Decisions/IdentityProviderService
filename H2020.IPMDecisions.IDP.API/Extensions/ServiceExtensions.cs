@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace H2020.IPMDecisions.IDP.API.Extensions
 {
@@ -80,6 +82,47 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey))
                 };
             });
+        }
+
+        public static void ConfigureSwagger(this IServiceCollection services){
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "H2020 IPM Decisions - Identity Provider API", 
+                    Version = "v1",
+                    Description = "Identity Provider for the H2020 IPM Decisions project",
+                    // TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "ADAS Modelling and Informatics Team",
+                        Email = "software@adas.co.uk",
+                        Url = new Uri("https://www.adas.uk/"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under GNU General Public License v3.0",
+                        Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.txt"),
+                    }});
+                c.DescribeAllParametersInCamelCase();
+
+                c.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = @"JWT Authorization header using the Bearer scheme. 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      Example: 'Bearer 12345abcdef'",
+                });
+
+                c.OperationFilter<SecurityRequirementsOperationFilter>();
+                c.OperationFilter<AddRequiredClientHeaderParameter>();
+                
+            });
+
+            services.AddSwaggerGenNewtonsoftSupport();            
         }
 
         public static void ConfigureCors(this IServiceCollection services, IConfiguration config)

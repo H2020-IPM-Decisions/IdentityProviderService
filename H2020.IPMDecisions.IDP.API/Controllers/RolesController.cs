@@ -11,11 +11,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Core.Services;
+using System.Net.Mime;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    JwtBearerDefaults.AuthenticationScheme)]
     [Route("/api/roles")]
     public class RolesController : ControllerBase
     {
@@ -36,6 +41,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetRoles")]
         [HttpHead]
         // GET: api/Roles
@@ -62,6 +70,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(rolesToReturnWithLinks);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{roleId:guid}", Name = "GetRole")]
         // GET: api/Roles/5
         public async Task<IActionResult> Get(Guid roleId, [FromQuery] string fields)
@@ -82,6 +93,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(roleToReturn);
         }
 
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("", Name = "CreateRole")]
         // POST: api/Roles
         public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto)
@@ -106,6 +120,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(result);
         }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{roleId:guid}", Name = "DeleteRole")]
         // DELETE: api/Roles/5
         public async Task<IActionResult> Delete(Guid roleId)
@@ -119,6 +136,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(result);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         // OPTIONS: api/Roles
         public IActionResult Options()

@@ -1,19 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Data.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/users/{userId:guid}/claims")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    JwtBearerDefaults.AuthenticationScheme)]
     public class UserClaimsController : ControllerBase
     {
         private readonly IDataService dataService;
@@ -29,6 +34,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("", Name = "AssignClaimsToUser")]
         // POST: api/users/1/Claims
         public async Task<IActionResult> Post(
@@ -49,9 +57,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             }
 
             var userToReturn = this.mapper.Map<UserDto>(user);
-            return Ok(userToReturn);
+            return CreatedAtRoute("GetClaimsFromUser",
+                    new { userId = userToReturn.Id },
+                    userToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("", Name = "RemoveClaimsFromUser")]
         // DELETE: api/users/1/Claims
         public async Task<IActionResult> Delete(
@@ -69,6 +81,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(userToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetClaimsFromUser")]
         // GET: api/users/1/Claims
         public async Task<IActionResult> Get(
@@ -83,6 +97,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(claimsToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         // OPTIONS: api/users/1/Claims
         public IActionResult Options()

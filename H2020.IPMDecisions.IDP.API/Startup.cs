@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 
 namespace H2020.IPMDecisions.IDP.API
@@ -36,7 +37,7 @@ namespace H2020.IPMDecisions.IDP.API
                      setupAction.SerializerSettings.ContractResolver =
                      new CamelCasePropertyNamesContractResolver();
                  });
-                 
+
             services.ConfigureIdentity();
 
             services.ConfigureJwtAuthentication(Configuration);
@@ -49,6 +50,8 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddScoped<IDataService, DataService>();
 
             services.ConfigureMySqlContext(Configuration);
+
+            services.ConfigureSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,6 +71,12 @@ namespace H2020.IPMDecisions.IDP.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "H2020 IPM Decisions - Identity Provider API");
             });
         }
     }

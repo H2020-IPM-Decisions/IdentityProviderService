@@ -12,12 +12,17 @@ using System.Text.Json;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Net.Mime;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/users")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController : ControllerBase
     {
         private readonly IMapper mapper;
@@ -39,8 +44,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
             this.propertyCheckerService = propertyCheckerService
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
-        }
-
+        }   
+        
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetUsers")]
         [HttpHead]
         // GET: api/users
@@ -88,6 +96,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(usersToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{userId:guid}", Name = "GetUser")]
         // GET: api/users/1
         public async Task<IActionResult> GetUser([FromRoute] Guid userId, [FromQuery] string fields)
@@ -110,6 +120,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(userToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{userId:guid}", Name = "DeleteUser")]
         // DELETE: api/users/1
         public async Task<IActionResult> DeleteUser([FromRoute] Guid userId)
@@ -125,6 +137,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(result);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         // OPTIONS: api/users
         public IActionResult Options()

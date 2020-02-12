@@ -1,17 +1,21 @@
 using System;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using AutoMapper;
+using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.API.Providers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/accounts")]
     public class AccountsController : ControllerBase
@@ -37,9 +41,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(config));
         }
 
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [AllowAnonymous]
-        [HttpPost("Register", Name = "RegisterUser")]
-        // POST: api/Accounts/Register
+        [HttpPost("register", Name = "RegisterUser")]
+        // POST: api/Accounts/register
         public async Task<ActionResult<UserDto>> Register([FromBody] UserForRegistrationDto userForRegistration)
         {
             var userEntity = this.mapper.Map<ApplicationUser>(userForRegistration);
@@ -53,16 +60,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 var userToReturn = this.mapper.Map<UserDto>(userEntity);
 
                 return CreatedAtRoute("GetUser",
-                new { userId = userToReturn.Id },
-                userToReturn);
+                    new { userId = userToReturn.Id },
+                    userToReturn);
             }
 
             return BadRequest(result);
         }
 
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [AllowAnonymous]
-        [HttpPost("Authenticate", Name = "AuthenticateUser")]
-        // POST: api/Accounts/Authenticate
+        [HttpPost("authenticate", Name = "AuthenticateUser")]
+        [RequiredClientHeader("client_id", "client_secret", "grant_type")]
+        // POST: api/Accounts/authenticate
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
         {
             var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
@@ -77,6 +88,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(new { Token = token });
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         public IActionResult Options()
         {
