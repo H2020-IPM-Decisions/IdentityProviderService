@@ -72,7 +72,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [AllowAnonymous]
         [HttpPost("authenticate", Name = "AuthenticateUser")]
-        [RequiredClientHeader()]
+        [RequiredClientHeader("client_id", "client_secret", "grant_type")]
         // POST: api/Accounts/authenticate
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
         {
