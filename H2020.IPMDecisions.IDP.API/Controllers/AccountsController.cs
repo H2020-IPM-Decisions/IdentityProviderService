@@ -15,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/accounts")]
     public class AccountsController : ControllerBase
@@ -60,8 +60,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 var userToReturn = this.mapper.Map<UserDto>(userEntity);
 
                 return CreatedAtRoute("GetUser",
-                new { userId = userToReturn.Id },
-                userToReturn);
+                    new { userId = userToReturn.Id },
+                    userToReturn);
             }
 
             return BadRequest(result);

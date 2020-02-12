@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Net.Mime;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     [Route("/api")]
     [ApiController]
     public class RootController : ControllerBase

@@ -1,19 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/users/{userId:guid}/roles")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    JwtBearerDefaults.AuthenticationScheme)]
     public class UserRolesController : ControllerBase
     {
         private readonly IDataService dataService;
@@ -28,7 +32,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
         }
-
+        
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("", Name = "AssignRolesToUser")]
         // POST: api/users/1/roles
         public async Task<IActionResult> Post(
@@ -51,9 +58,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             }
 
             var userToReturn = this.mapper.Map<UserDto>(user);
-            return Ok(userToReturn);
+            return CreatedAtRoute("GetRolesFromUser",
+                    new { userId = userToReturn.Id },
+                    userToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("", Name = "RemoveRolesFromUser")]
         // DELETE: api/users/1/roles
         public async Task<IActionResult> Delete(
@@ -76,6 +87,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(userToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetRolesFromUser")]
         // GET: api/users/1/roles
         public async Task<IActionResult> Get(
@@ -90,6 +103,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(rolesToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         // OPTIONS: api/users/1/roles
         public IActionResult Options()

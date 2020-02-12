@@ -16,10 +16,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Json;
 using H2020.IPMDecisions.IDP.Core.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Net.Mime;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Authorize(Roles = "SuperAdmin")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("/api/applicationclient")]
     public class ApplicationClientController : ControllerBase

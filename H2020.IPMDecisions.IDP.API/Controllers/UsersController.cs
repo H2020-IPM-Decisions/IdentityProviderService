@@ -14,9 +14,11 @@ using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Net.Mime;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/users")]
     [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
