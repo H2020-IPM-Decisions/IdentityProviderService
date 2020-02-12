@@ -12,6 +12,7 @@ namespace H2020.IPMDecisions.IDP.Data.Core
         Task CompleteAsync();
         UserManager<ApplicationUser> UserManager { get; }
         IUserManagerExtensionRepository UserManagerExtensions { get; }
+        IRefreshTokenRepository RefreshTokens { get; }
         RoleManager<IdentityRole> RoleManager { get; }
     }
 }

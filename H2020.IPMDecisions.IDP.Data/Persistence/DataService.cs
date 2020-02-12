@@ -29,7 +29,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
             }
         }
 
-        private IUserManagerExtensionRepository userManagerExtensions;
+        private IUserManagerExtensionRepository userManagerExtensions;       
         public IUserManagerExtensionRepository UserManagerExtensions
         {
             get
@@ -40,7 +40,19 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
                 }
                 return userManagerExtensions;
             }
-        }      
+        }
+
+        private IRefreshTokenRepository refreshTokens;
+        public IRefreshTokenRepository RefreshTokens {
+            get
+            {
+                if (refreshTokens == null)
+                {
+                    refreshTokens = new RefreshTokenRepository(this.context);
+                }
+                return refreshTokens;
+            }
+        }
 
         public DataService(
             ApplicationDbContext context,
