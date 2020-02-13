@@ -16,8 +16,7 @@ namespace H2020.IPMDecisions.IDP.Core.Entities
 
         [Required]
         public string ProtectedTicket { get; set; }
-
-        public virtual ApplicationUser User { get; set; }
+        
         public virtual ApplicationClient ApplicationClient { get; set; }
     }
 }
