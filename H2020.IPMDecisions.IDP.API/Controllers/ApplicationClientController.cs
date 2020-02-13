@@ -18,6 +18,7 @@ using System.Text.Json;
 using H2020.IPMDecisions.IDP.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Net.Mime;
+using Microsoft.AspNetCore.Http;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -49,6 +50,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetApplicationClients")]
         [HttpHead]
         // GET: api/applicationclient
@@ -97,6 +101,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(applicationClientsToReturn);
         }
 
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
         [Route("")]
         // POST: api/applicationclient
@@ -126,8 +133,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return CreatedAtRoute("GetApplicationClient",
                  new { id = clientToReturn["Id"] },
                  clientToReturn);
-        }       
+        }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id:guid}", Name = "DeleteApplicationClient")]
         //DELETE :  api/applicationclient/1
         public async Task<IActionResult> Delete([FromRoute] Guid id)
@@ -142,6 +151,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return NoContent();
         }
 
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPatch("{id:guid}", Name = "PartialUpdateApplicationClient")]
         //PATCH :  api/applicationclient/1
         public async Task<IActionResult> PartialUpdate(
@@ -186,6 +199,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return NoContent();
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id:guid}", Name = "GetApplicationClient")]
         // GET: api/applicationclient/1
         public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
@@ -205,6 +221,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(clientToReturn);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         // OPTIONS: api/applicationclient
         public IActionResult Options()
