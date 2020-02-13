@@ -12,6 +12,8 @@ using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using System.Linq;
 using System;
+using H2020.IPMDecisions.IDP.Core.Services;
+using System.Text.Json;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -24,15 +26,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     {
         private readonly IDataService dataService;
         private readonly IMapper mapper;
+        private readonly IPropertyCheckerService propertyCheckerService;
 
         public RefreshTokensController(
             IDataService dataService,
-            IMapper mapper)
+            IMapper mapper,
+            IPropertyCheckerService propertyCheckerService)
         {
             this.dataService = dataService
                 ?? throw new System.ArgumentNullException(nameof(dataService));
             this.mapper = mapper
                 ?? throw new System.ArgumentNullException(nameof(mapper));
+            this.propertyCheckerService = propertyCheckerService
+                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -41,27 +47,68 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpGet("", Name = "GetRefreshTokens")]
         [HttpHead]
         // GET: api/refreshtokens
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] RefreshTokenResourceParameter resourceParameter)
         {
-            var refreshTokens = await this.dataService.RefreshTokens.FindAllAsync();
-            if (refreshTokens.Count() == 0) return NotFound();
-            
-            var refreshtokensToReturn = this.mapper
-                .Map<IEnumerable<RefreshTokenDto>>(refreshTokens);
+            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(resourceParameter.Fields, true))
+                return BadRequest();
 
-            return Ok(refreshtokensToReturn);
+            var refreshTokens = await this.dataService.RefreshTokens.FindAllAsync(resourceParameter);
+            if (refreshTokens.Count() == 0) return NotFound();
+
+            var paginationMetaData = new
+            {
+                totalCount = refreshTokens.TotalCount,
+                pageSize = refreshTokens.PageSize,
+                currentPage = refreshTokens.CurrentPage,
+                totalPages = refreshTokens.TotalPages
+            };
+
+            Response.Headers.Add("X-Pagination",
+                JsonSerializer.Serialize(paginationMetaData));
+
+            var links = CreateLinksForRefreshTokens(resourceParameter, refreshTokens.HasNext, refreshTokens.HasPrevious);
+
+            var shapedRefreshTokens = this.mapper
+                .Map<IEnumerable<RefreshTokenDto>>(refreshTokens)
+                .ShapeData(resourceParameter.Fields);
+
+            var refreshTokensToReturnWithLinks = shapedRefreshTokens.Select(token =>
+            {
+                var tokenAsDictionary = token as IDictionary<string, object>;
+                var userLinks = CreateLinksForRefreshToken((Guid)tokenAsDictionary["Id"], resourceParameter.Fields);
+                tokenAsDictionary.Add("links", userLinks);
+                return tokenAsDictionary;
+            });
+
+            var RefreshTokensToReturn = new
+            {
+                value = refreshTokensToReturnWithLinks,
+                links
+            };
+
+            return Ok(RefreshTokensToReturn);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id:guid}", Name = "GetRefreshToken")]
         // GET: api/applicationclient/1
-        public async Task<IActionResult> Get([FromRoute] Guid id)
+        public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
         {
+            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
+                return BadRequest();
+
             var refreshTokenFromRepository = await this.dataService.RefreshTokens.FindByIdAsync(id);
             if (refreshTokenFromRepository == null) return NotFound();
 
-            var clientToReturn = this.mapper.Map<RefreshTokenDto>(refreshTokenFromRepository);
+            var links = CreateLinksForRefreshToken(id, fields);
+
+            var clientToReturn = this.mapper
+                .Map<RefreshTokenDto>(refreshTokenFromRepository)
+                .ShapeData(fields)
+                as IDictionary<string, object>;
+
+            clientToReturn.Add("links", links);
             return Ok(clientToReturn);
         }
 
@@ -81,6 +128,99 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return NoContent();
         }
 
+        #region helpers
+        private string CreateRefreshTokenResourceUri(
+               RefreshTokenResourceParameter resourceParameters,
+               ResourceUriType type)
+        {
+            switch (type)
+            {
+                case ResourceUriType.PreviousPage:
+                    return Url.Link("GetRefreshTokens",
+                    new
+                    {
+                        fields = resourceParameters.Fields,
+                        pageNumber = resourceParameters.PageNumber - 1,
+                        pageSize = resourceParameters.PageSize,
+                    });
+                case ResourceUriType.NextPage:
+                    return Url.Link("GetRefreshTokens",
+                    new
+                    {
+                        fields = resourceParameters.Fields,
+                        pageNumber = resourceParameters.PageNumber + 1,
+                        pageSize = resourceParameters.PageSize,
+                    });
+                case ResourceUriType.Current:
+                default:
+                    return Url.Link("GetRefreshTokens",
+                    new
+                    {
+                        fields = resourceParameters.Fields,
+                        pageNumber = resourceParameters.PageNumber,
+                        pageSize = resourceParameters.PageSize,
+                    });
+            }
+        }
+
+        private IEnumerable<LinkDto> CreateLinksForRefreshTokens(
+            RefreshTokenResourceParameter resourceParameters,
+            bool hasNextPage,
+            bool hasPreviousPage)
+        {
+            var links = new List<LinkDto>();
+
+            links.Add(new LinkDto(
+                CreateRefreshTokenResourceUri(resourceParameters, ResourceUriType.Current),
+                "self",
+                "GET"));
+
+            if (hasNextPage)
+            {
+                links.Add(new LinkDto(
+                CreateRefreshTokenResourceUri(resourceParameters, ResourceUriType.NextPage),
+                "next_page",
+                "GET"));
+            }
+            if (hasPreviousPage)
+            {
+                links.Add(new LinkDto(
+               CreateRefreshTokenResourceUri(resourceParameters, ResourceUriType.PreviousPage),
+               "previous_page",
+               "GET"));
+            }
+            return links;
+        }
+
+        private IEnumerable<LinkDto> CreateLinksForRefreshToken(
+            Guid id,
+            string fields = "")
+        {
+            var links = new List<LinkDto>();
+
+            if (string.IsNullOrWhiteSpace(fields))
+            {
+                links.Add(new LinkDto(
+                Url.Link("GetRefreshToken", new { id }),
+                "self",
+                "GET"));
+            }
+            else
+            {
+                links.Add(new LinkDto(
+                 Url.Link("GetRefreshToken", new { id, fields }),
+                 "self",
+                 "GET"));
+            }
+
+            links.Add(new LinkDto(
+                Url.Link("DeleteRefreshToken", new { id }),
+                "delete_refresh_token",
+                "DELETE"));
+
+            return links;
+        }
+        #endregion
 
     }
 }

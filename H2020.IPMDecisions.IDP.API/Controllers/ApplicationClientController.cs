@@ -332,11 +332,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             }
 
             links.Add(new LinkDto(
-                Url.Link("GetApplicationClient", new { id }),
-                "self",
-                "GET"));
-
-            links.Add(new LinkDto(
                 Url.Link("DeleteApplicationClient", new { id }),
                 "delete_application_client",
                 "DELETE"));
