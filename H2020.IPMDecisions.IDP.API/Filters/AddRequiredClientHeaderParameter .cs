@@ -42,6 +42,16 @@ namespace H2020.IPMDecisions.IDP.API.Filters
                 Description = "Grant Type",
                 Required = true,
                 AllowEmptyValue = false,
+                Style = ParameterStyle.Simple            
+            });
+
+            operation.Parameters.Add(new OpenApiParameter
+            {
+                Name = "refresh_token",
+                In = ParameterLocation.Header,
+                Description = "Refresh Token",
+                Required = false,
+                AllowEmptyValue = true,
                 Style = ParameterStyle.Simple
             });
         }
