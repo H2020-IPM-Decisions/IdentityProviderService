@@ -24,7 +24,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
         }
 
         public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
-        {
+        {            
             var response = new AuthenticationProviderResult<ApplicationClient>()
             {
                 IsSuccessful = false,

@@ -28,7 +28,6 @@ namespace H2020.IPMDecisions.IDP.API.Providers
         }
 
         public string GenerateToken(
-
                 List<Claim> claims,
                 string audienceServerUrl)
         {

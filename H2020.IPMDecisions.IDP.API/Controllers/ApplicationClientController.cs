@@ -34,7 +34,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         private readonly IPropertyCheckerService propertyCheckerService;
 
         public ApplicationClientController(
-            IDataService dataService, 
+            IDataService dataService,
             IMapper mapper,
             IPropertyMappingService propertyMappingService,
             IPropertyCheckerService propertyCheckerService)
