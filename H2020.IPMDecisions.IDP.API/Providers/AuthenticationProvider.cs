@@ -23,7 +23,6 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 ?? throw new ArgumentNullException(nameof(dataService));
         }
 
-
         public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
         {
             var response = new AuthenticationProviderResult<ApplicationClient>()
@@ -124,13 +123,18 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             };
 
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-
+            response.ResponseMessage = "Unauthorized";
             if (user == null)
-            {
-                response.ResponseMessage = "User is incorrect";
                 return response;
-            }
+
+            if (!await this.signInManager.CanSignInAsync(user))
+                return response;
+
+            if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
+                return response;
+
             response.IsSuccessful = true;
+            response.ResponseMessage = "";
             response.Result = user;
             return response;
 

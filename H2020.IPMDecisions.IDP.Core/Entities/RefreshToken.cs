@@ -17,6 +17,9 @@ namespace H2020.IPMDecisions.IDP.Core.Entities
         [Required]
         public string ProtectedTicket { get; set; }
         
+         [Required]
+         public DateTime ExpiresUtc { get; set; }
+        
         public virtual ApplicationClient ApplicationClient { get; set; }
     }
 }

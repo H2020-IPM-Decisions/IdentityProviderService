@@ -16,6 +16,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
     {
         private readonly IConfiguration config;
         private readonly IDataService dataService;
+
         public JWTProvider(
             IDataService dataService,
             IConfiguration config)
@@ -24,8 +25,8 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 ?? throw new ArgumentNullException(nameof(config));
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
-
         }
+
         public string GenerateToken(
 
                 List<Claim> claims,

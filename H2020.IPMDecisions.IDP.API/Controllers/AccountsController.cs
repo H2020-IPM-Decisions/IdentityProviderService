@@ -121,12 +121,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var claims = await this.jWTProvider.GetValidClaims(isAuthorize.Result);
             var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.Url);
-            
+            var refreshToken = await this.refreshTokenProvider.GenerateRefreshToken(isAuthorize.Result, isValidClient.Result);
+
             return Ok(new
             {
                 token,
                 token_type = "bearer",
-                refreshToken = isValidRefreshToken.Result.ProtectedTicket
+                refreshToken
             });
         }
 

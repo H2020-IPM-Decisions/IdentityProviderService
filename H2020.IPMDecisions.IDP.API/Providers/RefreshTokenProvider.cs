@@ -1,17 +1,17 @@
 using System;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
-using Microsoft.IdentityModel.Tokens;
 
 namespace H2020.IPMDecisions.IDP.API.Providers
 {
-        public class RefreshTokenProvider : IRefreshTokenProvider
+    public class RefreshTokenProvider : IRefreshTokenProvider
     {
         private readonly IDataService dataService;
-        public RefreshTokenProvider(IDataService dataService)
+
+        public RefreshTokenProvider(
+            IDataService dataService)
         {
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
@@ -21,7 +21,6 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             ApplicationUser user,
             ApplicationClient client)
         {
-
             var existingRefreshToken = await this.dataService
                 .RefreshTokens
                 .FindByCondition(r => r.ApplicationClientId == client.Id && r.UserId.ToString() == user.Id);
@@ -36,6 +35,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 UserId = Guid.Parse(user.Id),
                 ApplicationClientId = client.Id,
                 ProtectedTicket = GenerateRefreshToken(),
+                ExpiresUtc = DateTime.Now.AddMinutes(client.RefreshTokenLifeTime).ToUniversalTime()
             };
 
             dataService.RefreshTokens.Create(refreshToken);
@@ -66,21 +66,15 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
             }
 
-            dataService.RefreshTokens.Delete(existingRefreshToken);
-
-            RefreshToken newRefreshToken = new RefreshToken()
+            if (existingRefreshToken.ExpiresUtc < DateTime.Now.ToUniversalTime())
             {
-                UserId = existingRefreshToken.UserId,
-                ApplicationClientId = client.Id,
-                ProtectedTicket = GenerateRefreshToken(),
-            };
-
-            dataService.RefreshTokens.Create(newRefreshToken);
-            await dataService.CompleteAsync();
+                response.ResponseMessage = "Token expired";
+                return response;
+            }
+            
 
             response.IsSuccessful = true;
-            response.Result = newRefreshToken;
-
+            response.Result = existingRefreshToken;
             return response;
         }
 
