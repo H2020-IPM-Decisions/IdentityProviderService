@@ -1,85 +1,30 @@
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace H2020.IPMDecisions.IDP.API.Providers
 {
-    public static class AuthenticationProvider
+    public class AuthenticationProvider : IAuthenticationProvider
     {
-        public static async Task<List<Claim>> GetValidClaims(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            ApplicationUser user)
+        private readonly IDataService dataService;
+        private readonly SignInManager<ApplicationUser> signInManager;
+
+        public AuthenticationProvider(
+            IDataService dataService,
+            SignInManager<ApplicationUser> signInManager)
         {
-            IdentityOptions _options = new IdentityOptions();
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, await JtiGenerator()),
-                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64),
-                new Claim(_options.ClaimsIdentity.UserIdClaimType, user.Id.ToString()),
-                new Claim(_options.ClaimsIdentity.UserNameClaimType, user.UserName)
-            };
-
-            var userClaims = await userManager.GetClaimsAsync(user);
-            claims.AddRange(userClaims);
-
-            var userRoles = await userManager.GetRolesAsync(user);
-            foreach (var userRole in userRoles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, userRole));
-                var role = await roleManager.FindByNameAsync(userRole);
-                if (role != null)
-                {
-                    var roleClaims = await roleManager.GetClaimsAsync(role);
-                    foreach (Claim roleClaim in roleClaims)
-                    {
-                        claims.Add(roleClaim);
-                    }
-                }
-            }
-            return claims;
+            this.signInManager = signInManager
+                ?? throw new ArgumentNullException(nameof(signInManager));
+            this.dataService = dataService
+                ?? throw new ArgumentNullException(nameof(dataService));
         }
 
-        public static string GenerateToken(
-                IConfiguration config,
-                List<Claim> claims)
-        {
-            var tokenLifetimeMinutes = config["JwtSettings:TokenLifetimeMinutes"];
-            var authorizationServerUrl = config["JwtSettings:AuthorizationServerUrl"];
-            var audienceServerUrl = config["JwtSettings:ApiGatewayServerUrl"];
-            var authorizationSecretKey = config["JwtSettings:AuthorizationServerSecret"];
-
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authorizationSecretKey));
-            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-
-            var tokenOptions = new JwtSecurityToken(
-                issuer: authorizationServerUrl,
-                audience: audienceServerUrl,
-                claims,
-                notBefore: DateTime.Now,
-                expires: DateTime.Now.AddMinutes(double.Parse(tokenLifetimeMinutes)),
-                signingCredentials
-            );
-
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-            return tokenString;
-        }
-
-        public static async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(
-            HttpRequest request,
-            IDataService dataService)
-        {
+        public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
+        {            
             var response = new AuthenticationProviderResult<ApplicationClient>()
             {
                 IsSuccessful = false,
@@ -93,7 +38,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
             }
 
-            var client = await dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
+            var client = await this.dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
             if (client == null)
             {
                 response.ResponseMessage = "Invalid client Id";
@@ -127,10 +72,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             return response;
         }
 
-        public static async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            UserForAuthenticationDto userDto)
+        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(UserForAuthenticationDto userDto)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -139,7 +81,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 Result = null
             };
 
-            var user = await userManager.FindByNameAsync(userDto.Username);
+            var user = await this.dataService.UserManager.FindByNameAsync(userDto.Username);
 
             if (user == null)
             {
@@ -151,7 +93,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             //if (!user.EmailConfirmed) 
             // return Tuple.Create(false, "Email not confirmed"", user);"
 
-            var result = await signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
+            var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
             if (result.Succeeded)
             {
@@ -171,14 +113,31 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             }
         }
 
-        #region Helpers
-        private static Func<Task<string>> JtiGenerator =>
-                 () => Task.FromResult(Guid.NewGuid().ToString());
+        public async Task<AuthenticationProviderResult<ApplicationUser>> FindUserAsync(Guid userId)
+        {
+            var response = new AuthenticationProviderResult<ApplicationUser>()
+            {
+                IsSuccessful = false,
+                ResponseMessage = "",
+                Result = null
+            };
 
-        private static long ToUnixEpochDate(DateTime date)
-          => (long)Math.Round((date.ToUniversalTime() -
-                               new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
-                              .TotalSeconds);
-        #endregion
+            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
+            response.ResponseMessage = "Unauthorized";
+            if (user == null)
+                return response;
+
+            if (!await this.signInManager.CanSignInAsync(user))
+                return response;
+
+            if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
+                return response;
+
+            response.IsSuccessful = true;
+            response.ResponseMessage = "";
+            response.Result = user;
+            return response;
+
+        }
     }
 }

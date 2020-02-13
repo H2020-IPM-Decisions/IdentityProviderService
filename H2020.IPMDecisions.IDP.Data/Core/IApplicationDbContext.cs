@@ -6,5 +6,6 @@ namespace H2020.IPMDecisions.IDP.Data.Core
     public interface IApplicationDbContext
     {
         DbSet<ApplicationClient> ApplicationClient { get; set; }
+        DbSet<RefreshToken> RefreshToken { get; set; }
     }
 }

@@ -42,6 +42,10 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                     b.Property<int>("RefreshTokenLifeTime")
                         .HasColumnType("int");
 
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.HasKey("Id");
 
                     b.ToTable("ApplicationClient");
@@ -109,6 +113,32 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("H2020.IPMDecisions.IDP.Core.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ApplicationClientId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("ExpiresUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ProtectedTicket")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationClientId");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -237,6 +267,15 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("UserToken");
+                });
+
+            modelBuilder.Entity("H2020.IPMDecisions.IDP.Core.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("H2020.IPMDecisions.IDP.Core.Entities.ApplicationClient", "ApplicationClient")
+                        .WithMany()
+                        .HasForeignKey("ApplicationClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

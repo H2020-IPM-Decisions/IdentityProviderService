@@ -17,6 +17,9 @@ namespace H2020.IPMDecisions.IDP.Core.Entities
         public string Name { get; set; }
 
         [Required]
+        public string Url { get; set; }
+
+        [Required]
         public ApplicationClientType ApplicationClientType { get; set; }
 
         [Required]

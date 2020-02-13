@@ -9,6 +9,8 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
         public DbSet<ApplicationClient> ApplicationClient { get; set; }
+        public DbSet<RefreshToken> RefreshToken { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
