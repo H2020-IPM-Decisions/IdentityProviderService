@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using H2020.IPMDecisions.IDP.Data.Core.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
 {
@@ -19,32 +21,46 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
 
         public void Create(RefreshToken entity)
         {
-            throw new NotImplementedException();
+            this.context.RefreshToken.Add(entity);
         }
 
         public void Delete(RefreshToken entity)
         {
-            throw new NotImplementedException();
+            this.context.RefreshToken.Remove(entity);
         }
 
-        public Task<IEnumerable<RefreshToken>> FindAllAsync()
+        public async Task<IEnumerable<RefreshToken>> FindAllAsync()
         {
-            throw new NotImplementedException();
+            return await this.context
+                .RefreshToken
+                .ToListAsync<RefreshToken>();
         }
 
-        public Task<PagedList<RefreshToken>> FindAllAsync(RefreshTokenResourceParameter resourceParameter)
+        public async Task<PagedList<RefreshToken>> FindAllAsync(RefreshTokenResourceParameter resourceParameter)
         {
-            throw new NotImplementedException();
+             if (resourceParameter is null)
+                throw new ArgumentNullException(nameof(resourceParameter));
+                
+            var collection = this.context.RefreshToken as IQueryable<RefreshToken>;
+
+            return await PagedList<RefreshToken>.CreateAsync(
+                collection,
+                resourceParameter.PageNumber,
+                resourceParameter.PageSize);
         }
 
-        public Task<RefreshToken> FindByIdAsync(Guid id)
+        public async Task<RefreshToken> FindByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await this
+                .context
+                .RefreshToken
+                .SingleOrDefaultAsync(a =>
+                    a.Id == id);
         }
 
         public void Update(RefreshToken entity)
         {
-            throw new NotImplementedException();
+            this.context.RefreshToken.Update(entity);
         }
     }
 }
