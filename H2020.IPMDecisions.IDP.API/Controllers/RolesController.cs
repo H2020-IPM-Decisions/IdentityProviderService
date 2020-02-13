@@ -73,18 +73,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpGet("{roleId:guid}", Name = "GetRole")]
+        [HttpGet("{id:guid}", Name = "GetRole")]
         // GET: api/Roles/5
-        public async Task<IActionResult> Get(Guid roleId, [FromQuery] string fields)
+        public async Task<IActionResult> Get(Guid id, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
                 return BadRequest();
 
-            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(roleId.ToString());
+            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
 
             if (roleEntity == null) return NotFound();
 
-            var links = CreateLinksForRole(roleId, fields);
+            var links = CreateLinksForRole(id, fields);
             var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
                 .ShapeData(fields)
                 as IDictionary<string, object>;
@@ -114,7 +114,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 roleToReturn.Add("links", links);
 
                 return CreatedAtRoute("GetRole",
-                 new { roleId = roleToReturn["Id"] },
+                 new { id = roleToReturn["Id"] },
                  roleToReturn);
             }
             return BadRequest(result);
@@ -123,11 +123,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpDelete("{roleId:guid}", Name = "DeleteRole")]
+        [HttpDelete("{id:guid}", Name = "DeleteRole")]
         // DELETE: api/Roles/5
-        public async Task<IActionResult> Delete(Guid roleId)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(roleId.ToString());
+            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
             if (roleEntity == null) return NotFound();
 
             var result = await this.dataService.RoleManager.DeleteAsync(roleEntity);
@@ -147,7 +147,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         #region helpers
         private IEnumerable<LinkDto> CreateLinksForRole(
-            Guid roleId,
+            Guid id,
             string fields = "")
         {
             var links = new List<LinkDto>();
@@ -155,20 +155,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (string.IsNullOrWhiteSpace(fields))
             {
                 links.Add(new LinkDto(
-                    Url.Link("GetRole", new { roleId }),
+                    Url.Link("GetRole", new { id }),
                     "self",
                     "GET"));
             }
             else
             {
                 links.Add(new LinkDto(
-                    Url.Link("GetRole", new { roleId, fields }),
+                    Url.Link("GetRole", new { id, fields }),
                     "self",
                     "GET"));
             }
 
             links.Add(new LinkDto(
-                Url.Link("DeleteRole", new { roleId }),
+                Url.Link("DeleteRole", new { id }),
                 "delete_role",
                 "DELETE"));
 

@@ -26,15 +26,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
-    [Route("/api/applicationclient")]
-    public class ApplicationClientController : ControllerBase
+    [Route("/api/applicationclients")]
+    public class ApplicationClientsController : ControllerBase
     {
         private readonly IDataService dataService;
         private readonly IMapper mapper;
         private readonly IPropertyMappingService propertyMappingService;
         private readonly IPropertyCheckerService propertyCheckerService;
 
-        public ApplicationClientController(
+        public ApplicationClientsController(
             IDataService dataService,
             IMapper mapper,
             IPropertyMappingService propertyMappingService,
@@ -138,7 +138,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id:guid}", Name = "DeleteApplicationClient")]
-        //DELETE :  api/applicationclient/1
+        //DELETE :  api/applicationclients/1
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var clientToDelete = await this.dataService.ApplicationClients.FindByIdAsync(id);
@@ -156,7 +156,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPatch("{id:guid}", Name = "PartialUpdateApplicationClient")]
-        //PATCH :  api/applicationclient/1
+        //PATCH :  api/applicationclients/1
         public async Task<IActionResult> PartialUpdate(
             [FromRoute] Guid id,
             JsonPatchDocument<ApplicationClientForUpdateDto> patchDocument)
@@ -203,7 +203,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id:guid}", Name = "GetApplicationClient")]
-        // GET: api/applicationclient/1
+        // GET: api/applicationclients/1
         public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields))
@@ -223,7 +223,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
-        // OPTIONS: api/applicationclient
+        // OPTIONS: api/applicationclients
         public IActionResult Options()
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE,PATCH");

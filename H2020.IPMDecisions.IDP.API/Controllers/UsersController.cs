@@ -98,18 +98,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpGet("{userId:guid}", Name = "GetUser")]
+        [HttpGet("{id:guid}", Name = "GetUser")]
         // GET: api/users/1
-        public async Task<IActionResult> GetUser([FromRoute] Guid userId, [FromQuery] string fields)
+        public async Task<IActionResult> GetUser([FromRoute] Guid id, [FromQuery] string fields)
         {
             if (!propertyCheckerService.TypeHasProperties<UserDto>(fields))
                 return BadRequest();
 
-            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
+            var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
 
             if (user == null) return NotFound();
 
-            var links = CreateLinksForUser(userId, fields);
+            var links = CreateLinksForUser(id, fields);
 
             var userToReturn = this.mapper.Map<UserDto>(user)
                 .ShapeData(fields)
@@ -122,11 +122,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpDelete("{userId:guid}", Name = "DeleteUser")]
+        [HttpDelete("{id:guid}", Name = "DeleteUser")]
         // DELETE: api/users/1
-        public async Task<IActionResult> DeleteUser([FromRoute] Guid userId)
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
         {
-            var userToDelete = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
+            var userToDelete = await this.dataService.UserManager.FindByIdAsync(id.ToString());
 
             if (userToDelete == null) return NotFound();
 
@@ -149,7 +149,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(
-            Guid userId,
+            Guid id,
             string fields = "")
         {
             var links = new List<LinkDto>();
@@ -157,50 +157,50 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (string.IsNullOrWhiteSpace(fields))
             {
                 links.Add(new LinkDto(
-                Url.Link("GetUser", new { userId }),
+                Url.Link("GetUser", new { id }),
                 "self",
                 "GET"));
             }
             else
             {
                 links.Add(new LinkDto(
-                Url.Link("GetUser", new { userId, fields }),
+                Url.Link("GetUser", new { id, fields }),
                 "self",
                 "GET"));
             }
 
             links.Add(new LinkDto(
-                Url.Link("DeleteUser", new { userId }),
+                Url.Link("DeleteUser", new { id }),
                 "delete_user",
                 "DELETE"));
 
             links.Add(new LinkDto(
-                Url.Link("GetRolesFromUser", new { userId }),
+                Url.Link("GetRolesFromUser", new { userId = id }),
                 "roles",
                 "GET"));
 
             links.Add(new LinkDto(
-                Url.Link("AssignRolesToUser", new { userId }),
+                Url.Link("AssignRolesToUser", new { userId = id }),
                 "assign_roles_to_user",
                 "POST"));
 
             links.Add(new LinkDto(
-                Url.Link("RemoveRolesFromUser", new { userId }),
+                Url.Link("RemoveRolesFromUser", new { userId = id }),
                 "remove_roles_to_user",
                 "DELETE"));
 
             links.Add(new LinkDto(
-                Url.Link("GetClaimsFromUser", new { userId }),
+                Url.Link("GetClaimsFromUser", new { userId = id }),
                 "claims",
                 "GET"));
 
             links.Add(new LinkDto(
-                Url.Link("AssignClaimsToUser", new { userId }),
+                Url.Link("AssignClaimsToUser", new { userId = id }),
                 "assign_claims_to_user",
                 "POST"));
 
             links.Add(new LinkDto(
-                Url.Link("RemoveClaimsFromUser", new { userId }),
+                Url.Link("RemoveClaimsFromUser", new { userId = id }),
                 "remove_claims_to_user",
                 "DELETE"));
 
