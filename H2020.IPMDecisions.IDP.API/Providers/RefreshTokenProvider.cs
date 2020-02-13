@@ -38,12 +38,45 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             return refreshToken.ProtectedTicket;
         }
 
-        private static void ValidateRefreshToken(
+        public static async Task<AuthenticationProviderResult<RefreshToken>> ValidateRefreshToken(
             IDataService dataService,
-            ApplicationUser user, 
-            string refreshToken)
+            ApplicationClient client,
+            string refreshTokenTicket)
         {
-            //TODO
+            var response = new AuthenticationProviderResult<RefreshToken>()
+            {
+                IsSuccessful = false,
+                ResponseMessage = "",
+                Result = null
+            };
+
+            var existingRefreshToken = await dataService
+               .RefreshTokens
+               .FindByCondition(r => r.ApplicationClientId == client.Id
+               && r.ProtectedTicket == refreshTokenTicket);
+
+            if (existingRefreshToken == null)
+            {
+                response.ResponseMessage = "Invalid token";
+                return response;
+            }
+
+            dataService.RefreshTokens.Delete(existingRefreshToken);
+
+            RefreshToken newRefreshToken = new RefreshToken()
+            {
+                UserId = existingRefreshToken.UserId,
+                ApplicationClientId = client.Id,
+                ProtectedTicket = GenerateRefreshToken(),
+            };
+
+            dataService.RefreshTokens.Create(newRefreshToken);
+            await dataService.CompleteAsync();
+
+            response.IsSuccessful = true;
+            response.Result = newRefreshToken;
+            
+            return response;
         }
 
         #region Helpers

@@ -108,9 +108,22 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
             if (!isValidClient.IsSuccessful) return BadRequest(new { message = isValidClient.ResponseMessage });
 
-            //TODO
+            var refreshTokenFromHeader = Request.Headers["refresh_token"].ToString();
+            var isValidRefreshToken = await RefreshTokenProvider.ValidateRefreshToken(this.dataService, isValidClient.Result, refreshTokenFromHeader);
+            if (!isValidRefreshToken.IsSuccessful) return BadRequest(new { message = isValidRefreshToken.ResponseMessage });
+
+            var isAuthorize = await AuthenticationProvider.FindUserAsync(this.dataService, isValidRefreshToken.Result.UserId);
+            if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
+
+            var claims = await JWTProvider.GetValidClaims(this.dataService, isAuthorize.Result);
+            var token = JWTProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
             
-            return Ok();
+            return Ok(new
+            {
+                token,
+                token_type = "bearer",
+                refreshToken = isValidRefreshToken.Result.ProtectedTicket
+            });
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

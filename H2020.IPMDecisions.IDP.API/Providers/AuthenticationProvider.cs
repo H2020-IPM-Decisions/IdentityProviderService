@@ -104,5 +104,29 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
             }
         }
+
+        public static async Task<AuthenticationProviderResult<ApplicationUser>> FindUserAsync(
+            IDataService dataService,
+            Guid userId)
+        {
+            var response = new AuthenticationProviderResult<ApplicationUser>()
+            {
+                IsSuccessful = false,
+                ResponseMessage = "",
+                Result = null
+            };
+
+            var user = await dataService.UserManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+            {
+                response.ResponseMessage = "User is incorrect";
+                return response;
+            }
+            response.IsSuccessful = true;
+            response.Result = user;
+            return response;
+
+        }
     }
 }
