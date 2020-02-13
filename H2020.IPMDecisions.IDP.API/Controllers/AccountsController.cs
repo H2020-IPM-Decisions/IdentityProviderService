@@ -20,25 +20,29 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [Route("api/accounts")]
     public class AccountsController : ControllerBase
     {
-        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IMapper mapper;
         private readonly IDataService dataService;
-        private readonly IConfiguration config;
+        private readonly IAuthenticationProvider authenticationProvider;
+        private readonly IJWTProvider jWTProvider;
+        private readonly IRefreshTokenProvider refreshTokenProvider;
 
         public AccountsController(
-            SignInManager<ApplicationUser> signInManager,
             IMapper mapper,
             IDataService dataService,
-            IConfiguration config)
+            IAuthenticationProvider authenticationProvider,
+            IJWTProvider jWTProvider,
+            IRefreshTokenProvider refreshTokenProvider)
         {
-            this.signInManager = signInManager
-                ?? throw new ArgumentNullException(nameof(signInManager));
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
-            this.config = config
-                ?? throw new ArgumentNullException(nameof(config));
+            this.authenticationProvider = authenticationProvider 
+                ?? throw new ArgumentNullException(nameof(authenticationProvider));
+            this.jWTProvider = jWTProvider 
+                ?? throw new ArgumentNullException(nameof(jWTProvider));
+            this.refreshTokenProvider = refreshTokenProvider 
+                ?? throw new ArgumentNullException(nameof(refreshTokenProvider));
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
@@ -78,15 +82,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             if (Request.Headers["grant_type"].ToString().ToLower() != "password") return BadRequest();
             
-            var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
+            var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(this.Request);
             if (!isValidClient.IsSuccessful) return BadRequest(new { message = isValidClient.ResponseMessage });
 
-            var isAuthorize = await AuthenticationProvider.ValidateUserAuthenticationAsync(this.dataService, this.signInManager, userDto);
+            var isAuthorize = await this.authenticationProvider.ValidateUserAuthenticationAsync(userDto);
             if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
-            var claims = await JWTProvider.GetValidClaims(this.dataService, isAuthorize.Result);
-            var token = JWTProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
-            var refreshToken = await RefreshTokenProvider.GenerateRefreshToken(this.dataService, isAuthorize.Result, isValidClient.Result);
+            var claims = await this.jWTProvider.GetValidClaims(isAuthorize.Result);
+            var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.Url);
+            var refreshToken = await this.refreshTokenProvider.GenerateRefreshToken(isAuthorize.Result, isValidClient.Result);
 
             return Ok(new { 
                 token,
@@ -105,18 +109,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             if (Request.Headers["grant_type"].ToString().ToLower() != "refresh_token") return BadRequest();
 
-            var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
+            var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(this.Request);
             if (!isValidClient.IsSuccessful) return BadRequest(new { message = isValidClient.ResponseMessage });
 
             var refreshTokenFromHeader = Request.Headers["refresh_token"].ToString();
-            var isValidRefreshToken = await RefreshTokenProvider.ValidateRefreshToken(this.dataService, isValidClient.Result, refreshTokenFromHeader);
+            var isValidRefreshToken = await this.refreshTokenProvider.ValidateRefreshToken(isValidClient.Result, refreshTokenFromHeader);
             if (!isValidRefreshToken.IsSuccessful) return BadRequest(new { message = isValidRefreshToken.ResponseMessage });
 
-            var isAuthorize = await AuthenticationProvider.FindUserAsync(this.dataService, isValidRefreshToken.Result.UserId);
+            var isAuthorize = await this.authenticationProvider.FindUserAsync(isValidRefreshToken.Result.UserId);
             if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
-            var claims = await JWTProvider.GetValidClaims(this.dataService, isAuthorize.Result);
-            var token = JWTProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
+            var claims = await this.jWTProvider.GetValidClaims(isAuthorize.Result);
+            var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.Url);
             
             return Ok(new
             {

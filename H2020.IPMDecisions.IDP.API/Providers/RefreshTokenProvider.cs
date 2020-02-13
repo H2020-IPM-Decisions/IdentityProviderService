@@ -8,15 +8,21 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace H2020.IPMDecisions.IDP.API.Providers
 {
-    public static class RefreshTokenProvider
+        public class RefreshTokenProvider : IRefreshTokenProvider
     {
-        public async static Task<string> GenerateRefreshToken(
-            IDataService dataService,
+        private readonly IDataService dataService;
+        public RefreshTokenProvider(IDataService dataService)
+        {
+            this.dataService = dataService
+                ?? throw new ArgumentNullException(nameof(dataService));
+        }
+
+        public async Task<string> GenerateRefreshToken(
             ApplicationUser user,
             ApplicationClient client)
         {
 
-            var existingRefreshToken = await dataService
+            var existingRefreshToken = await this.dataService
                 .RefreshTokens
                 .FindByCondition(r => r.ApplicationClientId == client.Id && r.UserId.ToString() == user.Id);
 
@@ -38,8 +44,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             return refreshToken.ProtectedTicket;
         }
 
-        public static async Task<AuthenticationProviderResult<RefreshToken>> ValidateRefreshToken(
-            IDataService dataService,
+        public async Task<AuthenticationProviderResult<RefreshToken>> ValidateRefreshToken(
             ApplicationClient client,
             string refreshTokenTicket)
         {
@@ -50,7 +55,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 Result = null
             };
 
-            var existingRefreshToken = await dataService
+            var existingRefreshToken = await this.dataService
                .RefreshTokens
                .FindByCondition(r => r.ApplicationClientId == client.Id
                && r.ProtectedTicket == refreshTokenTicket);
@@ -75,12 +80,12 @@ namespace H2020.IPMDecisions.IDP.API.Providers
 
             response.IsSuccessful = true;
             response.Result = newRefreshToken;
-            
+
             return response;
         }
 
         #region Helpers
-        public static string GenerateRefreshToken()
+        private static string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())

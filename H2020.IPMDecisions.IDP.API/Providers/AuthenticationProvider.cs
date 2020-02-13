@@ -8,11 +8,23 @@ using Microsoft.AspNetCore.Identity;
 
 namespace H2020.IPMDecisions.IDP.API.Providers
 {
-    public static class AuthenticationProvider
+    public class AuthenticationProvider : IAuthenticationProvider
     {
-        public static async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(
-            HttpRequest request,
-            IDataService dataService)
+        private readonly IDataService dataService;
+        private readonly SignInManager<ApplicationUser> signInManager;
+
+        public AuthenticationProvider(
+            IDataService dataService,
+            SignInManager<ApplicationUser> signInManager)
+        {
+            this.signInManager = signInManager
+                ?? throw new ArgumentNullException(nameof(signInManager));
+            this.dataService = dataService
+                ?? throw new ArgumentNullException(nameof(dataService));
+        }
+
+
+        public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
         {
             var response = new AuthenticationProviderResult<ApplicationClient>()
             {
@@ -27,7 +39,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
             }
 
-            var client = await dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
+            var client = await this.dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
             if (client == null)
             {
                 response.ResponseMessage = "Invalid client Id";
@@ -61,10 +73,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             return response;
         }
 
-        public static async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(
-            IDataService dataService,
-            SignInManager<ApplicationUser> signInManager,
-            UserForAuthenticationDto userDto)
+        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(UserForAuthenticationDto userDto)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -73,7 +82,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 Result = null
             };
 
-            var user = await dataService.UserManager.FindByNameAsync(userDto.Username);
+            var user = await this.dataService.UserManager.FindByNameAsync(userDto.Username);
 
             if (user == null)
             {
@@ -85,7 +94,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             //if (!user.EmailConfirmed) 
             // return Tuple.Create(false, "Email not confirmed"", user);"
 
-            var result = await signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
+            var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
             if (result.Succeeded)
             {
@@ -105,9 +114,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             }
         }
 
-        public static async Task<AuthenticationProviderResult<ApplicationUser>> FindUserAsync(
-            IDataService dataService,
-            Guid userId)
+        public async Task<AuthenticationProviderResult<ApplicationUser>> FindUserAsync(Guid userId)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -116,7 +123,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 Result = null
             };
 
-            var user = await dataService.UserManager.FindByIdAsync(userId.ToString());
+            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
 
             if (user == null)
             {

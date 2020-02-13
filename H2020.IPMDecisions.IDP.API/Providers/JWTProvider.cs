@@ -12,16 +12,28 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace H2020.IPMDecisions.IDP.API.Providers
 {
-    public static class JWTProvider
+    public class JWTProvider : IJWTProvider
     {
-        public static string GenerateToken(
-                IConfiguration config,
+        private readonly IConfiguration config;
+        private readonly IDataService dataService;
+        public JWTProvider(
+            IDataService dataService,
+            IConfiguration config)
+        {
+            this.config = config
+                ?? throw new ArgumentNullException(nameof(config));
+            this.dataService = dataService
+                ?? throw new ArgumentNullException(nameof(dataService));
+
+        }
+        public string GenerateToken(
+
                 List<Claim> claims,
                 string audienceServerUrl)
         {
-            var tokenLifetimeMinutes = config["JwtSettings:TokenLifetimeMinutes"];
-            var issuerServerUrl = config["JwtSettings:IssuerServerUrl"];
-            var jwtSecretKey = config["JwtSettings:SecretKey"];
+            var tokenLifetimeMinutes = this.config["JwtSettings:TokenLifetimeMinutes"];
+            var issuerServerUrl = this.config["JwtSettings:IssuerServerUrl"];
+            var jwtSecretKey = this.config["JwtSettings:SecretKey"];
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -39,9 +51,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             return tokenString;
         }
 
-        public static async Task<List<Claim>> GetValidClaims(
-            IDataService dataService,
-            ApplicationUser user)
+        public async Task<List<Claim>> GetValidClaims(ApplicationUser user)
         {
             IdentityOptions _options = new IdentityOptions();
             var claims = new List<Claim>
@@ -53,17 +63,17 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 new Claim(_options.ClaimsIdentity.UserNameClaimType, user.UserName)
             };
 
-            var userClaims = await dataService.UserManager.GetClaimsAsync(user);
+            var userClaims = await this.dataService.UserManager.GetClaimsAsync(user);
             claims.AddRange(userClaims);
 
-            var userRoles = await dataService.UserManager.GetRolesAsync(user);
+            var userRoles = await this.dataService.UserManager.GetRolesAsync(user);
             foreach (var userRole in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, userRole));
-                var role = await dataService.RoleManager.FindByNameAsync(userRole);
+                var role = await this.dataService.RoleManager.FindByNameAsync(userRole);
                 if (role != null)
                 {
-                    var roleClaims = await dataService.RoleManager.GetClaimsAsync(role);
+                    var roleClaims = await this.dataService.RoleManager.GetClaimsAsync(role);
                     foreach (Claim roleClaim in roleClaims)
                     {
                         claims.Add(roleClaim);
