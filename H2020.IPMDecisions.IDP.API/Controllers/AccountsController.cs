@@ -35,9 +35,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(signInManager));
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
-            this.dataService = dataService 
+            this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
-            this.config = config 
+            this.config = config
                 ?? throw new ArgumentNullException(nameof(config));
         }
 
@@ -76,16 +76,41 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // POST: api/Accounts/authenticate
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
         {
+            if (Request.Headers["grant_type"].ToString().ToLower() != "password") return BadRequest();
+            
             var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
             if (!isValidClient.IsSuccessful) return BadRequest(new { message = isValidClient.ResponseMessage });
 
             var isAuthorize = await AuthenticationProvider.ValidateUserAuthenticationAsync(this.dataService, this.signInManager, userDto);
             if (!isAuthorize.IsSuccessful) return BadRequest(new { message = isAuthorize.ResponseMessage });
 
-            var claims = await AuthenticationProvider.GetValidClaims(this.dataService, isAuthorize.Result);
-            var token = AuthenticationProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
+            var claims = await JWTProvider.GetValidClaims(this.dataService, isAuthorize.Result);
+            var token = JWTProvider.GenerateToken(this.config, claims, isValidClient.Result.Url);
+            var refreshToken = await RefreshTokenProvider.GenerateRefreshToken(this.dataService, isAuthorize.Result, isValidClient.Result);
+
+            return Ok(new { 
+                token,
+                token_type = "bearer",
+                refreshToken});
+        }
+
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [AllowAnonymous]
+        [HttpPost("authenticate/token", Name = "AuthenticateUserWithToken")]
+        [RequiredClientHeader("client_id", "client_secret", "grant_type", "refresh_token")]
+        // POST: api/Accounts/authenticate/token
+        public async Task<IActionResult> AuthenticateToken()
+        {
+            if (Request.Headers["grant_type"].ToString().ToLower() != "refresh_token") return BadRequest();
+
+            var isValidClient = await AuthenticationProvider.ValidateApplicationClientAsync(this.Request, this.dataService);
+            if (!isValidClient.IsSuccessful) return BadRequest(new { message = isValidClient.ResponseMessage });
+
+            //TODO
             
-            return Ok(new { Token = token });
+            return Ok();
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

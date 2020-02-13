@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Helpers;
@@ -47,6 +48,14 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 collection,
                 resourceParameter.PageNumber,
                 resourceParameter.PageSize);
+        }
+
+        public async Task<RefreshToken> FindByCondition(Expression<Func<RefreshToken, bool>> expression)
+        {
+            return await this.context
+            .RefreshToken
+            .Where(expression)
+            .FirstOrDefaultAsync();
         }
 
         public async Task<RefreshToken> FindByIdAsync(Guid id)
