@@ -19,7 +19,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
-    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [Route("/api/roles")]
     public class RolesController : ControllerBase

@@ -23,7 +23,7 @@ using Microsoft.AspNetCore.Http;
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [Produces(MediaTypeNames.Application.Json)]
-    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("/api/applicationclients")]
