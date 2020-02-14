@@ -114,7 +114,7 @@ The following commands assumes that you are in the root directory of the applica
 ```Console
 docker build --rm --pull -f ".\H2020.IPMDecisions.IDP.API\Dockerfile" --label "com.microsoft.created-by=visual-studio-code" -t "h2020.ipmdecisions.identityproviderservice:latest" .
 
-docker run  -d -p 443:443/tcp -p 80:80/tcp --name IDP h2020.ipmdecisions.identityproviderservice:latest 
+docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP h2020.ipmdecisions.identityproviderservice:latest 
 ```
 Now you should be able to user your API in the docker container. Try to navigate to: `http://localhost/swagger/index.html`
 

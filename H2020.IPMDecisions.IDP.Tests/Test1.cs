@@ -11,7 +11,7 @@ namespace H2020.IPMDecisions.IDP.Tests
             var number = 1;
 
             // Act
-            number = 1 +1;
+            number = 1 + 1;
 
             // Assert
             Assert.Equal(number, 2);
