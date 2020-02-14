@@ -13,6 +13,7 @@
     <Description>Service in charge to authenticate and authorise users and clients that can access the H2020 IPM Decisions API Gateway.</Description>
     <Copyright>Under GNU GENERAL PUBLIC LICENSE</Copyright>
     <PackageTags>H2020, IPM Decisions, Identity Provider</PackageTags>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
   </PropertyGroup>
 
   <ItemGroup>
