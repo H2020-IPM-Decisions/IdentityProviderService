@@ -151,7 +151,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return NoContent();
         }
 
-        [Consumes(MediaTypeNames.Application.Json)]
+        [Consumes("application/json-patch+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
