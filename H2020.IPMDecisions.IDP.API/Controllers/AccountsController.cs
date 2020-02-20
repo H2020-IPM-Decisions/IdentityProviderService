@@ -17,6 +17,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
+    [AllowAnonymous]
     [Route("api/accounts")]
     public class AccountsController : ControllerBase
     {
@@ -48,7 +49,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [AllowAnonymous]
         [HttpPost("register", Name = "RegisterUser")]
         // POST: api/Accounts/register
         public async Task<ActionResult<UserDto>> Register([FromBody] UserForRegistrationDto userForRegistration)
@@ -63,9 +63,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
                 var userToReturn = this.mapper.Map<UserDto>(userEntity);
 
-                return CreatedAtRoute("GetUser",
-                    new { userId = userToReturn.Id },
-                    userToReturn);
+                return Ok(userToReturn);
             }
 
             return BadRequest(result);
@@ -74,7 +72,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [AllowAnonymous]
         [HttpPost("authenticate", Name = "AuthenticateUser")]
         [RequiredClientHeader("client_id", "client_secret", "grant_type")]
         // POST: api/Accounts/authenticate
@@ -101,7 +98,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [AllowAnonymous]
         [HttpPost("authenticate/token", Name = "AuthenticateUserWithToken")]
         [RequiredClientHeader("client_id", "client_secret", "grant_type", "refresh_token")]
         // POST: api/Accounts/authenticate/token

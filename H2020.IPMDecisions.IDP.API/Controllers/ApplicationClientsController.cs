@@ -23,7 +23,7 @@ using Microsoft.AspNetCore.Http;
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [Produces(MediaTypeNames.Application.Json)]
-    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("/api/applicationclients")]
@@ -151,7 +151,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return NoContent();
         }
 
-        [Consumes(MediaTypeNames.Application.Json)]
+        [Consumes("application/json-patch+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

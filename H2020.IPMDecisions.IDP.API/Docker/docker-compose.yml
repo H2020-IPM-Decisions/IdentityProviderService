@@ -1,0 +1,65 @@
+version: "3.7" 
+services:
+    idpdb:
+        image: mysql:8.0.19
+        container_name: ipmdecisions.idp.mysql
+        environment:
+            # change root password -> Change it before loading DB
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: H2020.IPMDecisions.IDP
+        volumes:
+            - dbdata:/var/lib/mysql
+            - ./MySQL_Init_Script:/docker-entrypoint-initdb.d
+        restart: always
+        networks:
+            idp_network:
+                ipv4_address: 172.18.1.6
+    phpmyadmin:
+        depends_on:
+        - idpdb
+        image: phpmyadmin/phpmyadmin
+        container_name: ipmdecisions.idp.phpmyadmin
+        restart: always
+        ports:
+            - '9080:80'
+        environment:
+            PMA_HOST: idpdb
+        networks:
+            idp_network:
+                ipv4_address: 172.18.1.7
+    idp:
+        depends_on:
+            - idpdb
+        image: h2020.ipmdecisions.identityproviderservice:latest
+        container_name: ipmdecisions.idp.api
+        restart: always
+        build:
+            context: .
+        ports:
+            - "8086:5000"
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+            args:
+                BUILDER_VERSION: 1.0.2
+                URL_PORT: 5000
+        environment:
+            # The following db username and password are create in line 32 in the MySQL_Init_Script/init.sql -> Change them before loading DB
+            - ConnectionStrings:MySqlDbConnection=Server=idpdb;Database=H2020.IPMDecisions.IDP;Uid=ipm_idp_user;Pwd=user_password;
+            - JwtSettings:TokenLifetimeMinutes=80
+            - JwtSettings:SecretKey=AddYourSecretKey
+            - JwtSettings:IssuerServerUrl=AddYourServer
+            # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
+            - JwtSettings:ValidAudiencesUrls=https://testclient.com
+            - AllowedHosts=*
+        networks:
+            idp_network:
+                ipv4_address: 172.18.1.5
+networks:
+    idp_network:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.18.1.0/24
+volumes:
+    dbdata:
