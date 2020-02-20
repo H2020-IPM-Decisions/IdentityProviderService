@@ -63,9 +63,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
                 var userToReturn = this.mapper.Map<UserDto>(userEntity);
 
-                return CreatedAtRoute("GetUser",
-                    new { userId = userToReturn.Id },
-                    userToReturn);
+                return Ok(userToReturn);
             }
 
             return BadRequest(result);
