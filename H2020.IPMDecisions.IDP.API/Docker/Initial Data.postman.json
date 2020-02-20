@@ -1,0 +1,378 @@
+{
+	"info": {
+		"_postman_id": "34a8ee83-0bd2-4576-88f2-3956da311edf",
+		"name": "H2020.IPMDecisions.IDP.Postman Initial Data",
+		"description": "Postman collection with endpoints for the Identity provider for the H2020 IPM Decisions project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authenticate InitialAdmin User",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "grant_type",
+						"type": "text",
+						"value": "password"
+					},
+					{
+						"key": "client_id",
+						"type": "text",
+						"value": "08d7aa5b-e23c-496e-8946-6d8af6b98dd6"
+					},
+					{
+						"key": "client_secret",
+						"value": "NotNeedAsInitialCLientTypePublic",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"initialadminuser\",\n\t\"password\" : \"Password1!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/accounts/authenticate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"accounts",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Create New Admin User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"myNewAdminUser\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"myNewAdminUser@test.com\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/Accounts/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Accounts",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Add Admin Role to new admin user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t{\n\t\"name\" : \"Admin\"\n\t}\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users/{NEW USER ID HERE}/roles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"{NEW USER ID HERE}",
+						"roles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Create New Application Client",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"My New Aplication Client\",\n    \"applicationClientType\": 1,\n    \"enabled\": true,\n    \"refreshTokenLifeTime\": 90,\n    \"url\": \"http://myURL.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/applicationclients",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"applicationclients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Delete Initial Application Client",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/applicationclients/08d7aa5b-e23c-496e-8946-6d8af6b98dd6",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"applicationclients",
+						"08d7aa5b-e23c-496e-8946-6d8af6b98dd6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. Delete InitialAdmin User",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"380f0a69-a009-4c34-8496-9a43c2e069be"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. Authenticate with new Admin User",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "grant_type",
+						"type": "text",
+						"value": "password"
+					},
+					{
+						"key": "client_id",
+						"type": "text",
+						"value": "your_new_client_ID"
+					},
+					{
+						"key": "client_secret",
+						"value": "your_new_client_Secret",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"myNewAdminUser\",\n\t\"password\" : \"Password1!\",\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/accounts/authenticate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"accounts",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Test that works with new AdminUser",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJteU5ld0FkbWluVXNlciIsImp0aSI6ImY0NGVlZjMzLWI1MWItNDZhMy04N2FlLTczMDY3Y2EyNmFiMiIsImlhdCI6MTU4MjIxNDgzNCwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiI3MDA1Nzg4Mi01YmRjLTQ2MjgtYTcwZS00ZmNmODU1OWVjYmIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoibXlOZXdBZG1pblVzZXIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsIm5iZiI6MTU4MjIxNDgzMywiZXhwIjoxNTgyMjE5NjMzLCJpc3MiOiJBZGRZb3VyU2VydmVyIiwiYXVkIjoiaHR0cDovL215VVJMLmNvbSJ9.KYRn0AVNDE64s_YEQRnIAhcJWj2IrNlTM111GHJawmU",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "ef9793a8-0453-40b5-91bf-c714fd7c908c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "9be5bd14-9900-4509-877c-f78e0a244e83",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "4e0b534f-059d-4fce-a947-196b6c80ca10",
+			"key": "baseUrl",
+			"value": "http://localhost",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

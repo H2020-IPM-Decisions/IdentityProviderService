@@ -120,7 +120,21 @@ docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP h2020.ipmdecisions.ident
 Now you should be able to user your API in the docker container. Try to navigate to: `http://localhost/swagger/index.html`
 
 ## Deployment with Docker Compose
-//TODO
+
+You can deploy the Identity Provider Service API, including a MySQL database with test data and a phpMyAdmin UI to manage the database, using a docker compose.
+A file called `docker-compose.yml` is located in the following folder `H2020.IPMDecisions.IDP.API\Docker`. 
+To run the docker compose, navigate to the following folder `H2020.IPMDecisions.IDP.API\Docker` and run the following command:
+
+```console
+dotnet-compose up -d
+```
+
+If no data have been modified in the `docker-compose.yml` the solution will be working in the URL `localhos:8086`, so you can check that the API works navigating to `http://localhost:8086/swagger/index.html`
+
+The docker compose file will also load data into the database. Please read more about this in the [ReadMe.md](H2020.IPMDecisions.IDP.API\Docker\MySQL_Init_Script\ReadMe.md) file located in `H2020.IPMDecisions.IDP.API\Docker\MySQL_Init_Script`.
+
+To help modifying the default data, a postman collection has been created with the calls needed. Also, please note that if a new Client is added into the database, this one will be needed added into the `H2020.IPMDecisions.IDP.API\appsettings.Development.json`. You can achieve this modifying the `docker-compose.yml` file and running `dotnet-compose up -d` again. 
+
 
 ## Versioning
 
