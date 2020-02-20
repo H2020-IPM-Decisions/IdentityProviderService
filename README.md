@@ -98,7 +98,7 @@ A [Swagger UI](https://swagger.io/) has been added to help the discovery of the 
 A [postman](https://www.getpostman.com/) collection has been created with the current end points available. 
 Once the project is running, open the file `H2020.IPMDecisions.IDP.Postman.json` using postman and you will be able to test the application.
 
-## Deployment 
+## Creating a Docker Image locally
 
 A Docker file has been created to allow to build and run the image in your preferred server. Before building your image ensure that your 'appsettings.json' is configured correctly.
 
@@ -111,12 +111,16 @@ Remember to change the **EXPOSE** ports in the `Dockerfile` if the default ports
 The following commands assumes that you are in the root directory of the application. Don't forget the **"."** at the end of the first command!
 * The image created will be called: `h2020.ipmdecisions.identityproviderservice`
 * The container created will be called `IDP` and will be running in the port `80`
+* The command bellow assumes that the URL port `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json` is 5000
 ```Console
-docker build --rm --pull -f ".\H2020.IPMDecisions.IDP.API\Dockerfile" --label "com.microsoft.created-by=visual-studio-code" -t "h2020.ipmdecisions.identityproviderservice:latest" .
+docker build --rm --pull -f ".\H2020.IPMDecisions.IDP.API\Docker\Dockerfile" -t "h2020.ipmdecisions.identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=0.0.1 .
 
 docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP h2020.ipmdecisions.identityproviderservice:latest 
 ```
 Now you should be able to user your API in the docker container. Try to navigate to: `http://localhost/swagger/index.html`
+
+## Deployment with Docker Compose
+//TODO
 
 ## Versioning
 
