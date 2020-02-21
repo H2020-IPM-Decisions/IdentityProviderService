@@ -113,7 +113,7 @@ The following commands assumes that you are in the root directory of the applica
 * The container created will be called `IDP` and will be running in the port `80`
 * The command bellow assumes that the URL port `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json` is 5000
 ```Console
-docker build --rm --pull -f ".\H2020.IPMDecisions.IDP.API\Docker\Dockerfile" -t "h2020ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=0.0.1 .
+docker build --rm --pull -f ".\Docker\Dockerfile" -t "h2020ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=0.0.1 .
 
 docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP h2020.ipmdecisions.identityproviderservice:latest 
 ```
@@ -122,16 +122,16 @@ Now you should be able to user your API in the docker container. Try to navigate
 ## Deployment with Docker Compose
 
 You can deploy the Identity Provider Service API, including a MySQL database with test data and a phpMyAdmin UI to manage the database, using a docker compose.
-A file called `docker-compose.yml` is located in the following folder `H2020.IPMDecisions.IDP.API\Docker`. 
-To run the docker compose, navigate to the following folder `H2020.IPMDecisions.IDP.API\Docker` and run the following command:
+A file called `docker-compose.yml` is located in the following folder `Docker` locate in the rrot of the project. 
+To run the following command:
 
 ```console
-dotnet-compose up -d
+docker-compose -f "./Docker/Docker-compose.yml" up -d
 ```
 
 If no data have been modified in the `docker-compose.yml` the solution will be working in the URL `localhos:8086`, so you can check that the API works navigating to `http://localhost:8086/swagger/index.html`
 
-The docker compose file will also load data into the database. Please read more about this in the [ReadMe.md](H2020.IPMDecisions.IDP.API\Docker\MySQL_Init_Script\ReadMe.md) file located in `H2020.IPMDecisions.IDP.API\Docker\MySQL_Init_Script`.
+The docker compose file will also load data into the database. Please read more about this in the [ReadMe.md](H2020.IPMDecisions.IDP.API\Docker\MySQL_Init_Script\ReadMe.md) file located in `Docker\MySQL_Init_Script`.
 
 To help modifying the default data, a postman collection has been created with the calls needed. Also, please note that if a new Client is added into the database, this one will be needed added into the `H2020.IPMDecisions.IDP.API\appsettings.Development.json`. You can achieve this modifying the `docker-compose.yml` file and running `dotnet-compose up -d` again. 
 

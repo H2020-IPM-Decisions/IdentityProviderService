@@ -33,8 +33,6 @@ services:
         image: h2020ipmdecisions/identityproviderservice:latest
         container_name: ipmdecisions.idp.api
         restart: always
-        build:
-            context: .
         ports:
             - "8086:5000"
         build:
