@@ -14,7 +14,6 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
