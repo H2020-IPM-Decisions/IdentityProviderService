@@ -64,6 +64,10 @@ namespace H2020.IPMDecisions.IDP.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                // app.UseHsts();
+            }
 
             app.UseCors("IdentityProviderCORS");
             app.UseHttpsRedirection();
