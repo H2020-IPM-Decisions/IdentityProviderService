@@ -7,6 +7,7 @@ using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,7 +51,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddScoped<IDataService, DataService>();
             services.AddTransient<IAuthenticationProvider, AuthenticationProvider>();
             services.AddTransient<IJWTProvider, JWTProvider>();
-            services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>(); 
+            services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
 
             services.ConfigureMySqlContext(Configuration);
 
@@ -67,7 +68,16 @@ namespace H2020.IPMDecisions.IDP.API
             else
             {
                 // app.UseHsts();
+                app.UseExceptionHandler(appBuilder =>
+                {
+                    appBuilder.Run(async context =>
+                    {
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("An unexpected error happened. Try again later.");
+                    });
+                });
             }
+            app.UseHsts();
 
             app.UseCors("IdentityProviderCORS");
             app.UseHttpsRedirection();
