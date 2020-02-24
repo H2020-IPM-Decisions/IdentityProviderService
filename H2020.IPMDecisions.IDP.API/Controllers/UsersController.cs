@@ -59,7 +59,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromHeader(Name = "Accept")] string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType,
-            out MediaTypeHeaderValue parsedMediaType))
+                out MediaTypeHeaderValue parsedMediaType))
             {
                 return BadRequest();
             }
@@ -67,10 +67,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (!propertyMappingService.ValidMappingExistsFor<UserDto, ApplicationUser>(resourceParameter.OrderBy))
                 return BadRequest();
             if (!propertyCheckerService.TypeHasProperties<UserDto>(resourceParameter.Fields, true))
-                return BadRequest();
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+                return BadRequest();           
 
             var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
             if (users.Count == 0) return NotFound();
@@ -86,18 +83,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("X-Pagination",
                 JsonSerializer.Serialize(paginationMetaData));
 
-            IEnumerable<LinkDto> links = new List<LinkDto>();
-            if (includeLinks)
-                links = CreateLinksForUsers(resourceParameter, users.HasNext, users.HasPrevious);
+            var links = CreateLinksForUsers(resourceParameter, users.HasNext, users.HasPrevious);
 
             var shapedUsersToReturn = this.mapper
                 .Map<IEnumerable<UserDto>>(users)
                 .ShapeData(resourceParameter.Fields);
 
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
             var shapedUsersToReturnWithLinks = shapedUsersToReturn.Select(user =>
             {
-                var userAsDictionary = user as IDictionary<string, object>;
-
+                var userAsDictionary = user as IDictionary<string, object>;                
                 if (includeLinks)
                 {
                     var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"], resourceParameter.Fields);
@@ -117,10 +113,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetUser")]
         // GET: api/users/1
-        public async Task<IActionResult> GetUser([FromRoute] Guid id, [FromQuery] string fields)
+        public async Task<IActionResult> GetUser(
+            [FromRoute] Guid id,
+            [FromQuery] string fields,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
             if (!propertyCheckerService.TypeHasProperties<UserDto>(fields))
                 return BadRequest();
 
@@ -128,13 +133,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             if (user == null) return NotFound();
 
-            var links = CreateLinksForUser(id, fields);
-
             var userToReturn = this.mapper.Map<UserDto>(user)
                 .ShapeData(fields)
                 as IDictionary<string, object>;
 
-            userToReturn.Add("links", links);
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+            if (includeLinks)
+            {
+                var links = CreateLinksForUser(id, fields);
+                userToReturn.Add("links", links);
+            }
 
             return Ok(userToReturn);
         }
@@ -164,7 +174,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
             return Ok();
         }
-
 
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(
