@@ -8,11 +8,14 @@ using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 
 namespace H2020.IPMDecisions.IDP.API.Extensions
 {
@@ -148,6 +151,30 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 {
                     builder.WithOrigins(allowedHosts);
                 });
+            });
+        }
+
+        public static void ConfigureContentNegotiation(this IServiceCollection services)
+        {
+            services.AddControllers(setupAction =>
+                {
+                    setupAction.ReturnHttpNotAcceptable = true;
+                })
+            .AddNewtonsoftJson(setupAction =>
+                {
+                    setupAction.SerializerSettings.ContractResolver =
+                    new CamelCasePropertyNamesContractResolver();
+                });
+
+            services.Configure<MvcOptions>(config =>
+            {
+                var newtonsoftJsonOutputFormatter = config.OutputFormatters
+                      .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+                if (newtonsoftJsonOutputFormatter != null)
+                {
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.h2020ipmdecisions.hateoas+json");
+                }
             });
         }
 

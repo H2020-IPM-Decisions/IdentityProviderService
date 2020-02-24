@@ -14,12 +14,13 @@ using H2020.IPMDecisions.IDP.Core.Services;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Net.Http.Headers;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
-    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [Route("/api/roles")]
     public class RolesController : ControllerBase
@@ -44,11 +45,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetRoles")]
         [HttpHead]
         // GET: api/Roles
-        public async Task<IActionResult> Get([FromQuery] string fields)
+        public async Task<IActionResult> Get(
+            [FromQuery] string fields,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
+
             if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
                 return BadRequest();
 
@@ -59,12 +69,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 .Map<IEnumerable<RoleDto>>(roles)
                 .ShapeData(fields);
 
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+               .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
             var rolesToReturnWithLinks = rolesToReturn.Select(role =>
             {
-                var userAsDictionary = role as IDictionary<string, object>;
-                var userLinks = CreateLinksForRole((Guid)userAsDictionary["Id"], fields);
-                userAsDictionary.Add("links", userLinks);
-                return userAsDictionary;
+                var roleAsDictionary = role as IDictionary<string, object>;
+                if (includeLinks)
+                {
+                    var rolesLinks = CreateLinksForRole((Guid)roleAsDictionary["Id"], fields);
+                    roleAsDictionary.Add("links", rolesLinks);
+                }
+                return roleAsDictionary;
             });
 
             return Ok(rolesToReturnWithLinks);
@@ -73,10 +89,19 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetRole")]
         // GET: api/Roles/5
-        public async Task<IActionResult> Get(Guid id, [FromQuery] string fields)
+        public async Task<IActionResult> Get(
+            [FromRoute] Guid id,
+            [FromQuery] string fields,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+            out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
             if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
                 return BadRequest();
 
@@ -84,11 +109,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             if (roleEntity == null) return NotFound();
 
-            var links = CreateLinksForRole(id, fields);
             var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
                 .ShapeData(fields)
                 as IDictionary<string, object>;
-            roleToReturn.Add("links", links);
+
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                             .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+            if (includeLinks)
+            {
+                var links = CreateLinksForRole(id, fields);
+                roleToReturn.Add("links", links);
+            }
 
             return Ok(roleToReturn);
         }
@@ -96,23 +128,36 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpPost("", Name = "CreateRole")]
         // POST: api/Roles
-        public async Task<IActionResult> Post([FromBody]RoleForCreationDto roleDto)
+        public async Task<IActionResult> Post(
+            [FromBody]RoleForCreationDto roleDto,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
             var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
             var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
 
             if (result.Succeeded)
             {
-                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
-
                 var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
                     .ShapeData()
                     as IDictionary<string, object>; ;
 
-                roleToReturn.Add("links", links);
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
 
+                if (includeLinks)
+                {
+                    var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
+                    roleToReturn.Add("links", links);
+                }
+                
                 return CreatedAtRoute("GetRole",
                  new { id = roleToReturn["Id"] },
                  roleToReturn);

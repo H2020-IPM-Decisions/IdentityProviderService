@@ -14,11 +14,12 @@ using System.Linq;
 using System;
 using H2020.IPMDecisions.IDP.Core.Services;
 using System.Text.Json;
+using Microsoft.Net.Http.Headers;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [Produces(MediaTypeNames.Application.Json)]
-    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("/api/refreshtokens")]
@@ -44,11 +45,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetRefreshTokens")]
         [HttpHead]
         // GET: api/refreshtokens
-        public async Task<IActionResult> Get([FromQuery] RefreshTokenResourceParameter resourceParameter)
+        public async Task<IActionResult> Get(
+            [FromQuery] RefreshTokenResourceParameter resourceParameter,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
+
             if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(resourceParameter.Fields, true))
                 return BadRequest();
 
@@ -72,11 +82,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 .Map<IEnumerable<RefreshTokenDto>>(refreshTokens)
                 .ShapeData(resourceParameter.Fields);
 
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+ 
             var refreshTokensToReturnWithLinks = shapedRefreshTokens.Select(token =>
             {
                 var tokenAsDictionary = token as IDictionary<string, object>;
-                var userLinks = CreateLinksForRefreshToken((Guid)tokenAsDictionary["Id"], resourceParameter.Fields);
-                tokenAsDictionary.Add("links", userLinks);
+                if (includeLinks)
+                {
+                    var userLinks = CreateLinksForRefreshToken((Guid)tokenAsDictionary["Id"], resourceParameter.Fields);
+                    tokenAsDictionary.Add("links", userLinks);
+                }
                 return tokenAsDictionary;
             });
 
@@ -91,24 +107,39 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetRefreshToken")]
         // GET: api/applicationclient/1
-        public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
+        public async Task<IActionResult> Get(
+            [FromRoute] Guid id,
+            [FromQuery] string fields,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
+
             if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
                 return BadRequest();
 
             var refreshTokenFromRepository = await this.dataService.RefreshTokens.FindByIdAsync(id);
             if (refreshTokenFromRepository == null) return NotFound();
 
-            var links = CreateLinksForRefreshToken(id, fields);
 
             var clientToReturn = this.mapper
                 .Map<RefreshTokenDto>(refreshTokenFromRepository)
                 .ShapeData(fields)
                 as IDictionary<string, object>;
 
-            clientToReturn.Add("links", links);
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                            .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+            if (includeLinks)
+            {
+                var links = CreateLinksForRefreshToken(id, fields);
+                clientToReturn.Add("links", links);
+            }
             return Ok(clientToReturn);
         }
 

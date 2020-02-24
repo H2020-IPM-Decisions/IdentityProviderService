@@ -13,5 +13,7 @@ namespace H2020.IPMDecisions.IDP.Core.Dtos
         public override bool Enabled { get => base.Enabled; set => base.Enabled = value; }
         [Required]
         public override int RefreshTokenLifeTime { get => base.RefreshTokenLifeTime; set => base.RefreshTokenLifeTime = value; }
+        [Required]
+        public override string Url { get; set; }
     }
 }

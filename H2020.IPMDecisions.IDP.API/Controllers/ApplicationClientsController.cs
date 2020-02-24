@@ -19,11 +19,12 @@ using H2020.IPMDecisions.IDP.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [Produces(MediaTypeNames.Application.Json)]
-    [Authorize(Roles = "SuperAdmin", AuthenticationSchemes =
+    [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("/api/applicationclients")]
@@ -42,23 +43,30 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             this.dataService = dataService
                 ?? throw new System.ArgumentNullException(nameof(dataService));
-            this.mapper = mapper 
+            this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
-            this.propertyMappingService = propertyMappingService 
+            this.propertyMappingService = propertyMappingService
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
-            this.propertyCheckerService = propertyCheckerService 
+            this.propertyCheckerService = propertyCheckerService
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetApplicationClients")]
         [HttpHead]
         // GET: api/applicationclient
         public async Task<IActionResult> GetApplicationClients(
-            [FromQuery] ApplicationClientResourceParameter resourceParameter)
+            [FromQuery] ApplicationClientResourceParameter resourceParameter,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
             if (!propertyMappingService.ValidMappingExistsFor<ApplicationClientDto, ApplicationClient>(resourceParameter.OrderBy))
                 return BadRequest();
             if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(resourceParameter.Fields, true))
@@ -82,13 +90,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var shapedClientsToReturn = this.mapper
                 .Map<IEnumerable<ApplicationClientDto>>(applicationClients)
-                .ShapeData(resourceParameter.Fields);           
+                .ShapeData(resourceParameter.Fields);
 
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);      
             var shapedClientsToReturnWithLinks = shapedClientsToReturn.Select(client =>
             {
                 var userAsDictionary = client as IDictionary<string, object>;
-                var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"], resourceParameter.Fields);
-                userAsDictionary.Add("links", userLinks);
+                if (includeLinks)
+                {
+                    var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"], resourceParameter.Fields);
+                    userAsDictionary.Add("links", userLinks);
+                }
                 return userAsDictionary;
             });
 
@@ -104,12 +117,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpPost]
         [Route("")]
         // POST: api/applicationclient
         public async Task<ActionResult<ApplicationClientDto>> Post(
-            [FromBody] ApplicationClientForCreationDto clientForCreationDto)
+            [FromBody] ApplicationClientForCreationDto clientForCreationDto,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
+
             var regex = new Regex("^[a-zA-Z0-9 ]*$");
             if (!regex.IsMatch(clientForCreationDto.Name))
                 return BadRequest("Special characters are not allowed in the client name.");
@@ -120,15 +141,21 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             var applicationClientEntity = this.mapper.Map<ApplicationClient>(clientForCreationDto);
             CreateClientSecret(applicationClientEntity);
-            
+
             this.dataService.ApplicationClients.Create(applicationClientEntity);
             await this.dataService.CompleteAsync();
 
-            var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
                 .ShapeData()
-                as IDictionary<string, object>; ;
-            clientToReturn.Add("links", links);
+                as IDictionary<string, object>;
+                
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                        .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+            if (includeLinks)
+            {
+                var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
+                clientToReturn.Add("links", links);
+            }
 
             return CreatedAtRoute("GetApplicationClient",
                  new { id = clientToReturn["Id"] },
@@ -151,7 +178,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return NoContent();
         }
 
-        [Consumes(MediaTypeNames.Application.Json)]
+        [Consumes("application/json-patch+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -195,28 +222,43 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             this.dataService.ApplicationClients.Update(clientFromRepository);
             await this.dataService.CompleteAsync();
-                        
+
             return NoContent();
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetApplicationClient")]
         // GET: api/applicationclients/1
-        public async Task<IActionResult> Get([FromRoute] Guid id, [FromQuery] string fields)
+        public async Task<IActionResult> Get(
+            [FromRoute] Guid id,
+            [FromQuery] string fields,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                   out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
             if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields))
                 return BadRequest();
 
             var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
             if (clientFromRepository == null) return NotFound();
 
-            var links = CreateLinksForApplicationClient(id, fields);
+
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientFromRepository)
                 .ShapeData(fields)
-                as IDictionary<string, object>; ;
-            clientToReturn.Add("links", links);
+                as IDictionary<string, object>;
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                        .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+            if (includeLinks)
+            {
+                var links = CreateLinksForApplicationClient(id, fields);
+                clientToReturn.Add("links", links);
+            }
 
             return Ok(clientToReturn);
         }

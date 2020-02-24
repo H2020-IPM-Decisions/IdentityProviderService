@@ -30,8 +30,8 @@ namespace H2020.IPMDecisions.IDP.API.Filters
                 Name = "client_secret",
                 In = ParameterLocation.Header,
                 Description = "Client Secret",
-                Required = true,
-                AllowEmptyValue = false,
+                Required = false,
+                AllowEmptyValue = true,
                 Style = ParameterStyle.Simple
             });
 
