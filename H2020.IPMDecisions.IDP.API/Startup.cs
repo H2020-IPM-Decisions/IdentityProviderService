@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Serialization;
 
 namespace H2020.IPMDecisions.IDP.API
 {
@@ -28,19 +27,9 @@ namespace H2020.IPMDecisions.IDP.API
         {
             services.ConfigureCors(Configuration);
 
-            services
-                .AddControllers(setupAction =>
-                {
-                    setupAction.ReturnHttpNotAcceptable = true;
-                })
-                .AddNewtonsoftJson(setupAction =>
-                 {
-                     setupAction.SerializerSettings.ContractResolver =
-                     new CamelCasePropertyNamesContractResolver();
-                 });
+            services.ConfigureContentNegotiation();
 
             services.ConfigureIdentity();
-
             services.ConfigureJwtAuthentication(Configuration);
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();

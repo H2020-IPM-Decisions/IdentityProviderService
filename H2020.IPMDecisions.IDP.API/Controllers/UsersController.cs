@@ -15,6 +15,7 @@ using H2020.IPMDecisions.IDP.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Net.Mime;
+using Microsoft.Net.Http.Headers;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -44,20 +45,32 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
             this.propertyCheckerService = propertyCheckerService
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
-        }   
-        
+        }
+
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetUsers")]
         [HttpHead]
         // GET: api/users
-        public async Task<IActionResult> GetUsers([FromQuery] ApplicationUserResourceParameter resourceParameter)
+        public async Task<IActionResult> GetUsers(
+            [FromQuery] ApplicationUserResourceParameter resourceParameter,
+            [FromHeader(Name = "Accept")] string mediaType)
         {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+            out MediaTypeHeaderValue parsedMediaType))
+            {
+                return BadRequest();
+            }
+
             if (!propertyMappingService.ValidMappingExistsFor<UserDto, ApplicationUser>(resourceParameter.OrderBy))
                 return BadRequest();
             if (!propertyCheckerService.TypeHasProperties<UserDto>(resourceParameter.Fields, true))
                 return BadRequest();
+
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
 
             var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
             if (users.Count == 0) return NotFound();
@@ -73,7 +86,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("X-Pagination",
                 JsonSerializer.Serialize(paginationMetaData));
 
-            var links = CreateLinksForUsers(resourceParameter, users.HasNext, users.HasPrevious);
+            IEnumerable<LinkDto> links = new List<LinkDto>();
+            if (includeLinks)
+                links = CreateLinksForUsers(resourceParameter, users.HasNext, users.HasPrevious);
 
             var shapedUsersToReturn = this.mapper
                 .Map<IEnumerable<UserDto>>(users)
@@ -82,8 +97,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var shapedUsersToReturnWithLinks = shapedUsersToReturn.Select(user =>
             {
                 var userAsDictionary = user as IDictionary<string, object>;
-                var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"], resourceParameter.Fields);
-                userAsDictionary.Add("links", userLinks);
+
+                if (includeLinks)
+                {
+                    var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"], resourceParameter.Fields);
+                    userAsDictionary.Add("links", userLinks);
+                }
                 return userAsDictionary;
             });
 
