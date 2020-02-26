@@ -13,7 +13,7 @@ jobs:
       id: vars
       run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
     - name: Echo Tag
-      run: echo 'Tag is ${{ RELEASE_VERSION }}'
+      run: echo 'Tag is $RELEASE_VERSION'
     - name: Build and Push docker
       uses: elgohr/Publish-Docker-Github-Action@master
       env:
