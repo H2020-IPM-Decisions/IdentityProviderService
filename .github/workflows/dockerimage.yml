@@ -23,5 +23,5 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: .\Docker\Dockerfile
-        buildargs: URL_PORT,BUILD_VERSION
-        tags: "latest, ${{ steps.vars.outputs.tag }}"
+        buildargs: URL_PORT,${{ steps.vars.outputs.tag }}
+        # tags: "latest, ${{ steps.vars.outputs.tag }}"
