@@ -133,7 +133,7 @@ If no data have been modified in the `docker-compose.yml` the solution will be w
 
 The docker compose file will also load data into the database. Please read more about this in the [ReadMe.md](H2020.IPMDecisions.IDP.API\Docker\MySQL_Init_Script\ReadMe.md) file located in `Docker\MySQL_Init_Script`.
 
-To help modifying the default data, a postman collection has been created with the calls needed. Also, please note that if a new Client is added into the database, this one will be needed added into the `H2020.IPMDecisions.IDP.API\appsettings.Development.json`. You can achieve this modifying the `docker-compose.yml` file and running `dotnet-compose up -d` again. 
+To help modifying the default data, a postman collection has been created with the calls needed. Also, please note that if a new Client is added into the database, this one will be needed added into the `H2020.IPMDecisions.IDP.API\appsettings.Development.json`. You can achieve this modifying the `docker-compose.yml` file and running `docker-compose up -d` again. 
 
 
 ## Versioning

@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 
-ARG URL_PORT=5000
-ARG URL_PORT_HTTPS=443
+ARG URL_EXPOSE_PORT=80
+ARG URL_EXPOSE_PORT_HTTPS=443
 ARG BUILDER_VERSION=0.0.1
 
 LABEL h2020.ipmdecisions.idp.version=${BUILDER_VERSION} \
@@ -9,8 +9,8 @@ LABEL h2020.ipmdecisions.idp.version=${BUILDER_VERSION} \
     h2020.ipmdecisions.idprelease-date="2020-02-20"
 
 WORKDIR /app
-EXPOSE ${URL_PORT}
-EXPOSE ${URL_PORT_HTTPS}
+EXPOSE ${URL_EXPOSE_PORT}
+EXPOSE ${URL_EXPOSE_PORT_HTTPS}
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
