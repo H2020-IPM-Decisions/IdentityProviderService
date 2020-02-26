@@ -13,7 +13,7 @@ jobs:
       id: vars
       run: echo ::set-output name=tag::${GITHUB_REF:10}
     - name: Echo Tag
-      run: echo 'Tag is ${{ GITHUB_REF:10 }}'
+      run: echo 'Tag is ${{ steps.vars.outputs.tag }}'
     - name: Build and Push docker
       uses: elgohr/Publish-Docker-Github-Action@master
       env:
