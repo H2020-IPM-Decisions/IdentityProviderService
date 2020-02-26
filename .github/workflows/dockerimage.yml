@@ -12,11 +12,13 @@ jobs:
     - name: Set tag
       id: vars
       run: echo ::set-output name=tag::${GITHUB_REF:10}
+    - name: Echo Tag
       run: echo 'Tag is ${{ GITHUB_REF:10 }}'
     - name: Build and Push docker
       uses: elgohr/Publish-Docker-Github-Action@master
       env:
         URL_PORT: 5000
+        RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         BUILD_VERSION: 1.0.2
       with:
         name: h2020ipmdecisions/identityproviderservice
@@ -24,5 +26,5 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         workdir: Docker
         dockerfile: Dockerfile
-        buildargs: URL_PORT,BUILD_VERSION
+        buildargs: URL_PORT,RELEASE_VERSION
         tags: "latest"
