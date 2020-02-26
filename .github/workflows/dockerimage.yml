@@ -1,6 +1,6 @@
 name: Build Docker Image And Push To Registry
 
-on:
+on: [push]
   # push:
   #   tags:
   #     - 'v*.*.*'
