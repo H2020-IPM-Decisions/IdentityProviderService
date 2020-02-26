@@ -1,9 +1,9 @@
 name: Build Docker Image And Push To Registry
 
-on:
-  push:
-    tags:
-      - 'v*.*.*'
+on: [push]
+  # push:
+  #   tags:
+  #     - 'v*.*.*'
 jobs:
   build:
     runs-on: ubuntu-latest
