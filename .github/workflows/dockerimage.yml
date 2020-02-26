@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Build image
       run: |
         docker build --rm --pull -f ".\Docker\Dockerfile" -t "h2020ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=0.0.2 .
 
