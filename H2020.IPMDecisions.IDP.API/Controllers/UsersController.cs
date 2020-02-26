@@ -214,7 +214,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             links.Add(new LinkDto(
                 Url.Link("RemoveRolesFromUser", new { userId = id }),
-                "remove_roles_to_user",
+                "remove_roles_from_user",
                 "DELETE"));
 
             links.Add(new LinkDto(
@@ -229,7 +229,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             links.Add(new LinkDto(
                 Url.Link("RemoveClaimsFromUser", new { userId = id }),
-                "remove_claims_to_user",
+                "remove_claims_from_user",
                 "DELETE"));
 
             return links;

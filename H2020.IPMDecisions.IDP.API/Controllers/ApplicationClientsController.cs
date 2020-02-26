@@ -93,7 +93,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 .ShapeData(resourceParameter.Fields);
 
             var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);      
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
             var shapedClientsToReturnWithLinks = shapedClientsToReturn.Select(client =>
             {
                 var userAsDictionary = client as IDictionary<string, object>;
@@ -148,7 +148,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
                 .ShapeData()
                 as IDictionary<string, object>;
-                
+
             var includeLinks = parsedMediaType.SubTypeWithoutSuffix
                         .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
             if (includeLinks)
@@ -194,14 +194,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             {
                 var clientDto = new ApplicationClientForUpdateDto();
                 patchDocument.ApplyTo(clientDto, ModelState);
-
                 if (!TryValidateModel(clientDto))
                     return ValidationProblem(ModelState);
 
                 var clientToAdd = this.mapper.Map<ApplicationClient>(clientDto);
-                clientToAdd.Id = id;
                 CreateClientSecret(clientToAdd);
+                if (!TryValidateModel(clientToAdd))
+                    return ValidationProblem(ModelState);
 
+                clientToAdd.Id = id;                
                 this.dataService.ApplicationClients.Create(clientToAdd);
                 await this.dataService.CompleteAsync();
 

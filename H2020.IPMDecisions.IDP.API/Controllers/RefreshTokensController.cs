@@ -15,6 +15,7 @@ using System;
 using H2020.IPMDecisions.IDP.Core.Services;
 using System.Text.Json;
 using Microsoft.Net.Http.Headers;
+using H2020.IPMDecisions.IDP.Core.Entities;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -59,7 +60,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return BadRequest();
             }
 
-            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(resourceParameter.Fields, true))
+            if (!propertyCheckerService.TypeHasProperties<RefreshToken>(resourceParameter.Fields, true))
                 return BadRequest();
 
             var refreshTokens = await this.dataService.RefreshTokens.FindAllAsync(resourceParameter);
@@ -121,7 +122,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return BadRequest();
             }
 
-            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
+            if (!propertyCheckerService.TypeHasProperties<RefreshToken>(fields))
                 return BadRequest();
 
             var refreshTokenFromRepository = await this.dataService.RefreshTokens.FindByIdAsync(id);
