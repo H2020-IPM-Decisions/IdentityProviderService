@@ -2,11 +2,12 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 
 ARG URL_EXPOSE_PORT=80
 ARG URL_EXPOSE_PORT_HTTPS=443
-ARG BUILDER_VERSION=0.0.1
+ARG BUILDER_VERSION=latest
+ARG RELEASE_DATE="2020-02-20"
 
 LABEL h2020.ipmdecisions.idp.version=${BUILDER_VERSION} \
     vendor="RSK ADAS Ltd" \
-    h2020.ipmdecisions.idprelease-date="2020-02-20"
+    h2020.ipmdecisions.idprelease-date=${RELEASE_DATE}
 
 WORKDIR /app
 EXPOSE ${URL_EXPOSE_PORT}
