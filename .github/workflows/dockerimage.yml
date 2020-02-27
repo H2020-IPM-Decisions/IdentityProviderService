@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2    
+    - name: ech name1
+      run: echo ${{ env.IMAGE_NAME }}
     - name: Get the version
       id: vars
       run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
@@ -24,16 +26,20 @@ jobs:
         dotnet-version: 3.1.101
     - name: Test with dotnet
       run: dotnet test H2020.IPMDecisions.IDP.Tests
+    - name: ech name2
+      run: echo ${{ env.IMAGE_NAME }}
     - name: Build image with latest
       run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:latest" --build-arg BUILDER_VERSION=latest --build-arg=${{ steps.current-time.outputs.time }}
     - name: Build image with tag ${{ env.BUILD_VERSION }}
       run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:${{ env.BUILD_VERSION }}" --build-arg BUILDER_VERSION=${{ env.BUILD_VERSION }} --build-arg=${{ steps.current-time.outputs.time }}
+    - name: ech name3
+      run: echo ${{ env.IMAGE_NAME }}
     - name: Login to docker hub
       uses: actions-hub/docker/login@master
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-    - name: ech name
+    - name: ech name4
       run: echo ${{ env.IMAGE_NAME }}
     - name: Push to docker hub :latest
       uses: actions-hub/docker@master      
