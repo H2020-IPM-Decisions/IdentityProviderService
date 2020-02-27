@@ -22,8 +22,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
-    # - name: Test with dotnet
-    #   run: dotnet test 
+    - name: Test with dotnet
+      run: dotnet test H2020.IPMDecisions.IDP.Tests
     - name: Build image with latest
       run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:latest" --build-arg BUILDER_VERSION=latest --build-arg=${{ steps.current-time.outputs.time }}
     - name: Build image with tag ${{ env.BUILD_VERSION }}
@@ -35,6 +35,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: Push to docker hub :latest
       uses: actions-hub/docker@master
+      run: echo ${{ env.IMAGE_NAME }}
       with:
         args: push ${{ env.IMAGE_NAME }}:latest
     - name: Push to docker hub tag ${{ env.BUILD_VERSION }}
