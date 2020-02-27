@@ -18,9 +18,9 @@ jobs:
     # - name: Run tests
     #   run: TODO
     - name: Build image with latest
-      run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:latest --build-arg BUILDER_VERSION=${{ env.BUILD_VERSION }}"
+      run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:latest" --build-arg BUILDER_VERSION=${{ env.BUILD_VERSION }}"
     - name: Build image with tag
-      run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:${{ env.BUILD_VERSION }}"
+      run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:${{ env.BUILD_VERSION }}" --build-arg BUILDER_VERSION=${{ env.BUILD_VERSION }}
     - name: Login to docker hub
       uses: actions-hub/docker/login@master
       env:
