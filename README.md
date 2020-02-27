@@ -108,12 +108,12 @@ This docker build image doesn't include the "MySQL" database with a user with `A
 ***
 
 Remember to change the **EXPOSE** ports in the `Dockerfile` if the default ports are taken (80 and 443).
-The following commands assumes that you are in the root directory of the application. Don't forget the **"."** at the end of the first command!
+The following commands assumes that you are in the root directory of the application.
 * The image created will be called: `h2020.ipmdecisions.identityproviderservice`
 * The container created will be called `IDP` and will be running in the port `80`
 * The command bellow assumes that the URL port `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json` is 5000
 ```Console
-docker build --rm --pull -f ".\Docker\Dockerfile" -t "h2020ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=0.0.1 .
+docker build . --rm --pull -f ".\Docker\Dockerfile" -t "h2020ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=0.0.1 
 
 docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP h2020.ipmdecisions.identityproviderservice:latest 
 ```
