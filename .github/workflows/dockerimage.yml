@@ -1,4 +1,4 @@
-name: Build Docker Image And Push To Registry
+name: Test, Build And Push Docker
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
       - '*.*.*'
 env:
   DOCKER_IMAGE_NAME: h2020ipmdecisions/identityproviderservice
-  BUILD_VERSION: 1.0.2
 jobs:
   build:
     runs-on: ubuntu-latest
