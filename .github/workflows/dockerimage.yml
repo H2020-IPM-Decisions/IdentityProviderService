@@ -5,20 +5,21 @@ on: [push]
   #   tags:
   #     - 'v*.*.*'
 env:
-  # TODO: Change variable to your image's name.
   IMAGE_NAME: h2020ipmdecisions/identityproviderservice
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    # - name: Login to DockerHub Registry
-    #   run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    - uses: actions/checkout@master    
     - name: Get the version
       id: vars
       run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
-    - name: Build image
-      run: docker build . -f "./Docker/Dockerfile" -t "h2020ipmdecisions/identityproviderservice:latest"
+    - name: Build image with latest
+      run: docker build . -f "./Docker/Dockerfile" -t "${{IMAGE_NAME}}:latest"
+    - name: Build image with tag
+      run: docker build . -f "./Docker/Dockerfile" -t "${{IMAGE_NAME}}:${{steps.vars.outputs.tag}}"
+    # - name: Login to DockerHub Registry
+    #   run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
     # - name: Set tag
     #   id: get_tag_name
