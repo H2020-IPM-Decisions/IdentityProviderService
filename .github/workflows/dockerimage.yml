@@ -33,9 +33,10 @@ jobs:
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-    - name: Push to docker hub :latest
-      uses: actions-hub/docker@master
+    - name: ech name
       run: echo ${{ env.IMAGE_NAME }}
+    - name: Push to docker hub :latest
+      uses: actions-hub/docker@master      
       with:
         args: push ${{ env.IMAGE_NAME }}:latest
     - name: Push to docker hub tag ${{ env.BUILD_VERSION }}
