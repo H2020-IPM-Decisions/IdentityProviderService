@@ -19,7 +19,7 @@ jobs:
     #   run: TODO
     - name: Build image with latest
       run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:latest" --build-arg BUILDER_VERSION=latest
-    - name: Build image with tag
+    - name: Build image with tag ${{ env.BUILD_VERSION }}
       run: docker build . -f "./Docker/Dockerfile" -t "${{ env.IMAGE_NAME }}:${{ env.BUILD_VERSION }}" --build-arg BUILDER_VERSION=${{ env.BUILD_VERSION }}
     - name: Login to docker hub
       uses: actions-hub/docker/login@master
@@ -29,7 +29,11 @@ jobs:
     - name: Push to docker hub :latest
       uses: actions-hub/docker@master
       with:
-        args: push ${{ env.IMAGE_NAME }}:latest
+        args: push h2020ipmdecisions/identityproviderservice:latest
+    # - name: Push to docker hub ${{ env.BUILD_VERSION }}
+    #   uses: actions-hub/docker@master
+    #   with:
+    #     args: push ${{ env.IMAGE_NAME }}:${{ env.BUILD_VERSION }}
 
 
     
