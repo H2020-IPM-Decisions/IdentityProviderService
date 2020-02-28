@@ -13,7 +13,7 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
 
             // Dtos to Entities
             CreateMap<RoleDto, IdentityRole>();
-            CreateMap<RoleForCreationDto, IdentityRole>(); 
+            CreateMap<RoleForManipulationDto, IdentityRole>(); 
         }
 
 

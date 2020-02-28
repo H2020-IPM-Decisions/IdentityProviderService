@@ -13,7 +13,7 @@ namespace H2020.IPMDecisions.IDP.BLL
 {
     public partial class BusinessLogic : IBusinessLogic
     {
-        public async Task<GenericResponse> CreateRole(RoleForCreationDto role, string mediaType)
+        public async Task<GenericResponse> CreateRole(RoleForManipulationDto role, string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType,
                 out MediaTypeHeaderValue parsedMediaType))

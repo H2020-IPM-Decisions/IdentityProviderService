@@ -85,7 +85,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpPost("", Name = "CreateRole")]
         // POST: api/Roles
         public async Task<IActionResult> Post(
-            [FromBody]RoleForCreationDto roleDto,
+            [FromBody]RoleForManipulationDto roleDto,
             [FromHeader(Name = "Accept")] string mediaType)
         {
             var response = await businessLogic.CreateRole(roleDto, mediaType);

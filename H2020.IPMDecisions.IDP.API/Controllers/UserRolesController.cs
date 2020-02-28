@@ -40,7 +40,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // POST: api/users/1/roles
         public async Task<IActionResult> Post(
             [FromRoute] Guid userId,
-            [FromBody] List<RoleForCreationDto> rolesDto)
+            [FromBody] List<RoleForManipulationDto> rolesDto)
         {
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound();
@@ -69,7 +69,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // DELETE: api/users/1/roles
         public async Task<IActionResult> Delete(
             [FromRoute] Guid userId,
-            [FromBody] List<RoleForDeletionDto> rolesDto)
+            [FromBody] List<RoleForManipulationDto> rolesDto)
         {
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound();

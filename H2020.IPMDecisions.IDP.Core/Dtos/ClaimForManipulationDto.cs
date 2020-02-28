@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace H2020.IPMDecisions.IDP.Core.Dtos
 {
-    public class ClaimForCreationDto : ClaimDto
+    public class ClaimForManipulationDto : ClaimDto
     {
         [MaxLength(50)]
         public override string Type { get => base.Type; set => base.Type = value; }
