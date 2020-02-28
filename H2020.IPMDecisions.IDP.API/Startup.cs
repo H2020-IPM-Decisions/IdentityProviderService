@@ -1,6 +1,7 @@
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
-using H2020.IPMDecisions.IDP.API.Providers;
+using H2020.IPMDecisions.IDP.BLL;
+using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Profiles;
 using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core;
@@ -41,6 +42,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IAuthenticationProvider, AuthenticationProvider>();
             services.AddTransient<IJWTProvider, JWTProvider>();
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
+            services.AddScoped<IBusinessLogic, BusinessLogic>();
 
             services.ConfigureMySqlContext(Configuration);
 

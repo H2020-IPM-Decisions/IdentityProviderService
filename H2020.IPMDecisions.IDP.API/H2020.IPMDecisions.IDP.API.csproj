@@ -37,6 +37,7 @@
   <ItemGroup>
     <ProjectReference Include="..\H2020.IPMDecisions.IDP.Core\H2020.IPMDecisions.IDP.Core.csproj" />
     <ProjectReference Include="..\H2020.IPMDecisions.IDP.Data\H2020.IPMDecisions.IDP.Data.csproj" />
+    <ProjectReference Include="..\H2020.IPMDecisions.IDP.BLL\H2020.IPMDecisions.IDP.BLL.csproj" />
   </ItemGroup>
 
 </Project>

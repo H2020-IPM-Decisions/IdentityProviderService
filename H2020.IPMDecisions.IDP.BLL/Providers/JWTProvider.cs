@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace H2020.IPMDecisions.IDP.API.Providers
+namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
     public class JWTProvider : IJWTProvider
     {

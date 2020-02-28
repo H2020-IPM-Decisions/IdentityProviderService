@@ -6,7 +6,7 @@ using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
-namespace H2020.IPMDecisions.IDP.API.Providers
+namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
     public class AuthenticationProvider : IAuthenticationProvider
     {
@@ -91,7 +91,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
 
             // ToDo When Email confirmation available
             //if (!user.EmailConfirmed) 
-            // return Tuple.Create(false, "Email not confirmed"", user);"
+            // return Tuple.Create(false, "Email not confirmed", user);
 
             var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
@@ -128,10 +128,20 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
 
             if (!await this.signInManager.CanSignInAsync(user))
-                return response;
+                return response;       
 
             if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
+            {
+                response.ResponseMessage = "User is lockout";
                 return response;
+            }
+            
+            // ToDo When Email confirmation available
+            // if (!user.EmailConfirmed)
+            // {
+            //     response.ResponseMessage = "Email not confirmed";
+            //     return response;
+            // }
 
             response.IsSuccessful = true;
             response.ResponseMessage = "";

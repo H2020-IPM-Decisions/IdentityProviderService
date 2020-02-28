@@ -4,7 +4,7 @@ using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using Microsoft.AspNetCore.Http;
 
-namespace H2020.IPMDecisions.IDP.API.Providers
+namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
     public interface IAuthenticationProvider
     {

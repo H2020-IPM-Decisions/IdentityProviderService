@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
 
-namespace H2020.IPMDecisions.IDP.API.Providers
+namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
     public interface IJWTProvider
     {
