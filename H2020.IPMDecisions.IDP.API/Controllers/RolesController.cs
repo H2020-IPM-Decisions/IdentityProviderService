@@ -2,19 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using H2020.IPMDecisions.IDP.Data.Core;
-using H2020.IPMDecisions.IDP.Core.Services;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Net.Http.Headers;
 using H2020.IPMDecisions.IDP.BLL;
+using H2020.IPMDecisions.IDP.Core.Models;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -25,30 +21,18 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [Route("/api/roles")]
     public class RolesController : ControllerBase
     {
-        private readonly IDataService dataService;
-        private readonly IMapper mapper;
-        private readonly IPropertyCheckerService propertyCheckerService;
         private readonly IBusinessLogic businessLogic;
 
         public RolesController(
-            IDataService dataService,
-            IMapper mapper,
-            IPropertyCheckerService propertyCheckerService,
             IBusinessLogic businessLogic)
-        {
-            this.dataService = dataService
-                ?? throw new ArgumentNullException(nameof(dataService));
-            this.mapper = mapper
-                ?? throw new System.ArgumentNullException(nameof(mapper));
-            this.propertyCheckerService = propertyCheckerService
-                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
+        {           
             this.businessLogic = businessLogic
                 ?? throw new ArgumentNullException(nameof(businessLogic));
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetRoles")]
         [HttpHead]
@@ -65,9 +49,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     return NoContent();
 
                 return Ok(response.Result);
-            }           
+            }
 
-            return BadRequest(new { message = response.ErrorMessage });           
+            return BadRequest(new { message = response.ErrorMessage });
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -81,32 +65,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromQuery] string fields,
             [FromHeader(Name = "Accept")] string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-            out MediaTypeHeaderValue parsedMediaType))
+            var response = await businessLogic.GetRole(id, fields, mediaType);
+
+            if (response.IsSuccessful)
             {
-                return BadRequest();
-            }
-            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
-                return BadRequest();
+                if (response.Result.Count() == 0)
+                    return NoContent();
 
-            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
-
-            if (roleEntity == null) return NotFound();
-
-            var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                .ShapeData(fields)
-                as IDictionary<string, object>;
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                             .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-            if (includeLinks)
-            {
-                var links = CreateLinksForRole(id, fields);
-                roleToReturn.Add("links", links);
+                return Ok(response.Result);
             }
 
-            return Ok(roleToReturn);
+            return BadRequest(new { message = response.ErrorMessage });
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
@@ -119,50 +88,35 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromBody]RoleForCreationDto roleDto,
             [FromHeader(Name = "Accept")] string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue parsedMediaType))
+            var response = await businessLogic.CreateRole(roleDto, mediaType);
+
+            if (response.IsSuccessful)
             {
-                return BadRequest();
-            }
-            var roleEntity = this.mapper.Map<IdentityRole>(roleDto);
-            var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
-
-            if (result.Succeeded)
-            {
-                var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                    .ShapeData()
-                    as IDictionary<string, object>; ;
-
-                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-                if (includeLinks)
-                {
-                    var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
-                    roleToReturn.Add("links", links);
-                }
-
+                var responseAsRoleDto = (GenericResponse<IDictionary<string, object>>)response;
                 return CreatedAtRoute("GetRole",
-                 new { id = roleToReturn["Id"] },
-                 roleToReturn);
+                 new { id = responseAsRoleDto.Result["Id"] },
+                 responseAsRoleDto.Result);
             }
-            return BadRequest(result);
+
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            return BadRequest(responseAsIdentityResult.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id:guid}", Name = "DeleteRole")]
         // DELETE: api/Roles/5
         public async Task<IActionResult> Delete(Guid id)
         {
-            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
-            if (roleEntity == null) return NotFound();
+            var response = await businessLogic.DeleteRole(id);
 
-            var result = await this.dataService.RoleManager.DeleteAsync(roleEntity);
-            if (result.Succeeded) return NoContent();
+            if (response.IsSuccessful)
+            {
+                return NoContent();
+            }
 
-            return BadRequest(result);
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            return BadRequest(responseAsIdentityResult.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -173,36 +127,5 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
             return Ok();
         }
-
-        #region helpers
-        private IEnumerable<LinkDto> CreateLinksForRole(
-            Guid id,
-            string fields = "")
-        {
-            var links = new List<LinkDto>();
-
-            if (string.IsNullOrWhiteSpace(fields))
-            {
-                links.Add(new LinkDto(
-                    Url.Link("GetRole", new { id }),
-                    "self",
-                    "GET"));
-            }
-            else
-            {
-                links.Add(new LinkDto(
-                    Url.Link("GetRole", new { id, fields }),
-                    "self",
-                    "GET"));
-            }
-
-            links.Add(new LinkDto(
-                Url.Link("DeleteRole", new { id }),
-                "delete_role",
-                "DELETE"));
-
-            return links;
-        }
-        #endregion
     }
 }

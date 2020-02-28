@@ -21,6 +21,14 @@ namespace H2020.IPMDecisions.IDP.Core.Models
                 Result = result
             };
         }
+
+        public static GenericResponse Success()
+        {
+            return new GenericResponse()
+            {
+                IsSuccessful = true
+            };
+        }
         
         public static GenericResponse<T> NoSuccess<T>(T result, string errorMessage = "")
         {

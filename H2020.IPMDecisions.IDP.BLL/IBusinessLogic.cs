@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
@@ -21,6 +22,9 @@ namespace H2020.IPMDecisions.IDP.BLL
         #endregion
 
         #region Roles Controller
+        Task<GenericResponse> CreateRole(RoleForCreationDto role, string mediaType);
+        Task<GenericResponse> DeleteRole(Guid id);
+        Task<GenericResponse<IDictionary<string, object>>> GetRole(Guid id, string fields, string mediaType);
         Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRoles(string fields, string mediaType);
         #endregion
 

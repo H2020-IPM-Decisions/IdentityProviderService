@@ -7,11 +7,87 @@ using Microsoft.EntityFrameworkCore;
 using H2020.IPMDecisions.IDP.Core.Helpers;
 using System.Linq;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Identity;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
     public partial class BusinessLogic : IBusinessLogic
     {
+        public async Task<GenericResponse> CreateRole(RoleForCreationDto role, string mediaType)
+        {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+            {
+                return GenericResponseBuilder.NoSuccess("Wrong media type");
+            }
+            var roleEntity = this.mapper.Map<IdentityRole>(role);
+            var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
+
+            if (result.Succeeded)
+            {
+                var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
+                    .ShapeData()
+                    as IDictionary<string, object>; ;
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+                if (includeLinks)
+                {
+                    var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
+                    roleToReturn.Add("links", links);
+                }
+                
+                return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
+            }
+            return GenericResponseBuilder.NoSuccess<IdentityResult>(result);
+        }
+
+        public async Task<GenericResponse> DeleteRole(Guid id)
+        {
+            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
+            if (roleEntity == null) return GenericResponseBuilder.Success();
+
+            var result = await this.dataService.RoleManager.DeleteAsync(roleEntity);
+            if (result.Succeeded) return GenericResponseBuilder.Success();
+            
+            return GenericResponseBuilder.NoSuccess(result);
+        }
+
+        public async Task<GenericResponse<IDictionary<string, object>>> GetRole(Guid id, string fields, string mediaType)
+        {
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
+            out MediaTypeHeaderValue parsedMediaType))
+            {
+                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
+            }
+            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
+                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
+
+            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
+
+            if(roleEntity == null)
+            {
+                var emptyDictionary = new Dictionary<string, object>();
+                return GenericResponseBuilder.Success<IDictionary<string, object>>(emptyDictionary);
+            }                
+
+            var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
+                .ShapeData(fields)
+                as IDictionary<string, object>;
+                
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                             .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+            if (includeLinks)
+            {
+                var links = CreateLinksForRole(id, fields);
+                roleToReturn.Add("links", links);
+            }
+
+            return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
+        }
+
         public async Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRoles(string fields, string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType,
