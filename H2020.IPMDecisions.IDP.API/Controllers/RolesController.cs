@@ -8,13 +8,13 @@ using H2020.IPMDecisions.IDP.Core.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Core.Services;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Net.Http.Headers;
+using H2020.IPMDecisions.IDP.BLL;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -28,11 +28,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         private readonly IDataService dataService;
         private readonly IMapper mapper;
         private readonly IPropertyCheckerService propertyCheckerService;
+        private readonly IBusinessLogic businessLogic;
 
         public RolesController(
             IDataService dataService,
             IMapper mapper,
-            IPropertyCheckerService propertyCheckerService)
+            IPropertyCheckerService propertyCheckerService,
+            IBusinessLogic businessLogic)
         {
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
@@ -40,6 +42,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 ?? throw new System.ArgumentNullException(nameof(mapper));
             this.propertyCheckerService = propertyCheckerService
                 ?? throw new ArgumentNullException(nameof(propertyCheckerService));
+            this.businessLogic = businessLogic
+                ?? throw new ArgumentNullException(nameof(businessLogic));
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -53,42 +57,22 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromQuery] string fields,
             [FromHeader(Name = "Accept")] string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue parsedMediaType))
+            var response = await businessLogic.GetRoles(fields, mediaType);
+
+            if (response.IsSuccessful)
             {
-                return BadRequest();
-            }
+                if (response.Result.Count() == 0)
+                    return NoContent();
 
-            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
-                return BadRequest();
+                return Ok(response.Result);
+            }           
 
-            var roles = await this.dataService.RoleManager.Roles.ToListAsync();
-            if (roles.Count == 0) return NotFound();
-
-            var rolesToReturn = this.mapper
-                .Map<IEnumerable<RoleDto>>(roles)
-                .ShapeData(fields);
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-               .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-            var rolesToReturnWithLinks = rolesToReturn.Select(role =>
-            {
-                var roleAsDictionary = role as IDictionary<string, object>;
-                if (includeLinks)
-                {
-                    var rolesLinks = CreateLinksForRole((Guid)roleAsDictionary["Id"], fields);
-                    roleAsDictionary.Add("links", rolesLinks);
-                }
-                return roleAsDictionary;
-            });
-
-            return Ok(rolesToReturnWithLinks);
+            return BadRequest(new { message = response.ErrorMessage });           
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetRole")]
         // GET: api/Roles/5
@@ -157,7 +141,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                     var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
                     roleToReturn.Add("links", links);
                 }
-                
+
                 return CreatedAtRoute("GetRole",
                  new { id = roleToReturn["Id"] },
                  roleToReturn);
