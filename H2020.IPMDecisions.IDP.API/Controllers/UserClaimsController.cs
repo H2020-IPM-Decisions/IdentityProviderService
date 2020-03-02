@@ -37,13 +37,16 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromBody] List<ClaimForManipulationDto> claimsDto)
         {
             var response = await businessLogic.ManageUserClaims(userId, claimsDto);
-            if (response.IsSuccessful)
-            {
-                return CreatedAtRoute("GetClaimsFromUser",
+
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
+
+            if (response.Result == null)
+                return NotFound();
+
+            return CreatedAtRoute("GetClaimsFromUser",
                     new { userId = response.Result.Id },
                     response.Result);
-            }
-            return BadRequest(new { message = response.ErrorMessage });
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -55,11 +58,14 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromBody] List<ClaimForManipulationDto> claimsDto)
         {
             var response = await businessLogic.ManageUserClaims(userId, claimsDto, true);
-            if (response.IsSuccessful)
-            {
-                return Ok(response.Result);
-            }
-            return BadRequest(new { message = response.ErrorMessage });
+
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
+
+            if (response.Result == null)
+                return NotFound();
+
+            return Ok(response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -70,9 +76,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromRoute] Guid userId)
         {
             var response = await businessLogic.GetUserClaims(userId);
-            
+
             if (!response.IsSuccessful)
-                return BadRequest(response.ErrorMessage);
+                return BadRequest(new { message = response.ErrorMessage });
 
             if (response.Result == null)
                 return NotFound();

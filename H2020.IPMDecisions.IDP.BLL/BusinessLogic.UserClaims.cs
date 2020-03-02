@@ -21,14 +21,14 @@ namespace H2020.IPMDecisions.IDP.BLL
             return GenericResponseBuilder.Success<IList<Claim>>(claimsToReturn);
         }
 
-        public async Task<GenericResponse<UserDto>> ManageUserClaims(Guid id, List<ClaimForManipulationDto> claimsDto, bool remove = false)
+        public async Task<GenericResponse<UserDto>> ManageUserClaims(Guid id, List<ClaimForManipulationDto> claims, bool remove = false)
         {
             var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
-            if (user == null) GenericResponseBuilder.Success();
+            if (user == null) return GenericResponseBuilder.Success<UserDto>(null);
 
             var currentUserClaims = await this.dataService.UserManager.GetClaimsAsync(user);
 
-            foreach (var claim in claimsDto)
+            foreach (var claim in claims)
             {
                 if (!currentUserClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value) & !remove)
                 {

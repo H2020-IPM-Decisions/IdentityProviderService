@@ -31,12 +31,12 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         #region UserClaims Controller
         Task<GenericResponse<IList<Claim>>> GetUserClaims(Guid id);
-        Task<GenericResponse<UserDto>> ManageUserClaims(Guid id, List<ClaimForManipulationDto> claimsDto, bool remove = false);
+        Task<GenericResponse<UserDto>> ManageUserClaims(Guid id, List<ClaimForManipulationDto> claims, bool remove = false);
         #endregion
 
         #region UserRoles Controller
         Task<GenericResponse<IList<string>>> GetUserRoles(Guid id);
-        Task<GenericResponse<UserDto>> ManageUserRoles(Guid id, List<RoleForManipulationDto> claimsDto, bool remove);
+        Task<GenericResponse<UserDto>> ManageUserRoles(Guid id, List<RoleForManipulationDto> roles, bool remove = false);
 
         #endregion
 

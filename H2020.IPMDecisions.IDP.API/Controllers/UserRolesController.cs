@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using AutoMapper;
+using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
@@ -20,19 +18,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     JwtBearerDefaults.AuthenticationScheme)]
     public class UserRolesController : ControllerBase
     {
-        private readonly IDataService dataService;
-        private readonly IMapper mapper;
+        private readonly IBusinessLogic businessLogic;
 
         public UserRolesController(
-            IDataService dataService,
-            IMapper mapper)
+            IBusinessLogic businessLogic)
         {
-            this.dataService = dataService 
-                ?? throw new ArgumentNullException(nameof(dataService));
-            this.mapper = mapper
-                ?? throw new ArgumentNullException(nameof(mapper));
+            this.businessLogic = businessLogic
+                ?? throw new ArgumentNullException(nameof(businessLogic));
         }
-        
+
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,25 +36,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromRoute] Guid userId,
             [FromBody] List<RoleForManipulationDto> rolesDto)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            if (user == null) return NotFound();
+            var response = await businessLogic.ManageUserRoles(userId, rolesDto);
 
-            foreach (var role in rolesDto)
-            {
-                var roleEntity = await this.dataService.RoleManager.FindByNameAsync(role.Name);
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
 
-                if (roleEntity == null)
-                {
-                    roleEntity = this.mapper.Map<IdentityRole>(role);
-                    await this.dataService.RoleManager.CreateAsync(roleEntity);
-                };
-                await this.dataService.UserManager.AddToRoleAsync(user, roleEntity.Name);
-            }
+            if (response.Result == null)
+                return NotFound();
 
-            var userToReturn = this.mapper.Map<UserDto>(user);
             return CreatedAtRoute("GetRolesFromUser",
-                    new { userId = userToReturn.Id },
-                    userToReturn);
+                    new { userId = response.Result.Id },
+                    response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -71,20 +57,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromRoute] Guid userId,
             [FromBody] List<RoleForManipulationDto> rolesDto)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            if (user == null) return NotFound();
+            var response = await businessLogic.ManageUserRoles(userId, rolesDto, true);
 
-            foreach (var role in rolesDto)
-            {
-                var roleEntity = await this.dataService.RoleManager.FindByNameAsync(role.Name);
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
 
-                if (roleEntity != null)
-                {
-                    await this.dataService.UserManager.RemoveFromRoleAsync(user, roleEntity.Name);
-                };
-            }
-            var userToReturn = this.mapper.Map<UserDto>(user);
-            return Ok(userToReturn);
+            if (response.Result == null)
+                return NotFound();
+
+            return Ok(response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -94,13 +75,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Get(
             [FromRoute] Guid userId)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            if (user == null) return NotFound();
+            var response = await businessLogic.GetUserRoles(userId);
 
-            var rolesToReturn = await this.dataService.UserManager.GetRolesAsync(user);
-            if (rolesToReturn.Count == 0) return NotFound();
+            if (!response.IsSuccessful)
+                return BadRequest(response.ErrorMessage);
 
-            return Ok(rolesToReturn);
+            if (response.Result == null)
+                return NotFound();
+
+            return Ok(response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

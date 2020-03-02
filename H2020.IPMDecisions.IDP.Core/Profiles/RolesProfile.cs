@@ -15,7 +15,5 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
             CreateMap<RoleDto, IdentityRole>();
             CreateMap<RoleForManipulationDto, IdentityRole>(); 
         }
-
-
     }
 }
