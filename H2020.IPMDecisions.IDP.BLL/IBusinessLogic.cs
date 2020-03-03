@@ -31,8 +31,8 @@ namespace H2020.IPMDecisions.IDP.BLL
         #endregion
 
         #region RefreshTokens Controller
-        Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRefreshToken(string fields, string mediaType);
-        Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRefreshTokens(RefreshTokenResourceParameter resourceParameter, string fields, string mediaType);
+        Task<GenericResponse<IDictionary<string, object>>> GetRefreshToken(Guid id, string fields, string mediaType);
+        Task<GenericResponse<ShapedDataWithLinks>> GetRefreshTokens(RefreshTokenResourceParameter resourceParameter, string mediaType);
         Task<GenericResponse> DeleteRefreshToken(Guid id);
         #endregion
 
