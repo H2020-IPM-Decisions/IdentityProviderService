@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
+using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -19,11 +19,15 @@ namespace H2020.IPMDecisions.IDP.BLL
         #endregion
 
         #region ApplicationClients Controller
-        Task<GenericResponse> CreateApplicationClient(ApplicationClientForCreationDto applicationClient, string mediaType);
-        Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetApplicationClient(string mediaType);
-        Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetApplicationClients(ApplicationClientForCreationDto resourceParameter, string fields, string mediaType);
+        Task<GenericResponse<IDictionary<string, object>>> CreateApplicationClient(ApplicationClientForCreationDto applicationClient, string mediaType);
+        Task<GenericResponse<ApplicationClientDto>> CreateApplicationClient(Guid id, ApplicationClient applicationClient);
         Task<GenericResponse> DeleteApplicationClient(Guid id);
-        Task<GenericResponse> UpdateApplicationClient(Guid id, JsonPatchDocument<ApplicationClientForUpdateDto> patchDocument);
+        Task<GenericResponse<ApplicationClient>> GetApplicationClient(Guid id);
+        Task<GenericResponse<IDictionary<string, object>>> GetApplicationClient(Guid id, string fields, string mediaType);
+        Task<GenericResponse<ShapedDataWithLinks>> GetApplicationClients(ApplicationClientResourceParameter resourceParameter, string mediaType);
+        ApplicationClient MapToApplicationClientAddingClientSecret(ApplicationClientForUpdateDto applicationClient);
+        ApplicationClientForUpdateDto MapToApplicationClientForUpdateDto(ApplicationClient applicationClient);
+        Task<GenericResponse<ApplicationClientDto>> UpdateApplicationClient(ApplicationClient applicationClient, ApplicationClientForUpdateDto applicationClientForUpdate);
         #endregion
 
         #region RefreshTokens Controller

@@ -16,6 +16,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         private readonly IRefreshTokenProvider refreshTokenProvider;
         private readonly IPropertyCheckerService propertyCheckerService;
         private readonly IUrlHelper url;
+        private readonly IPropertyMappingService propertyMappingService;
 
         public BusinessLogic(
             IMapper mapper,
@@ -24,6 +25,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             IJWTProvider jWTProvider,
             IRefreshTokenProvider refreshTokenProvider,
             IPropertyCheckerService propertyCheckerService,
+            IPropertyMappingService propertyMappingService,
             IUrlHelper url)
         {
             this.mapper = mapper
@@ -38,6 +40,8 @@ namespace H2020.IPMDecisions.IDP.BLL
                 ?? throw new ArgumentNullException(nameof(refreshTokenProvider));
             this.propertyCheckerService = propertyCheckerService
                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
+            this.propertyMappingService = propertyMappingService
+                ?? throw new ArgumentNullException(nameof(propertyMappingService));
             this.url = url 
                 ?? throw new ArgumentNullException(nameof(url));
         }        
