@@ -36,11 +36,12 @@ services:
         ports:
             - "8086:5000"
         build:
-            context: .
-            dockerfile: ./Dockerfile
+            context: ../
+            dockerfile: ./Docker/Dockerfile
             args:
-                BUILDER_VERSION: 1.0.2
+                BUILDER_VERSION: latest
                 URL_PORT: 5000
+                RELEASE_DATE: "2020-03-03"
         environment:
             # The following db username and password are create in line 32 in the MySQL_Init_Script/init.sql -> Change them before loading DB
             - ConnectionStrings:MySqlDbConnection=Server=idpdb;Database=H2020.IPMDecisions.IDP;Uid=ipm_idp_user;Pwd=user_password;

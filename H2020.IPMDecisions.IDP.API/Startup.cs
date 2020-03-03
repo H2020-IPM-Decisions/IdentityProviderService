@@ -79,8 +79,7 @@ namespace H2020.IPMDecisions.IDP.API
                     });
                 });
             }
-            app.UseHsts();
-
+            
             app.UseCors("IdentityProviderCORS");
             app.UseHttpsRedirection();
             app.UseRouting();
