@@ -54,8 +54,8 @@ namespace H2020.IPMDecisions.IDP.BLL
         #endregion
 
         #region Users Controller
-        Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetUser(string fields, string mediaType);
-        Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetUsers(ApplicationUserResourceParameter resourceParameter, string fields, string mediaType);
+        Task<GenericResponse<IDictionary<string, object>>> GetUser(Guid id, string fields, string mediaType);
+        Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType);
         Task<GenericResponse> DeleteUser(Guid id);
         #endregion
     }
