@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [AllowAnonymous]
     [Route("api/accounts")]
@@ -23,11 +22,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public AccountsController(
             IBusinessLogic businessLogic)
         {
-            this.businessLogic = businessLogic 
+            this.businessLogic = businessLogic
                 ?? throw new ArgumentNullException(nameof(businessLogic));
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("register", Name = "RegisterUser")]
@@ -47,6 +47,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("authenticate", Name = "AuthenticateUser")]
@@ -59,10 +60,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (tokenResponse.IsSuccessful)
                 return Ok(tokenResponse.Result);
 
-            return BadRequest(new { message = tokenResponse.ErrorMessage});           
+            return BadRequest(new { message = tokenResponse.ErrorMessage });
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("authenticate/token", Name = "AuthenticateUserWithToken")]

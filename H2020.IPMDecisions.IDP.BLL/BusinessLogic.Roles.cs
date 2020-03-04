@@ -23,24 +23,22 @@ namespace H2020.IPMDecisions.IDP.BLL
             var roleEntity = this.mapper.Map<IdentityRole>(role);
             var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
 
-            if (result.Succeeded)
+            if (!result.Succeeded) return GenericResponseBuilder.NoSuccess<IdentityResult>(result);
+
+            var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
+                .ShapeData()
+                as IDictionary<string, object>; ;
+
+            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+            .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+            if (includeLinks)
             {
-                var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                    .ShapeData()
-                    as IDictionary<string, object>; ;
-
-                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-                if (includeLinks)
-                {
-                    var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
-                    roleToReturn.Add("links", links);
-                }
-                
-                return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
+                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
+                roleToReturn.Add("links", links);
             }
-            return GenericResponseBuilder.NoSuccess<IdentityResult>(result);
+
+            return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
         }
 
         public async Task<GenericResponse> DeleteRole(Guid id)
@@ -49,9 +47,11 @@ namespace H2020.IPMDecisions.IDP.BLL
             if (roleEntity == null) return GenericResponseBuilder.Success();
 
             var result = await this.dataService.RoleManager.DeleteAsync(roleEntity);
-            if (result.Succeeded) return GenericResponseBuilder.Success();
             
-            return GenericResponseBuilder.NoSuccess(result);
+            if (!result.Succeeded)
+                return GenericResponseBuilder.NoSuccess(result);
+
+            return GenericResponseBuilder.Success();
         }
 
         public async Task<GenericResponse<IDictionary<string, object>>> GetRole(Guid id, string fields, string mediaType)
@@ -66,16 +66,16 @@ namespace H2020.IPMDecisions.IDP.BLL
 
             var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
 
-            if(roleEntity == null)
+            if (roleEntity == null)
             {
                 var emptyDictionary = new Dictionary<string, object>();
                 return GenericResponseBuilder.Success<IDictionary<string, object>>(emptyDictionary);
-            }                
+            }
 
             var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
                 .ShapeData(fields)
                 as IDictionary<string, object>;
-                
+
             var includeLinks = parsedMediaType.SubTypeWithoutSuffix
                              .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
 
@@ -101,7 +101,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, "Wrong fields entered");
             }
 
-            var roles = await this.dataService.RoleManager.Roles.ToListAsync();          
+            var roles = await this.dataService.RoleManager.Roles.ToListAsync();
 
             var rolesToReturn = this.mapper
                 .Map<IEnumerable<RoleDto>>(roles)

@@ -50,7 +50,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 clientToReturn.Add("links", links);
             }
 
-            return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(clientToReturn);
+            return GenericResponseBuilder.Success<IDictionary<string, object>>(clientToReturn);
         }
 
         public async Task<GenericResponse<ApplicationClientDto>> CreateApplicationClient(Guid id, ApplicationClient applicationClient)

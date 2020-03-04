@@ -1,12 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using System.Text.Json;
-using H2020.IPMDecisions.IDP.Data.Core;
-using H2020.IPMDecisions.IDP.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Net.Mime;
@@ -16,7 +13,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/users")]
     [Authorize(Roles = "Admin", AuthenticationSchemes =
@@ -35,7 +31,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
+        [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetUsers")]
         [HttpHead]
         // GET: api/users
@@ -65,7 +61,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
+        [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetUser")]
         // GET: api/users/1
         public async Task<IActionResult> GetUser(
@@ -108,6 +104,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
             return Ok();
-        }        
+        }
     }
 }

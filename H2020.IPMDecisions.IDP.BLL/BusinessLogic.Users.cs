@@ -19,9 +19,9 @@ namespace H2020.IPMDecisions.IDP.BLL
             if (userToDelete == null) return GenericResponseBuilder.Success();
 
             var result = await this.dataService.UserManager.DeleteAsync(userToDelete);
-            if (result.Succeeded) return GenericResponseBuilder.Success();
+            if (!result.Succeeded) return GenericResponseBuilder.NoSuccess(result);
 
-            return GenericResponseBuilder.NoSuccess(result);
+            return GenericResponseBuilder.Success();
         }
 
         public async Task<GenericResponse<IDictionary<string, object>>> GetUser(Guid id, string fields, string mediaType)
@@ -55,7 +55,7 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         public async Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType)
         {
-            if(!MediaTypeHeaderValue.TryParse(mediaType,
+            if (!MediaTypeHeaderValue.TryParse(mediaType,
                 out MediaTypeHeaderValue parsedMediaType))
             {
                 return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong media type");

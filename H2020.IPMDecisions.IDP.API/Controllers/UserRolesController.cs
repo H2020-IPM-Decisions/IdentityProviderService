@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/users/{userId:guid}/roles")]
     [Authorize(Roles = "Admin", AuthenticationSchemes =
@@ -28,6 +27,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("", Name = "AssignRolesToUser")]
@@ -68,12 +68,13 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return Ok(response.Result);
         }
 
+        [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetRolesFromUser")]
         // GET: api/users/1/roles
         public async Task<IActionResult> Get(
-            [FromRoute] Guid userId)
+                [FromRoute] Guid userId)
         {
             var response = await businessLogic.GetUserRoles(userId);
 
