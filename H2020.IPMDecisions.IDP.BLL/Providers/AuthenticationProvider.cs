@@ -24,7 +24,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         }
 
         public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
-        {            
+        {
             var response = new AuthenticationProviderResult<ApplicationClient>()
             {
                 IsSuccessful = false,
@@ -38,7 +38,13 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
 
-            var client = await this.dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
+            if (!Guid.TryParse(clientId, out Guid validClientID))
+            {
+                response.ResponseMessage = "Invalid client Id";
+                return response;
+            }
+
+            var client = await this.dataService.ApplicationClients.FindByIdAsync(validClientID);
             if (client == null)
             {
                 response.ResponseMessage = "Invalid client Id";
@@ -128,14 +134,14 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
 
             if (!await this.signInManager.CanSignInAsync(user))
-                return response;       
+                return response;
 
             if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
             {
                 response.ResponseMessage = "User is lockout";
                 return response;
             }
-            
+
             // ToDo When Email confirmation available
             // if (!user.EmailConfirmed)
             // {
