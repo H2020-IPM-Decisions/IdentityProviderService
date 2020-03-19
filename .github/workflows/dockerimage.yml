@@ -5,7 +5,7 @@ on:
     tags:
       - '*.*.*'
 env:
-  DOCKER_IMAGE_NAME: h2020ipmdecisions/identityproviderservice
+  DOCKER_IMAGE_NAME: ipmdecisions/identityproviderservice
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -70,7 +70,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(options =>
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;

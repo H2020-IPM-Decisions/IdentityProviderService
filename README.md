@@ -113,9 +113,9 @@ The following commands assumes that you are in the root directory of the applica
 * The container created will be called `IDP` and will be running in the port `80`
 * The command bellow assumes that the URL port `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json` is 5000
 ```Console
-docker build . --rm --pull -f ".\Docker\Dockerfile" -t "h2020ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=0.0.1 
+docker build . --rm --pull -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=latest 
 
-docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP h2020.ipmdecisions.identityproviderservice:latest 
+docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP ipmdecisions/identityproviderservice:latest 
 ```
 Now you should be able to user your API in the docker container. Try to navigate to: `http://localhost/swagger/index.html`
 
@@ -129,7 +129,7 @@ To run the following command:
 docker-compose -f "./Docker/Docker-compose.yml" up -d
 ```
 
-If no data have been modified in the `docker-compose.yml` the solution will be working in the URL `localhos:8086`, so you can check that the API works navigating to `http://localhost:8086/swagger/index.html`
+If no data have been modified in the `docker-compose.yml` the solution will be working in the URL `localhost:8086`, so you can check that the API works navigating to `http://localhost:8086/swagger/index.html`
 
 The docker compose file will also load data into the database. Please read more about this in the [ReadMe.md](H2020.IPMDecisions.IDP.API\Docker\MySQL_Init_Script\ReadMe.md) file located in `Docker\MySQL_Init_Script`.
 
