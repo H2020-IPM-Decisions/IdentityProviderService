@@ -115,7 +115,7 @@ The following commands assumes that you are in the root directory of the applica
 ```Console
 docker build . --rm --pull -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=latest 
 
-docker run  -d -p 443:443/tcp -p 80:5000/tcp --name IDP ipmdecisions/identityproviderservice:latest 
+docker run  -d -p 443:443/tcp -p 8086:5000/tcp --name IDP ipmdecisions/identityproviderservice:latest 
 ```
 Now you should be able to user your API in the docker container. Try to navigate to: `http://localhost/swagger/index.html`
 

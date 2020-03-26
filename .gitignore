@@ -352,3 +352,4 @@ MigrationBackup/
 # Custom ignores
 .vscode/**
 H2020.IPMDecisions.IDP.API/appsettings.json
+Docker/docker-compose.local.yml

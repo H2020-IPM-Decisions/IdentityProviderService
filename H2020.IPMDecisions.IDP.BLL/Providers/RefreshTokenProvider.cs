@@ -72,7 +72,6 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
             
-
             response.IsSuccessful = true;
             response.Result = existingRefreshToken;
             return response;

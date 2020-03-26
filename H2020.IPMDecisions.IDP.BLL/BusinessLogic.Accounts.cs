@@ -65,7 +65,8 @@ namespace H2020.IPMDecisions.IDP.BLL
             return GenericResponseBuilder.Success<BearerToken>(bearerToken);
         }
 
-        private async Task<BearerToken> CreateBearerToken(AuthenticationProviderResult<ApplicationClient> isValidClient, AuthenticationProviderResult<ApplicationUser> isAuthorize)
+        private async Task<BearerToken> CreateBearerToken(AuthenticationProviderResult<ApplicationClient> isValidClient, 
+        AuthenticationProviderResult<ApplicationUser> isAuthorize)
         {
             var claims = await this.jWTProvider.GetValidClaims(isAuthorize.Result);
             var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.Url);
