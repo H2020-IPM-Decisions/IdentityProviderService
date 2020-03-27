@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper;
+using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,52 +11,42 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     [Route("api/users/{userId:guid}/claims")]
     [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     public class UserClaimsController : ControllerBase
     {
-        private readonly IDataService dataService;
-        private readonly IMapper mapper;
+        private readonly IBusinessLogic businessLogic;
 
         public UserClaimsController(
-            IDataService dataService,
-            IMapper mapper)
+            IBusinessLogic businessLogic)
         {
-            this.dataService = dataService 
-                ?? throw new ArgumentNullException(nameof(dataService));
-            this.mapper = mapper
-                ?? throw new ArgumentNullException(nameof(mapper));
+            this.businessLogic = businessLogic
+                ?? throw new ArgumentNullException(nameof(businessLogic));
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("", Name = "AssignClaimsToUser")]
         // POST: api/users/1/Claims
         public async Task<IActionResult> Post(
             [FromRoute] Guid userId,
-            [FromBody] List<ClaimForCreationDto> claimsDto)
+            [FromBody] List<ClaimForManipulationDto> claimsDto)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            if (user == null) return NotFound();
+            var response = await businessLogic.ManageUserClaims(userId, claimsDto);
 
-            var currentUserClaims = await this.dataService.UserManager.GetClaimsAsync(user);
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
 
-            foreach (var claim in claimsDto)
-            {
-                if (!currentUserClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
-                {
-                    await this.dataService.UserManager.AddClaimAsync(user, CreateClaim(claim.Type, claim.Value));
-                }
-            }
+            if (response.Result == null)
+                return NotFound();
 
-            var userToReturn = this.mapper.Map<UserDto>(user);
             return CreatedAtRoute("GetClaimsFromUser",
-                    new { userId = userToReturn.Id },
-                    userToReturn);
+                    new { userId = response.Result.Id },
+                    response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -68,19 +55,20 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // DELETE: api/users/1/Claims
         public async Task<IActionResult> Delete(
             [FromRoute] Guid userId,
-            [FromBody] List<ClaimForDeletionDto> claimsDto)
+            [FromBody] List<ClaimForManipulationDto> claimsDto)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            if (user == null) return NotFound();
+            var response = await businessLogic.ManageUserClaims(userId, claimsDto, true);
 
-            foreach (var claim in claimsDto)
-            {
-                await this.dataService.UserManager.RemoveClaimAsync(user, CreateClaim(claim.Type, claim.Value));
-            }
-            var userToReturn = this.mapper.Map<UserDto>(user);
-            return Ok(userToReturn);
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
+
+            if (response.Result == null)
+                return NotFound();
+
+            return Ok(response.Result);
         }
 
+        [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("", Name = "GetClaimsFromUser")]
@@ -88,13 +76,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Get(
             [FromRoute] Guid userId)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            if (user == null) return NotFound();
+            var response = await businessLogic.GetUserClaims(userId);
 
-            var claimsToReturn = await this.dataService.UserManager.GetClaimsAsync(user);
-            if (claimsToReturn.Count == 0) return NotFound();
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
 
-            return Ok(claimsToReturn);
+            if (response.Result == null)
+                return NotFound();
+
+            return Ok(response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -105,12 +95,5 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
             return Ok();
         }
-
-        #region helpers
-        private static Claim CreateClaim(string type, string value)
-        {
-            return new Claim(type, value, ClaimValueTypes.String);
-        }
-        #endregion
     }
 }

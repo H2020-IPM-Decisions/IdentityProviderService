@@ -12,8 +12,8 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
 
             // Dtos to Entities
             CreateMap<UserDto, ApplicationUser>();
-            CreateMap<UserForRegistrationDto, ApplicationUser>();
-
+            CreateMap<UserForRegistrationDto, ApplicationUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
         }
     }
 }

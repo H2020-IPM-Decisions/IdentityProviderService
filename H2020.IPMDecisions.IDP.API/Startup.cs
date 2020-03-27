@@ -1,6 +1,7 @@
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
-using H2020.IPMDecisions.IDP.API.Providers;
+using H2020.IPMDecisions.IDP.BLL;
+using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Profiles;
 using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core;
@@ -8,6 +9,9 @@ using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -41,6 +45,15 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IAuthenticationProvider, AuthenticationProvider>();
             services.AddTransient<IJWTProvider, JWTProvider>();
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
+            services.AddScoped<IBusinessLogic, BusinessLogic>();
+
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddScoped<IUrlHelper>(x =>
+            {
+                var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
+                var factory = x.GetRequiredService<IUrlHelperFactory>();
+                return factory.GetUrlHelper(actionContext);
+            });
 
             services.ConfigureMySqlContext(Configuration);
 
@@ -66,8 +79,7 @@ namespace H2020.IPMDecisions.IDP.API
                     });
                 });
             }
-            app.UseHsts();
-
+            
             app.UseCors("IdentityProviderCORS");
             app.UseHttpsRedirection();
             app.UseRouting();

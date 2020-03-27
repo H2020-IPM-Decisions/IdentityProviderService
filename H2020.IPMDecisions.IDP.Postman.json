@@ -7,160 +7,14 @@
 	},
 	"item": [
 		{
-			"name": "User Controller",
-			"item": [
-				{
-					"name": "Get All Users",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Users - Invalid accept header",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/xml"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User by Id",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/a05ed738-43f6-46c3-bd77-a93da227aabc",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"a05ed738-43f6-46c3-bd77-a93da227aabc"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User by Id",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/5189ad0f-a3ef-41f4-97a6-44cf0b50bf26",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"5189ad0f-a3ef-41f4-97a6-44cf0b50bf26"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
 			"name": "Account Controller",
 			"item": [
 				{
 					"name": "Create New User",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -174,7 +28,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"usernorole\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"usernorole@test.com\"\n}"
+							"raw": "{\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"newuser@test.com\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/accounts/register",
@@ -191,8 +45,46 @@
 					"response": []
 				},
 				{
-					"name": "Create New - Invalid content type header",
+					"name": "Create New User With UserType",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"newuser@test.com\",\n\t\"userType\": \"Level1\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New - Invalid Content Type header",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -230,8 +122,53 @@
 					"response": []
 				},
 				{
+					"name": "Create New - Invalid Accept header",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"0bc659c8-517a-4859-9a7c-62727a13464b\",\r\n    \"username\": \"newuser\",\r\n    \"email\": \"newuser@test.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Authenticate User",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -241,11 +178,26 @@
 							{
 								"key": "Accept",
 								"value": "application/json"
+							},
+							{
+								"key": "client_id",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "client_secret",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "grant_type",
+								"value": "",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user2\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user2@test.com\"\n}"
+							"raw": "{\n\t\"password\" : \"yourPassword\",\n\t\"email\" : \"your@email.com\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/accounts/authenticate",
@@ -260,6 +212,61 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Options Account",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "OPTIONS",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e9b66e8f-3d89-45a2-bfda-4421b65ce701",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "29e0f3c8-6bbe-4ac4-bd95-2c4faa69e388",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -279,20 +286,104 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclient",
+							"raw": "{{baseUrl}}/api/applicationclients",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"applicationclient"
+								"applicationclients"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get Application Client",
+					"name": "Get All Application Clients - With HATEOAS Links",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - Search Query",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?searchquery=Test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "searchquery",
+									"value": "Test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - IsEnabled Filter",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?IsEnabled=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "IsEnabled",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - SearchQuery and IsEnabled Filter",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -303,14 +394,424 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclient/08d7a8c6-57d2-4c33-8144-955a92e1d267",
+							"raw": "{{baseUrl}}/api/applicationclients?searchquery=test&IsEnabled=true",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"applicationclient",
-								"08d7a8c6-57d2-4c33-8144-955a92e1d267"
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "searchquery",
+									"value": "test"
+								},
+								{
+									"key": "IsEnabled",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - Fields",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?fields=id, name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id, name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - Fields - Invalid Field Name",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?fields=id, namexxx",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id, namexxx"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - Fields - Missing Id field",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?fields=name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - OrderBy",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?orderby=name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "orderby",
+									"value": "name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - OrderBy Desc",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?orderby=name desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "orderby",
+									"value": "name desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - OrderBy - Invalid Field Name",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?orderby=namexxx",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "orderby",
+									"value": "namexxx"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients - Page Number and Page Size",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?PageSize=5&pagenumber=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "PageSize",
+									"value": "5"
+								},
+								{
+									"key": "pagenumber",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients -  SearchQuery, IsEnabled Filter, Page Number, Page Size, Fields and Order By",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?PageSize=2&pagenumber=1&searchquery=test&IsEnabled=true&fields=id,name&orderby=name desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "PageSize",
+									"value": "2"
+								},
+								{
+									"key": "pagenumber",
+									"value": "1"
+								},
+								{
+									"key": "searchquery",
+									"value": "test"
+								},
+								{
+									"key": "IsEnabled",
+									"value": "true"
+								},
+								{
+									"key": "fields",
+									"value": "id,name"
+								},
+								{
+									"key": "orderby",
+									"value": "name desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Application Clients -  HATEOAS - SearchQuery, IsEnabled Filter, Page Number, Page Size, Fields and Order By",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients?PageSize=2&pagenumber=1&searchquery=test&IsEnabled=true&fields=id,name&orderby=name desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							],
+							"query": [
+								{
+									"key": "PageSize",
+									"value": "2"
+								},
+								{
+									"key": "pagenumber",
+									"value": "1"
+								},
+								{
+									"key": "searchquery",
+									"value": "test"
+								},
+								{
+									"key": "IsEnabled",
+									"value": "true"
+								},
+								{
+									"key": "fields",
+									"value": "id,name"
+								},
+								{
+									"key": "orderby",
+									"value": "name desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Application Client By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients/08d7aa5b-e23c-496e-8946-6d8af6b98dd6",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients",
+								"08d7aa5b-e23c-496e-8946-6d8af6b98dd6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Application Client By ID - Fields",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients/08d7aa5b-e23c-496e-8946-6d8af6b98dd6?fields=name,refreshTokenLifeTime,url",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients",
+								"08d7aa5b-e23c-496e-8946-6d8af6b98dd6"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name,refreshTokenLifeTime,url"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Application Client By ID - Fields With HATEOAS Links",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients/08d7aa5b-e23c-496e-8946-6d8af6b98dd6?fields=name,refreshTokenLifeTime,url",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients",
+								"08d7aa5b-e23c-496e-8946-6d8af6b98dd6"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name,refreshTokenLifeTime,url"
+								}
 							]
 						}
 					},
@@ -326,11 +827,16 @@
 								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n        \"name\": \"My API Client 2\",\n        \"applicationClientType\": 0,\n        \"enabled\": true,\n        \"refreshTokenLifeTime\": 90\n}",
+							"raw": "{\n\t\"name\": \"H2020 API Gateway\",\n    \"applicationClientType\": 1,\n    \"enabled\": true,\n    \"refreshTokenLifeTime\": 240,\n    \"url\": \"https://localhost:6001\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -338,13 +844,91 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclient",
+							"raw": "{{baseUrl}}/api/applicationclients",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"applicationclient"
+								"applicationclients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Application Client - With HATEOAS Links",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"My Application Client XX\",\n        \"applicationClientType\": 0,\n        \"enabled\": true,\n        \"refreshTokenLifeTime\": 90,\n        \"url\": \"http://test.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Application Client - Invalid characters",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"@pplication\",\n        \"applicationClientType\": 0,\n        \"enabled\": true,\n        \"refreshTokenLifeTime\": 90,\n        \"url\": \"http://test.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients"
 							]
 						}
 					},
@@ -354,14 +938,7 @@
 					"name": "Delete Application Client",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n        \"name\": \"My Authorization Server\",\n        \"applicationClientType\": 1,\n        \"enabled\": true,\n        \"refreshTokenLifeTime\": 10\n}",
@@ -372,14 +949,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclient/08d7a95c-de5f-4b1a-8970-f862469c5603",
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab3-f797-46de-8357-fae655024fc6",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"applicationclient",
-								"08d7a95c-de5f-4b1a-8970-f862469c5603"
+								"applicationclients",
+								"08d7bab3-f797-46de-8357-fae655024fc6"
 							]
 						}
 					},
@@ -394,12 +971,7 @@
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json-patch+json"
 							}
 						],
 						"body": {
@@ -412,14 +984,129 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclient/08d7a95f-8a47-47e8-8f11-0f68555461e4",
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c11fabc",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"applicationclient",
-								"08d7a95f-8a47-47e8-8f11-0f68555461e4"
+								"applicationclients",
+								"08d7bab4-0eb3-4e0d-83e6-0c145c11fabc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Partial Update Application Client - Bad Fields",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n      \"op\": \"replace\",\n      \"path\": \"/namexx\",\n      \"value\": \"New name\"\n    },\n    {\n      \"op\": \"replace\",\n      \"path\": \"/enabled\",\n      \"value\": \"true\"\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c11faea",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients",
+								"08d7bab4-0eb3-4e0d-83e6-0c145c11faea"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Partial Update Application Client - New Client Create",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json-patch+json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n      \"op\": \"replace\",\n      \"path\": \"/name\",\n      \"value\": \"New name\"\n    },\n    {\n      \"op\": \"replace\",\n      \"path\": \"/enabled\",\n      \"value\": \"true\"\n    },\n    {\n      \"op\": \"replace\",\n      \"path\": \"/url\",\n      \"value\": \"theUrl.com\"\n    },\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c22fccf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients",
+								"08d7bab4-0eb3-4e0d-83e6-0c145c22fccf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Partial Update Application Client - New Client Create Missing URL",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json-patch+json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n      \"op\": \"replace\",\n      \"path\": \"/name\",\n      \"value\": \"New name\"\n    },\n    {\n      \"op\": \"replace\",\n      \"path\": \"/enabled\",\n      \"value\": \"true\"\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c22fccf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"applicationclients",
+								"08d7bab4-0eb3-4e0d-83e6-0c145c22fccf"
 							]
 						}
 					},
@@ -429,7 +1116,508 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Role Controller",
+			"name": "Refresh Tokens Controller",
+			"item": [
+				{
+					"name": "Get All Refresh Tokens",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Refresh Tokens - With HATEOAS Links",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Refresh Tokens - Fields",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens?fields=id,userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,userId"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Refresh Tokens - Fields - Invalid Field Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens?fields=id,userIdx",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,userIdx"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Refresh Tokens - Fields - Missing Id field",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens?fields=userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "userId"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Refresh Tokens  - Page Number and Page Size",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens?PageSize=5&pagenumber=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							],
+							"query": [
+								{
+									"key": "PageSize",
+									"value": "5"
+								},
+								{
+									"key": "pagenumber",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Refresh Tokens  - Fields, Page Number and Page Size",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens?fields=id,userId&PageSize=5&pagenumber=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,userId"
+								},
+								{
+									"key": "PageSize",
+									"value": "5"
+								},
+								{
+									"key": "pagenumber",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Refresh Tokens  - HATEOAS - Fields, Page Number and Page Size",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens?fields=id,userId&PageSize=5&pagenumber=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,userId"
+								},
+								{
+									"key": "PageSize",
+									"value": "5"
+								},
+								{
+									"key": "pagenumber",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Refresh Tokens by Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens/08d7bac1-da60-4e80-8a4f-e0eb325a8250",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens",
+								"08d7bac1-da60-4e80-8a4f-e0eb325a8250"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Refresh Tokens by Id - Fields",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens/08d7bc43-19e9-4f11-8399-c5b5587a42f9?fields=id,userid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens",
+								"08d7bc43-19e9-4f11-8399-c5b5587a42f9"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,userid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Refresh Tokens by Id - Fields With HATEOAS links",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens/08d7bc43-19e9-4f11-8399-c5b5587a42f9?fields=id,userid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens",
+								"08d7bc43-19e9-4f11-8399-c5b5587a42f9"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,userid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Refresh Tokensby Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/refreshtokens/08d7bf8f-9a2a-4534-8d23-9c51db61dbe7",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"refreshtokens",
+								"08d7bf8f-9a2a-4534-8d23-9c51db61dbe7"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Roles Controller",
 			"item": [
 				{
 					"name": "Get All Roles",
@@ -468,6 +1656,168 @@
 					"response": []
 				},
 				{
+					"name": "Get All Roles - Fields",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles?fields=id, name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id, name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Roles - Fields - Missing Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles?fields=name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Roles - With HATEOAS links",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Roles - Fields with HATEOAS links",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles?fields=id,name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Role",
 					"request": {
 						"method": "POST",
@@ -485,7 +1835,45 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\" : \"New Role\"\n}",
+							"raw": "{\n\t\"name\" : \"Role1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role - With HATEOAS links",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\" : \"New Role X\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -529,101 +1917,21 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/roles/0f8eb613-b83e-49e5-ac82-3c02f5b71548",
+							"raw": "{{baseUrl}}/api/roles/8d671d9f-a23e-4a2c-aa8d-e573d2bd3102",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"roles",
-								"0f8eb613-b83e-49e5-ac82-3c02f5b71548"
+								"8d671d9f-a23e-4a2c-aa8d-e573d2bd3102"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Delete Role",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/roles/0f8eb613-b83e-49e5-ac82-3c02f5b71546",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"roles",
-								"0f8eb613-b83e-49e5-ac82-3c02f5b71546"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "User Roles Controller",
-			"item": [
-				{
-					"name": "Add Roles to user",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n\t{\n\t\"name\" : \"SuperAdmin\"\n\t},\n\t{\n\t\"name\" : \"OtherRole\"\n\t}\n]\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"380f0a69-a009-4c34-8496-9a43c2e069be",
-								"roles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Roles from user",
+					"name": "Get Role By Id - Fields",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -634,11 +1942,6 @@
 								"key": "Accept",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
 							}
 						],
 						"body": {
@@ -651,34 +1954,37 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"raw": "{{baseUrl}}/api/roles/dd2f7616-65b7-4456-a6dd-37b25a2c050d?fields=id,name",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users",
-								"380f0a69-a009-4c34-8496-9a43c2e069be",
-								"roles"
+								"roles",
+								"dd2f7616-65b7-4456-a6dd-37b25a2c050d"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,name"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Options Controller",
+					"name": "Get Role By Id - Fields with HATEOAS links",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
-						"method": "OPTIONS",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
 								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json"
 							}
 						],
 						"body": {
@@ -691,39 +1997,33 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"raw": "{{baseUrl}}/api/roles/8d671d9f-a23e-4a2c-aa8d-e573d2bd3102?fields=name",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users",
-								"380f0a69-a009-4c34-8496-9a43c2e069be",
-								"roles"
+								"roles",
+								"8d671d9f-a23e-4a2c-aa8d-e573d2bd3102"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Remove Roles from user",
+					"name": "Delete Role",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{\n\t\"name\" : \"ExtraRole\"\n\t}\n\t,\n\t{\n\t\"name\" : \"OtherRole\"\n\t}\n]\n",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -731,15 +2031,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
+							"raw": "{{baseUrl}}/api/roles/a186ccef-66fa-4cdb-be7f-f178656f63b3",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users",
-								"380f0a69-a009-4c34-8496-9a43c2e069be",
-								"roles"
+								"roles",
+								"a186ccef-66fa-4cdb-be7f-f178656f63b3"
 							]
 						}
 					},
@@ -769,7 +2068,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{\n\t\t\"type\" : \"MyClaim1\",\n\t\t\"Value\" : \"Claim\"\n\t},\n\t{\n\t\t\"type\" : \"MyClaim2\",\n\t\t\"Value\" : \"Claim2\"\n\t}\n\t,\n\t{\n\t\t\"type\" : \"MyClaim2\",\n\t\t\"Value\" : \"Claim2a\"\n\t}\n]\n",
+							"raw": "[\n\t{\n\t\t\"type\" : \"UserAccessType\",\n\t\t\"value\" : \"Level1\"\n\t}\n]\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -777,14 +2076,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/claims",
+							"raw": "{{baseUrl}}/api/users/0bc659c8-517a-4859-9a7c-62727a13464b/claims",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"0bc659c8-517a-4859-9a7c-62727a13464b",
 								"claims"
 							]
 						}
@@ -798,46 +2097,6 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/claims",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"380f0a69-a009-4c34-8496-9a43c2e069be",
-								"claims"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Options Controller",
-					"request": {
-						"method": "OPTIONS",
 						"header": [
 							{
 								"key": "Accept",
@@ -892,7 +2151,36 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{\n\t\t\"type\" : \"MyClaim2\",\n\t\t\"Value\" : \"Claim2a\"\n\t}\n]",
+							"raw": "[\n\t{\n\t\t\"type\" : \"UserAccessType\",\n\t\t\"Value\" : \"Level3\"\n\t}\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/0bc659c8-517a-4859-9a7c-62727a13464b/claims",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"0bc659c8-517a-4859-9a7c-62727a13464b",
+								"claims"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Options Controller",
+					"request": {
+						"method": "OPTIONS",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -918,34 +2206,27 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Test Controller",
+			"name": "User Roles Controller",
 			"item": [
 				{
-					"name": "Not Protected",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Add Roles to user",
 					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
 							},
 							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "[\n\t{\n\t\"name\" : \"Admin\"\n\t},\n\t{\n\t\"name\" : \"ThisRoleDoNotExist\"\n\t}\n]\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -953,21 +2234,22 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/test/notprotected",
+							"raw": "{{baseUrl}}/api/users/0bc659c8-517a-4859-9a7c-62727a13464b/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"test",
-								"notprotected"
+								"users",
+								"0bc659c8-517a-4859-9a7c-62727a13464b",
+								"roles"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Protected",
+					"name": "Get Roles from user",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -975,15 +2257,9 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"type": "text",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -996,42 +2272,39 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/test/protected",
+							"raw": "{{baseUrl}}/api/users/0bc659c8-517a-4859-9a7c-62727a13464b/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"test",
-								"protected"
+								"users",
+								"0bc659c8-517a-4859-9a7c-62727a13464b",
+								"roles"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "SuperAdmin",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Remove Roles from user",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"name": "Content-Type",
+								"key": "Accept",
 								"type": "text",
 								"value": "application/json"
 							},
 							{
-								"key": "Accept",
+								"key": "Content-Type",
 								"type": "text",
 								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "[\n\t{\n\t\"name\" : \"SuperAdmin\"\n\t},\n\t{\n\t\"name\" : \"OtherRole\"\n\t}\n]\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1039,35 +2312,32 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/test/SuperAdmin",
+							"raw": "{{baseUrl}}/api/users/6ca41f7a-44cb-48eb-80ad-f58f5912df9b/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"test",
-								"SuperAdmin"
+								"users",
+								"6ca41f7a-44cb-48eb-80ad-f58f5912df9b",
+								"roles"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "ExtraRole",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Options Controller",
 					"request": {
-						"method": "GET",
+						"method": "OPTIONS",
 						"header": [
 							{
-								"key": "Content-Type",
-								"name": "Content-Type",
+								"key": "Accept",
 								"type": "text",
 								"value": "application/json"
 							},
 							{
-								"key": "Accept",
+								"key": "Content-Type",
 								"type": "text",
 								"value": "application/json"
 							}
@@ -1082,57 +2352,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/test/ExtraRole",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"test",
-								"ExtraRole"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "BothRoles",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/test/BothRoles",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"test",
-								"BothRoles"
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
+								"roles"
 							]
 						}
 					},
@@ -1142,8 +2370,695 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Authenticate No Role",
+			"name": "User Controller",
+			"item": [
+				{
+					"name": "Get All Users",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users  - With HATEOAS Links",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - Search Query",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?searchQuery=test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "searchQuery",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - Fields",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?fields=username,id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "username,id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - Fields - Invalid Field Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?fields=usernamexx,id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "usernamexx,id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - Fields - Missing Id field",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?fields=username",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "username"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - OrderBy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?orderby=username",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "orderby",
+									"value": "username"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - OrderBy 2 Fields",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?orderby=username,email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "orderby",
+									"value": "username,email"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - OrderBy Desc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?orderby=username",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "orderby",
+									"value": "username"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - OrderBy - Invalid Field Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?orderby=user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "orderby",
+									"value": "user"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - Page Number and Page Size",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?PageSize=1&pagenumber=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "PageSize",
+									"value": "1"
+								},
+								{
+									"key": "pagenumber",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - SearchQuery, Page Number, Page Size, Fields and Order By",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?searchQuery=test&fields=username,id&orderby=username desc&PageSize=1&pagenumber=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "searchQuery",
+									"value": "test"
+								},
+								{
+									"key": "fields",
+									"value": "username,id"
+								},
+								{
+									"key": "orderby",
+									"value": "username desc"
+								},
+								{
+									"key": "PageSize",
+									"value": "1"
+								},
+								{
+									"key": "pagenumber",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users - HATEOAS - SearchQuery, Page Number, Page Size, Fields and Order By",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users?searchQuery=test&fields=username,id&orderby=username desc&PageSize=1&pagenumber=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "searchQuery",
+									"value": "test"
+								},
+								{
+									"key": "fields",
+									"value": "username,id"
+								},
+								{
+									"key": "orderby",
+									"value": "username desc"
+								},
+								{
+									"key": "PageSize",
+									"value": "1"
+								},
+								{
+									"key": "pagenumber",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Id - With HATEOAS Links",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User by Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/b591ada9-dee6-4fcb-9268-ffcf20ea4489",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"b591ada9-dee6-4fcb-9268-ffcf20ea4489"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Authenticate Default Role Admin With Default Client",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -1165,7 +3080,7 @@
 					{
 						"key": "client_id",
 						"type": "text",
-						"value": "08d7a8c6-57d2-4c33-8144-955a92e1d267"
+						"value": "08d7aa5b-e23c-496e-8946-6d8af6b98dd6"
 					},
 					{
 						"key": "client_secret",
@@ -1175,7 +3090,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\" : \"usernorole\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"usernorole@test.com\"\n}",
+					"raw": "{\n\t\"email\" : \"ADMIN@TEST.COM\",\n\t\"password\" : \"Password1!\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1197,8 +3112,11 @@
 			"response": []
 		},
 		{
-			"name": "Authenticate SuperAdmin",
+			"name": "Authenticate With Refresh Token",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -1214,38 +3132,65 @@
 					},
 					{
 						"key": "grant_type",
-						"value": "password",
+						"value": "refresh_token",
 						"type": "text"
 					},
 					{
 						"key": "client_id",
-						"value": "08d7a8c6-57d2-4c33-8144-955a92e1d267",
+						"value": "08d7aa5b-e23c-496e-8946-6d8af6b98dd6",
 						"type": "text"
 					},
 					{
 						"key": "client_secret",
-						"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujA",
+						"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujo",
+						"type": "text"
+					},
+					{
+						"key": "refresh_token",
+						"value": "MfNZtc6OmGzNR8DiPoA6oT1J+I7EUlNRksFmhE34tiI=",
 						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"user1@test.com\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "{{baseUrl}}/api/accounts/authenticate",
+					"raw": "{{baseUrl}}/api/accounts/authenticate/token",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"api",
 						"accounts",
-						"authenticate"
+						"authenticate",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Root",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						""
 					]
 				}
 			},
@@ -1257,7 +3202,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsImp0aSI6IjM5YmQwMWUzLTgzNTMtNGQwOS1hMjc5LWIxYTEwMTk0MDBkOSIsImlhdCI6MTU4MDg5MzE3NSwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzODBmMGE2OS1hMDA5LTRjMzQtODQ5Ni05YTQzYzJlMDY5YmUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdXBlckFkbWluIiwibmJmIjoxNTgwODkzMTc1LCJleHAiOjE1ODA4OTc5NzUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLCJhdWQiOiJ5b3VyQXBpR2F0ZVdheVNlcnZlclVybCJ9.YYNb6YMU4N4l3dVRfYsxRLZcWR2sfMj-CUfTmjbpRfE",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImp0aSI6IjhiYzFhN2NkLTU5N2QtNDBkMi04YTJlLTI2MzFjYTU3Njc5NCIsImlhdCI6MTU4NTMxMTU5OSwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzODBmMGE2OS1hMDA5LTRjMzQtODQ5Ni05YTQzYzJlMDY5YmUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AdGVzdC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsIm5iZiI6MTU4NTMxMTU5OCwiZXhwIjoxNTg1MzE2Mzk4LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo4MDg2IiwiYXVkIjoiaHR0cHM6Ly90ZXN0Y2xpZW50LmNvbSJ9.CJWRbG2OgSRh84tJrppv6f01RJJfzpb-Fj3BGtutkdk",
 				"type": "string"
 			}
 		]
@@ -1286,7 +3231,7 @@
 	],
 	"variable": [
 		{
-			"id": "cb75b018-8066-46f3-8629-178e2fe03a42",
+			"id": "c2e72afc-b3e4-4169-b8cb-17eb250b0676",
 			"key": "baseUrl",
 			"value": "",
 			"type": "string"

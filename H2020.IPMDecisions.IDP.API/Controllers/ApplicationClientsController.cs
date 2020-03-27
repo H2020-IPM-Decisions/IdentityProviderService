@@ -1,180 +1,97 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
-using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
-using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Json;
-using H2020.IPMDecisions.IDP.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
+using H2020.IPMDecisions.IDP.BLL;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
-    [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Roles = "Admin", AuthenticationSchemes =
     JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("/api/applicationclients")]
     public class ApplicationClientsController : ControllerBase
     {
-        private readonly IDataService dataService;
-        private readonly IMapper mapper;
-        private readonly IPropertyMappingService propertyMappingService;
-        private readonly IPropertyCheckerService propertyCheckerService;
+        private readonly IBusinessLogic businessLogic;
 
         public ApplicationClientsController(
-            IDataService dataService,
-            IMapper mapper,
-            IPropertyMappingService propertyMappingService,
-            IPropertyCheckerService propertyCheckerService)
+            IBusinessLogic businessLogic)
         {
-            this.dataService = dataService
-                ?? throw new System.ArgumentNullException(nameof(dataService));
-            this.mapper = mapper
-                ?? throw new ArgumentNullException(nameof(mapper));
-            this.propertyMappingService = propertyMappingService
-                ?? throw new ArgumentNullException(nameof(propertyMappingService));
-            this.propertyCheckerService = propertyCheckerService
-                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
+            this.businessLogic = businessLogic
+                ?? throw new ArgumentNullException(nameof(businessLogic));
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
+        [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetApplicationClients")]
         [HttpHead]
-        // GET: api/applicationclient
+        // GET: api/applicationclients
         public async Task<IActionResult> GetApplicationClients(
             [FromQuery] ApplicationClientResourceParameter resourceParameter,
             [FromHeader(Name = "Accept")] string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue parsedMediaType))
-            {
-                return BadRequest();
-            }
-            if (!propertyMappingService.ValidMappingExistsFor<ApplicationClientDto, ApplicationClient>(resourceParameter.OrderBy))
-                return BadRequest();
-            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(resourceParameter.Fields, true))
-                return BadRequest();
+            var response = await this.businessLogic.GetApplicationClients(resourceParameter, mediaType);
 
-            var applicationClients = await this.dataService.ApplicationClients.FindAllAsync(resourceParameter);
-            if (applicationClients.Count() == 0) return NotFound();
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
 
-            var paginationMetaData = new
-            {
-                totalCount = applicationClients.TotalCount,
-                pageSize = applicationClients.PageSize,
-                currentPage = applicationClients.CurrentPage,
-                totalPages = applicationClients.TotalPages
-            };
+            if (response.Result == null)
+                return NotFound();
 
             Response.Headers.Add("X-Pagination",
-                JsonSerializer.Serialize(paginationMetaData));
+                JsonSerializer.Serialize(response.Result.PaginationMetaData));
 
-            var links = CreateLinksForApplicationClients(resourceParameter, applicationClients.HasNext, applicationClients.HasPrevious);
-
-            var shapedClientsToReturn = this.mapper
-                .Map<IEnumerable<ApplicationClientDto>>(applicationClients)
-                .ShapeData(resourceParameter.Fields);
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);      
-            var shapedClientsToReturnWithLinks = shapedClientsToReturn.Select(client =>
-            {
-                var userAsDictionary = client as IDictionary<string, object>;
-                if (includeLinks)
+            return Ok(
+                new
                 {
-                    var userLinks = CreateLinksForApplicationClient((Guid)userAsDictionary["Id"], resourceParameter.Fields);
-                    userAsDictionary.Add("links", userLinks);
+                    value = response.Result.Value,
+                    links = response.Result.Links
                 }
-                return userAsDictionary;
-            });
-
-            var applicationClientsToReturn = new
-            {
-                value = shapedClientsToReturnWithLinks,
-                links
-            };
-
-            return Ok(applicationClientsToReturn);
+            );
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
+        [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpPost]
         [Route("")]
-        // POST: api/applicationclient
+        // POST: api/applicationclients
         public async Task<ActionResult<ApplicationClientDto>> Post(
             [FromBody] ApplicationClientForCreationDto clientForCreationDto,
             [FromHeader(Name = "Accept")] string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue parsedMediaType))
+            var response = await this.businessLogic.CreateApplicationClient(clientForCreationDto, mediaType);
+
+            if (!response.IsSuccessful)
             {
-                return BadRequest();
+                return BadRequest(new { message = response.ErrorMessage });
             }
-
-            var regex = new Regex("^[a-zA-Z0-9 ]*$");
-            if (!regex.IsMatch(clientForCreationDto.Name))
-                return BadRequest("Special characters are not allowed in the client name.");
-
-            var client = await this.dataService.ApplicationClients.FindByNameAsync(clientForCreationDto.Name);
-            if (client != null)
-                return BadRequest(string.Format("Client already exits with name: {0}", clientForCreationDto.Name));
-
-            var applicationClientEntity = this.mapper.Map<ApplicationClient>(clientForCreationDto);
-            CreateClientSecret(applicationClientEntity);
-
-            this.dataService.ApplicationClients.Create(applicationClientEntity);
-            await this.dataService.CompleteAsync();
-
-            var clientToReturn = this.mapper.Map<ApplicationClientDto>(applicationClientEntity)
-                .ShapeData()
-                as IDictionary<string, object>;
-                
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                        .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-            if (includeLinks)
-            {
-                var links = CreateLinksForApplicationClient(applicationClientEntity.Id);
-                clientToReturn.Add("links", links);
-            }
-
             return CreatedAtRoute("GetApplicationClient",
-                 new { id = clientToReturn["Id"] },
-                 clientToReturn);
+                 new { id = response.Result["Id"] },
+                 response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id:guid}", Name = "DeleteApplicationClient")]
         //DELETE :  api/applicationclients/1
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var clientToDelete = await this.dataService.ApplicationClients.FindByIdAsync(id);
+            var response = await this.businessLogic.DeleteApplicationClient(id);
 
-            if (clientToDelete == null) return NotFound();
-
-            this.dataService.ApplicationClients.Delete(clientToDelete);
-            await this.dataService.CompleteAsync();
-
+            if (!response.IsSuccessful)
+            {
+                return BadRequest(new { message = response.ErrorMessage });
+            }
             return NoContent();
         }
 
@@ -188,48 +105,45 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromRoute] Guid id,
             JsonPatchDocument<ApplicationClientForUpdateDto> patchDocument)
         {
-            var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
+            var applicationClientResponse = await this.businessLogic.GetApplicationClient(id);
 
-            if (clientFromRepository == null)
+            if (applicationClientResponse.Result == null)
             {
                 var clientDto = new ApplicationClientForUpdateDto();
                 patchDocument.ApplyTo(clientDto, ModelState);
-
                 if (!TryValidateModel(clientDto))
                     return ValidationProblem(ModelState);
 
-                var clientToAdd = this.mapper.Map<ApplicationClient>(clientDto);
-                clientToAdd.Id = id;
-                CreateClientSecret(clientToAdd);
+                var applicationClientWithSecret = this.businessLogic.MapToApplicationClientAddingClientSecret(clientDto);                
+                if (!TryValidateModel(applicationClientWithSecret))
+                    return ValidationProblem(ModelState);
 
-                this.dataService.ApplicationClients.Create(clientToAdd);
-                await this.dataService.CompleteAsync();
+                var createClientResponse = await this.businessLogic.CreateApplicationClient(id, applicationClientWithSecret);
 
-                var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientToAdd);
+                if(!createClientResponse.IsSuccessful)
+                    return BadRequest(new { message = createClientResponse.ErrorMessage });
+
                 return CreatedAtRoute("GetApplicationClient",
                  new { id = id },
-                 clientToReturn);
+                 createClientResponse.Result);
             }
-
-            var clientToPatch = this.mapper.Map<ApplicationClientForUpdateDto>(clientFromRepository);
-            // ToDo need validation
+            var clientToPatch = this.businessLogic.MapToApplicationClientForUpdateDto(applicationClientResponse.Result);
             patchDocument.ApplyTo(clientToPatch, ModelState);
-
             if (!TryValidateModel(clientToPatch))
                 return ValidationProblem(ModelState);
 
-            this.mapper.Map(clientToPatch, clientFromRepository);
+            var response = await this.businessLogic.UpdateApplicationClient(applicationClientResponse.Result, clientToPatch);
 
-            this.dataService.ApplicationClients.Update(clientFromRepository);
-            await this.dataService.CompleteAsync();
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
 
-            return NoContent();
+            return NoContent();            
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Produces("application/vnd.h2020ipmdecisions.hateoas+json")]
+        [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetApplicationClient")]
         // GET: api/applicationclients/1
         public async Task<IActionResult> Get(
@@ -237,30 +151,15 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             [FromQuery] string fields,
             [FromHeader(Name = "Accept")] string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                   out MediaTypeHeaderValue parsedMediaType))
-            {
-                return BadRequest();
-            }
-            if (!propertyCheckerService.TypeHasProperties<ApplicationClientDto>(fields))
-                return BadRequest();
+            var response = await this.businessLogic.GetApplicationClient(id, fields, mediaType);
 
-            var clientFromRepository = await this.dataService.ApplicationClients.FindByIdAsync(id);
-            if (clientFromRepository == null) return NotFound();
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
 
+            if (response.Result == null)
+                return NotFound();
 
-            var clientToReturn = this.mapper.Map<ApplicationClientDto>(clientFromRepository)
-                .ShapeData(fields)
-                as IDictionary<string, object>;
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                        .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-            if (includeLinks)
-            {
-                var links = CreateLinksForApplicationClient(id, fields);
-                clientToReturn.Add("links", links);
-            }
-
-            return Ok(clientToReturn);
+            return Ok(response.Result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -271,120 +170,5 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE,PATCH");
             return Ok();
         }
-
-        #region helpers
-        private static void CreateClientSecret(ApplicationClient applicationClientEntity)
-        {
-            var key = new byte[32];
-            RandomNumberGenerator.Create().GetBytes(key);
-            applicationClientEntity.Base64Secret = WebEncoders.Base64UrlEncode(key);
-        }
-
-        private string CreateApplicationClientResourceUri(
-               ApplicationClientResourceParameter resourceParameters,
-               ResourceUriType type)
-        {
-            switch (type)
-            {
-                case ResourceUriType.PreviousPage:
-                    return Url.Link("GetApplicationClients",
-                    new
-                    {
-                        fields = resourceParameters.Fields,
-                        orderBy = resourceParameters.OrderBy,
-                        pageNumber = resourceParameters.PageNumber - 1,
-                        pageSize = resourceParameters.PageSize,
-                        isEnabled = resourceParameters.IsEnabled,
-                        searchQuery = resourceParameters.SearchQuery
-                    });
-                case ResourceUriType.NextPage:
-                    return Url.Link("GetApplicationClients",
-                    new
-                    {
-                        fields = resourceParameters.Fields,
-                        orderBy = resourceParameters.OrderBy,
-                        pageNumber = resourceParameters.PageNumber + 1,
-                        pageSize = resourceParameters.PageSize,
-                        isEnabled = resourceParameters.IsEnabled,
-                        searchQuery = resourceParameters.SearchQuery
-                    });
-                case ResourceUriType.Current:
-                default:
-                    return Url.Link("GetApplicationClients",
-                    new
-                    {
-                        fields = resourceParameters.Fields,
-                        orderBy = resourceParameters.OrderBy,
-                        pageNumber = resourceParameters.PageNumber,
-                        pageSize = resourceParameters.PageSize,
-                        isEnabled = resourceParameters.IsEnabled,
-                        searchQuery = resourceParameters.SearchQuery
-                    });
-            }
-        }
-
-        private IEnumerable<LinkDto> CreateLinksForApplicationClients(
-            ApplicationClientResourceParameter resourceParameters,
-            bool hasNextPage,
-            bool hasPreviousPage)
-        {
-            var links = new List<LinkDto>();
-
-            links.Add(new LinkDto(
-                CreateApplicationClientResourceUri(resourceParameters, ResourceUriType.Current),
-                "self",
-                "GET"));
-
-            if (hasNextPage)
-            {
-                links.Add(new LinkDto(
-                CreateApplicationClientResourceUri(resourceParameters, ResourceUriType.NextPage),
-                "next_page",
-                "GET"));
-            }
-            if (hasPreviousPage)
-            {
-                links.Add(new LinkDto(
-               CreateApplicationClientResourceUri(resourceParameters, ResourceUriType.PreviousPage),
-               "previous_page",
-               "GET"));
-            }
-            return links;
-        }
-
-        private IEnumerable<LinkDto> CreateLinksForApplicationClient(
-            Guid id,
-            string fields = "")
-        {
-            var links = new List<LinkDto>();
-
-            if (string.IsNullOrWhiteSpace(fields))
-            {
-                links.Add(new LinkDto(
-                Url.Link("GetApplicationClient", new { id }),
-                "self",
-                "GET"));
-            }
-            else
-            {
-                links.Add(new LinkDto(
-                 Url.Link("GetApplicationClient", new { id, fields }),
-                 "self",
-                 "GET"));
-            }
-
-            links.Add(new LinkDto(
-                Url.Link("DeleteApplicationClient", new { id }),
-                "delete_application_client",
-                "DELETE"));
-
-            links.Add(new LinkDto(
-                Url.Link("PartialUpdateApplicationClient", new { id }),
-                "update_application_client",
-                "PATCH"));
-
-            return links;
-        }
-        #endregion
     }
 }
