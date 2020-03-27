@@ -28,6 +28,41 @@
 						],
 						"body": {
 							"mode": "raw",
+							"raw": "{\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"newuser@test.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New User With UserType",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
 							"raw": "{\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"newuser@test.com\",\n\t\"userType\": \"Level1\"\n}"
 						},
 						"url": {
@@ -162,7 +197,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"yourUser\",\n\t\"password\" : \"yourPassword\",\n\t\"email\" : \"your@email.com\"\n}"
+							"raw": "{\n\t\"password\" : \"yourPassword\",\n\t\"email\" : \"your@email.com\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/accounts/authenticate",
@@ -3196,7 +3231,7 @@
 	],
 	"variable": [
 		{
-			"id": "8efd2cd3-79f7-408c-a5ee-8e74811fc25d",
+			"id": "c2e72afc-b3e4-4169-b8cb-17eb250b0676",
 			"key": "baseUrl",
 			"value": "",
 			"type": "string"

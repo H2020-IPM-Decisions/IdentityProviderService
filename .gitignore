@@ -353,3 +353,4 @@ MigrationBackup/
 .vscode/**
 H2020.IPMDecisions.IDP.API/appsettings.json
 Docker/docker-compose.local.yml
+Docker/docker-compose.develop.yml

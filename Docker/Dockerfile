@@ -45,5 +45,7 @@ ENV JwtSettings:SecretKey=""
 ENV JwtSettings:IssuerServerUrl=""
 ENV JwtSettings:ValidAudiencesUrls=""
 ENV AllowedHosts="*"
+ENV AccessClaims:ClaimTypeName="UserAccessType"
+ENV AccessClaims:DefaultUserAccessLevel="Level0"
 
 ENTRYPOINT ["dotnet", "H2020.IPMDecisions.IDP.API.dll"]
