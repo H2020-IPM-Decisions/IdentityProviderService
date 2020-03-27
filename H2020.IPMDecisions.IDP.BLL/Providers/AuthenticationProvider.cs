@@ -87,7 +87,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 Result = null
             };
 
-            var user = await this.dataService.UserManager.FindByNameAsync(userDto.Username);
+            var user = await this.dataService.UserManager.FindByEmailAsync(userDto.Email);
 
             if (user == null)
             {

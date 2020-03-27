@@ -28,7 +28,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"newuser\",\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"newuser@test.com\"\n}"
+							"raw": "{\n\t\"password\" : \"Password1!\",\n\t\"email\" : \"newuser@test.com\",\n\t\"userType\": \"Level1\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/accounts/register",
@@ -795,13 +795,13 @@
 							},
 							{
 								"key": "Accept",
-								"value": "application/xml",
+								"value": "application/json",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n        \"name\": \"My Application Client X\",\n        \"applicationClientType\": 0,\n        \"enabled\": true,\n        \"refreshTokenLifeTime\": 90,\n        \"url\": \"http://test.com\"\n}",
+							"raw": "{\n\t\"name\": \"H2020 API Gateway\",\n    \"applicationClientType\": 1,\n    \"enabled\": true,\n    \"refreshTokenLifeTime\": 240,\n    \"url\": \"https://localhost:6001\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -984,14 +984,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c11fabc",
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c11faea",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"applicationclients",
-								"08d7bab4-0eb3-4e0d-83e6-0c145c11fabc"
+								"08d7bab4-0eb3-4e0d-83e6-0c145c11faea"
 							]
 						}
 					},
@@ -1024,14 +1024,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c11facc",
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c22fccf",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"applicationclients",
-								"08d7bab4-0eb3-4e0d-83e6-0c145c11facc"
+								"08d7bab4-0eb3-4e0d-83e6-0c145c22fccf"
 							]
 						}
 					},
@@ -1064,14 +1064,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c22fccc",
+							"raw": "{{baseUrl}}/api/applicationclients/08d7bab4-0eb3-4e0d-83e6-0c145c22fccf",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"applicationclients",
-								"08d7bab4-0eb3-4e0d-83e6-0c145c22fccc"
+								"08d7bab4-0eb3-4e0d-83e6-0c145c22fccf"
 							]
 						}
 					},
@@ -1401,13 +1401,27 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/refreshtokens",
+							"raw": "{{baseUrl}}/api/refreshtokens?fields=id,userId&PageSize=5&pagenumber=1",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"refreshtokens"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,userId"
+								},
+								{
+									"key": "PageSize",
+									"value": "5"
+								},
+								{
+									"key": "pagenumber",
+									"value": "1"
+								}
 							]
 						}
 					},
@@ -1474,14 +1488,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/refreshtokens/08d7bac1-da60-4e80-8a4f-e0eb325a8250?fields=id,userid",
+							"raw": "{{baseUrl}}/api/refreshtokens/08d7bc43-19e9-4f11-8399-c5b5587a42f9?fields=id,userid",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"refreshtokens",
-								"08d7bac1-da60-4e80-8a4f-e0eb325a8250"
+								"08d7bc43-19e9-4f11-8399-c5b5587a42f9"
 							],
 							"query": [
 								{
@@ -1517,14 +1531,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/refreshtokens/08d7bac1-da60-4e80-8a4f-e0eb325a8250?fields=id,userid",
+							"raw": "{{baseUrl}}/api/refreshtokens/08d7bc43-19e9-4f11-8399-c5b5587a42f9?fields=id,userid",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"refreshtokens",
-								"08d7bac1-da60-4e80-8a4f-e0eb325a8250"
+								"08d7bc43-19e9-4f11-8399-c5b5587a42f9"
 							],
 							"query": [
 								{
@@ -1551,14 +1565,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/refreshtokens/08d7bac1-3089-406e-8a5d-db33c5d5f954",
+							"raw": "{{baseUrl}}/api/refreshtokens/08d7bf8f-9a2a-4534-8d23-9c51db61dbe7",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"refreshtokens",
-								"08d7bac1-3089-406e-8a5d-db33c5d5f954"
+								"08d7bf8f-9a2a-4534-8d23-9c51db61dbe7"
 							]
 						}
 					},
@@ -1786,7 +1800,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\" : \"New Role Z\"\n}",
+							"raw": "{\n\t\"name\" : \"Role1\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1868,14 +1882,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/roles/dd2f7616-65b7-4456-a6dd-37b25a2c050d",
+							"raw": "{{baseUrl}}/api/roles/8d671d9f-a23e-4a2c-aa8d-e573d2bd3102",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"roles",
-								"dd2f7616-65b7-4456-a6dd-37b25a2c050d"
+								"8d671d9f-a23e-4a2c-aa8d-e573d2bd3102"
 							]
 						}
 					},
@@ -1948,14 +1962,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/roles/dd2f7616-65b7-4456-a6dd-37b25a2c050d?fields=name",
+							"raw": "{{baseUrl}}/api/roles/8d671d9f-a23e-4a2c-aa8d-e573d2bd3102?fields=name",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"roles",
-								"dd2f7616-65b7-4456-a6dd-37b25a2c050d"
+								"8d671d9f-a23e-4a2c-aa8d-e573d2bd3102"
 							],
 							"query": [
 								{
@@ -1982,14 +1996,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/roles/0f8eb613-b83e-49e5-ac82-3c02f5b71546",
+							"raw": "{{baseUrl}}/api/roles/a186ccef-66fa-4cdb-be7f-f178656f63b3",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"roles",
-								"0f8eb613-b83e-49e5-ac82-3c02f5b71546"
+								"a186ccef-66fa-4cdb-be7f-f178656f63b3"
 							]
 						}
 					},
@@ -2070,14 +2084,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/0bc659c8-517a-4859-9a7c-62727a13464b/claims",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/claims",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"0bc659c8-517a-4859-9a7c-62727a13464b",
+								"380f0a69-a009-4c34-8496-9a43c2e069be",
 								"claims"
 							]
 						}
@@ -2263,14 +2277,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/0bc659c8-517a-4859-9a7c-62727a13464b/roles",
+							"raw": "{{baseUrl}}/api/users/6ca41f7a-44cb-48eb-80ad-f58f5912df9b/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"0bc659c8-517a-4859-9a7c-62727a13464b",
+								"6ca41f7a-44cb-48eb-80ad-f58f5912df9b",
 								"roles"
 							]
 						}
@@ -2671,7 +2685,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users?orderby=usernamexx",
+							"raw": "{{baseUrl}}/api/users?orderby=username",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2682,7 +2696,7 @@
 							"query": [
 								{
 									"key": "orderby",
-									"value": "usernamexx"
+									"value": "username"
 								}
 							]
 						}
@@ -2917,7 +2931,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be?fields=id",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2925,19 +2939,13 @@
 								"api",
 								"users",
 								"380f0a69-a009-4c34-8496-9a43c2e069be"
-							],
-							"query": [
-								{
-									"key": "fields",
-									"value": "id"
-								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get All Users OrderBy",
+					"name": "Get User by Id - With HATEOAS Links",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -2946,7 +2954,7 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
+								"value": "application/vnd.h2020ipmdecisions.hateoas+json",
 								"type": "text"
 							}
 						],
@@ -2960,23 +2968,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users?orderby=username&fields=username",
+							"raw": "{{baseUrl}}/api/users/380f0a69-a009-4c34-8496-9a43c2e069be",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users"
-							],
-							"query": [
-								{
-									"key": "orderby",
-									"value": "username"
-								},
-								{
-									"key": "fields",
-									"value": "username"
-								}
+								"users",
+								"380f0a69-a009-4c34-8496-9a43c2e069be"
 							]
 						}
 					},
@@ -3015,48 +3014,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Get All Users - OrderBy Copy",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users?orderby=username",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users"
-							],
-							"query": [
-								{
-									"key": "orderby",
-									"value": "username"
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -3064,6 +3021,9 @@
 		{
 			"name": "Authenticate Default Role Admin With Default Client",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -3095,7 +3055,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\" : \"INITIALADMINUSER\",\n\t\"password\" : \"Password1!\"\n}",
+					"raw": "{\n\t\"email\" : \"ADMIN@TEST.COM\",\n\t\"password\" : \"Password1!\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -3119,6 +3079,9 @@
 		{
 			"name": "Authenticate With Refresh Token",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -3144,12 +3107,12 @@
 					},
 					{
 						"key": "client_secret",
-						"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujj",
+						"value": "bpjiu9ticX8TB0owtMESxM27iQdp9iX_b4RpZ8VAujo",
 						"type": "text"
 					},
 					{
 						"key": "refresh_token",
-						"value": "KbOBfPUpC2zoJNwOZRfDhyjc76FuuWSrCyGHfZ9u9+w=",
+						"value": "MfNZtc6OmGzNR8DiPoA6oT1J+I7EUlNRksFmhE34tiI=",
 						"type": "text"
 					}
 				],
@@ -3204,7 +3167,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbml0aWFsYWRtaW51c2VyIiwianRpIjoiZWU5NzYxNDktMGI2ZC00MjY0LTgxMzAtYjNhZmVjOWNkYjQ5IiwiaWF0IjoxNTgyNzI0MzIwLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjM4MGYwYTY5LWEwMDktNGMzNC04NDk2LTlhNDNjMmUwNjliZSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJpbml0aWFsYWRtaW51c2VyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJuYmYiOjE1ODI3MjQzMjAsImV4cCI6MTU4MjcyOTEyMCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0LmNvbSJ9.8wvobKsWQGWVxonaTdDa6yypogf7BCe7c9Nd7Ps4unU",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImp0aSI6IjhiYzFhN2NkLTU5N2QtNDBkMi04YTJlLTI2MzFjYTU3Njc5NCIsImlhdCI6MTU4NTMxMTU5OSwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzODBmMGE2OS1hMDA5LTRjMzQtODQ5Ni05YTQzYzJlMDY5YmUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AdGVzdC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsIm5iZiI6MTU4NTMxMTU5OCwiZXhwIjoxNTg1MzE2Mzk4LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo4MDg2IiwiYXVkIjoiaHR0cHM6Ly90ZXN0Y2xpZW50LmNvbSJ9.CJWRbG2OgSRh84tJrppv6f01RJJfzpb-Fj3BGtutkdk",
 				"type": "string"
 			}
 		]
@@ -3233,7 +3196,7 @@
 	],
 	"variable": [
 		{
-			"id": "531d274f-c82a-4db6-9e6b-eab495885c53",
+			"id": "8efd2cd3-79f7-408c-a5ee-8e74811fc25d",
 			"key": "baseUrl",
 			"value": "",
 			"type": "string"

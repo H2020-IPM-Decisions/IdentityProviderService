@@ -4,6 +4,7 @@ using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -16,12 +17,14 @@ namespace H2020.IPMDecisions.IDP.BLL
 
             if (identityResult.Succeeded)
             {
+                await AddInitialClaim(userEntity, user.UserType);
+
                 //ToDo Generate Email token and return
                 var userToReturn = this.mapper.Map<UserDto>(userEntity);
-                var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);                
+                var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                 return successResponse;
             }
-            
+
             var failResponse = GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
             return failResponse;
         }
@@ -78,6 +81,13 @@ namespace H2020.IPMDecisions.IDP.BLL
                 RefreshToken = refreshToken
             };
             return bearerToken;
+        }
+
+        private async Task AddInitialClaim(ApplicationUser userEntity, string userType)
+        {
+            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
+            string userTypeClaimValue = !string.IsNullOrEmpty(userType) ? userType : this.configuration["AccessClaims:DefaultUserAccessLevel"];
+            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue));
         }
     }
 }
