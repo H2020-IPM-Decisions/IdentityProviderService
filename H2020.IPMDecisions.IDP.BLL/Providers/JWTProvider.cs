@@ -56,7 +56,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             IdentityOptions _options = new IdentityOptions();
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, await JtiGenerator()),
                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64),
                 new Claim(_options.ClaimsIdentity.UserIdClaimType, user.Id.ToString()),

@@ -15,7 +15,7 @@ These instructions will get you a copy of the project up and running on your loc
 The Identity Provider Service uses the following technologies:
 
 ```
-ASP.NET Core 3.1
+ASP.NET Core 3.1.101
 MySql 8
 ```
 1. [Install](https://dotnet.microsoft.com/download/dotnet-core/3.1) the required .NET Core SDK.
@@ -60,7 +60,7 @@ dotnet ef database update
 
 Open your MySQL instance and check that the database has been created and tables added.
 
-If new tables are added to the project, to add new migrations to the database run this commands:
+If new tables are added to the project using [CodeFirst approach](https://entityframeworkcore.com/approach-code-first), to add new migrations to the database run these commands:
 
 ```console
 dotnet ef migrations add YourMessage --project ..\H2020.IPMDecisions.IDP.Data\H2020.IPMDecisions.IDP.Data.csproj
@@ -139,6 +139,10 @@ To help modifying the default data, a postman collection has been created with t
 ## Versioning
 
 For the versions available, see the [tags on this repository](https://github.com/H2020-IPM-Decisions/IdentityProviderService/tags). 
+
+## ToDo
+- Add Exception handling and login message
+- HATEOAS to return API Gateway URL
 
 ## Authors
 
