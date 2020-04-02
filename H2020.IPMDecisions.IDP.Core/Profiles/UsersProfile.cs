@@ -9,6 +9,7 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
         {
             // Entities to Dtos
             CreateMap<ApplicationUser, UserDto>();
+            CreateMap<ApplicationUser, UserWithRolesClaimsDto>();
 
             // Dtos to Entities
             CreateMap<UserDto, ApplicationUser>();

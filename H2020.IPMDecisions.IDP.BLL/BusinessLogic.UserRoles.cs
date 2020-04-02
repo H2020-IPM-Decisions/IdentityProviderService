@@ -15,10 +15,10 @@ namespace H2020.IPMDecisions.IDP.BLL
             var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
             if (user == null) return GenericResponseBuilder.Success<IList<string>>(null);
 
-            var claimsToReturn = await this.dataService.UserManager.GetRolesAsync(user);
-            if (claimsToReturn.Count == 0) return GenericResponseBuilder.Success<IList<string>>(null);
+            var rolesToReturn = await this.dataService.UserManager.GetRolesAsync(user);
+            if (rolesToReturn.Count == 0) return GenericResponseBuilder.Success<IList<string>>(null);
 
-            return GenericResponseBuilder.Success<IList<string>>(claimsToReturn);
+            return GenericResponseBuilder.Success<IList<string>>(rolesToReturn);
         }
 
         public async Task<GenericResponse<UserDto>> ManageUserRoles(Guid id, List<RoleForManipulationDto> roles, bool remove = false)

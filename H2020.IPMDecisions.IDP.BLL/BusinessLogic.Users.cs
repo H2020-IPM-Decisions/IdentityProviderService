@@ -37,7 +37,11 @@ namespace H2020.IPMDecisions.IDP.BLL
             var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
             if (user == null) return GenericResponseBuilder.Success<IDictionary<string, object>>(null);
 
-            var userToReturn = this.mapper.Map<UserDto>(user)
+            var userToReturn = this.mapper.Map<UserWithRolesClaimsDto>(user);
+            userToReturn.Roles = await this.dataService.UserManager.GetRolesAsync(user);
+            userToReturn.Claims = await this.dataService.UserManager.GetClaimsAsync(user);
+
+            var userToReturnShaped = userToReturn
                 .ShapeData(fields)
                 as IDictionary<string, object>;
 
@@ -47,10 +51,10 @@ namespace H2020.IPMDecisions.IDP.BLL
             if (includeLinks)
             {
                 var links = CreateLinksForUser(id, fields);
-                userToReturn.Add("links", links);
+                userToReturnShaped.Add("links", links);
             }
 
-            return GenericResponseBuilder.Success<IDictionary<string, object>>(userToReturn);
+            return GenericResponseBuilder.Success<IDictionary<string, object>>(userToReturnShaped);
         }
 
         public async Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType)
