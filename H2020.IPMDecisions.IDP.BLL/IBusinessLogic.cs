@@ -27,7 +27,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse<ShapedDataWithLinks>> GetApplicationClients(ApplicationClientResourceParameter resourceParameter, string mediaType);
         ApplicationClient MapToApplicationClientAddingClientSecret(ApplicationClientForUpdateDto applicationClient);
         ApplicationClientForUpdateDto MapToApplicationClientForUpdateDto(ApplicationClient applicationClient);
-        Task<GenericResponse<ApplicationClientDto>> UpdateApplicationClient(ApplicationClient applicationClient, ApplicationClientForUpdateDto applicationClientForUpdate);
+        Task<GenericResponse> UpdateApplicationClient(ApplicationClient applicationClient, ApplicationClientForUpdateDto applicationClientForUpdate);
         #endregion
 
         #region RefreshTokens Controller

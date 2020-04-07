@@ -122,7 +122,7 @@ Now you should be able to user your API in the docker container. Try to navigate
 ## Deployment with Docker Compose
 
 You can deploy the Identity Provider Service API, including a MySQL database with test data and a phpMyAdmin UI to manage the database, using a docker compose.
-A file called `docker-compose.yml` is located in the following folder `Docker` locate in the rrot of the project. 
+A file called `docker-compose.yml` is located in the following folder `Docker` locate in the root of the project. 
 To run the following command:
 
 ```console

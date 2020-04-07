@@ -173,17 +173,17 @@ namespace H2020.IPMDecisions.IDP.BLL
             return applicationClientEntity;
         }        
 
-        public async Task<GenericResponse<ApplicationClientDto>> UpdateApplicationClient(ApplicationClient applicationClient, ApplicationClientForUpdateDto applicationClientForUpdate)
+        public async Task<GenericResponse> UpdateApplicationClient(ApplicationClient applicationClient, ApplicationClientForUpdateDto applicationClientForUpdate)
         {
             this.mapper.Map(applicationClientForUpdate, applicationClient);
 
             this.dataService.ApplicationClients.Update(applicationClient);
             await this.dataService.CompleteAsync();
 
-            return GenericResponseBuilder.Success<ApplicationClientDto>(null);
+            return GenericResponseBuilder.Success();
         }
 
-        #region helpers
+        #region Helpers
         private static void CreateClientSecret(ApplicationClient applicationClientEntity)
         {
             var key = new byte[32];
