@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
@@ -153,7 +155,16 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             response.ResponseMessage = "";
             response.Result = user;
             return response;
+        }
+        
+        public async Task<IList<string>> GetUserRolesAsync(ApplicationUser user)
+        {
+            return await this.dataService.UserManager.GetRolesAsync(user);
+        }
 
+        public async Task<IList<Claim>> GetUserClaimsAsync(ApplicationUser user)
+        {
+            return await this.dataService.UserManager.GetClaimsAsync(user);
         }
     }
 }

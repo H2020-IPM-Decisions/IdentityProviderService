@@ -14,8 +14,8 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         #region Accounts Controller
         Task<GenericResponse> AddNewUser(UserForRegistrationDto user);
-        Task<GenericResponse<BearerToken>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
-        Task<GenericResponse<BearerToken>> AuthenticateUser(HttpRequest request);
+        Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
+        Task<GenericResponse<AuthenticationDto>> AuthenticateUser(HttpRequest request);
         #endregion
 
         #region ApplicationClients Controller
