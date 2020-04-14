@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace H2020.IPMDecisions.IDP.BLL.Providers
@@ -12,7 +13,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
     {
         Task<IList<Claim>> GetUserClaimsAsync(ApplicationUser user);
         Task<IList<string>> GetUserRolesAsync(ApplicationUser user);
-        Task<AuthenticationProviderResult<ApplicationUser>> FindUserAsync(Guid userId);
+        Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAsync(Guid userId);
         Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request);
         Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(UserForAuthenticationDto userDto);
     }
