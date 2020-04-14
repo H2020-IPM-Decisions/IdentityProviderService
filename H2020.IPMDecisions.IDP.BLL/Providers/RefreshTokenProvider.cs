@@ -72,7 +72,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 response.ResponseMessage = "Token expired";
                 return response;
             }
-            
+
             response.IsSuccessful = true;
             response.Result = existingRefreshToken;
             return response;
