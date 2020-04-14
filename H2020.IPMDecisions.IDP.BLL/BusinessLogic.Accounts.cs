@@ -31,44 +31,60 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         public async Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request)
         {
-            if (request.Headers["grant_type"].ToString().ToLower() != "password")
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
+            try
+            {
+                if (request.Headers["grant_type"].ToString().ToLower() != "password")
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
 
-            var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
-            if (!isValidClient.IsSuccessful)
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidClient.ResponseMessage);
+                var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
+                if (!isValidClient.IsSuccessful)
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidClient.ResponseMessage);
 
-            var isAuthorize = await this.authenticationProvider.ValidateUserAuthenticationAsync(user);
-            if (!isAuthorize.IsSuccessful)
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
+                var isAuthorize = await this.authenticationProvider.ValidateUserAuthenticationAsync(user);
+                if (!isAuthorize.IsSuccessful)
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
 
-            var userClaims = await this.dataService.UserManager.GetClaimsAsync(isAuthorize.Result);
-            var userRoles = await this.dataService.UserManager.GetRolesAsync(isAuthorize.Result);
+                var userClaims = await this.dataService.UserManager.GetClaimsAsync(isAuthorize.Result);
+                var userRoles = await this.dataService.UserManager.GetRolesAsync(isAuthorize.Result);
 
-            AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
-            return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
+                AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
+                return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
+            }
         }
 
         public async Task<GenericResponse<AuthenticationDto>> AuthenticateUser(HttpRequest request)
         {
-            if (request.Headers["grant_type"].ToString().ToLower() != "refresh_token")
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
+            try
+            {
+                if (request.Headers["grant_type"].ToString().ToLower() != "refresh_token")
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
 
-            var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
-            if (!isValidClient.IsSuccessful)
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidClient.ResponseMessage);
+                var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
+                if (!isValidClient.IsSuccessful)
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidClient.ResponseMessage);
 
-            var refreshTokenFromHeader = request.Headers["refresh_token"].ToString();
-            var isValidRefreshToken = await this.refreshTokenProvider.ValidateRefreshToken(isValidClient.Result, refreshTokenFromHeader);
-            if (!isValidRefreshToken.IsSuccessful)
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidRefreshToken.ResponseMessage);
+                var refreshTokenFromHeader = request.Headers["refresh_token"].ToString();
+                var isValidRefreshToken = await this.refreshTokenProvider.ValidateRefreshToken(isValidClient.Result, refreshTokenFromHeader);
+                if (!isValidRefreshToken.IsSuccessful)
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidRefreshToken.ResponseMessage);
 
-            var isAuthorize = await this.authenticationProvider.FindUserAsync(isValidRefreshToken.Result.UserId);
-            if (!isAuthorize.IsSuccessful)
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
+                var isAuthorize = await this.authenticationProvider.FindUserAsync(isValidRefreshToken.Result.UserId);
+                if (!isAuthorize.IsSuccessful)
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
 
-            AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
-            return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
+                AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
+                return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
+            }
         }
 
         private async Task<AuthenticationDto> CreateAuthentificationDto(AuthenticationProviderResult<ApplicationClient> isValidClient,
