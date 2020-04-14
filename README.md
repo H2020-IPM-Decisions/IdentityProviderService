@@ -50,6 +50,7 @@ dotnet build
 
 ### How to connect and start the database
 
+'docker run -p 3306:3306 --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:8.0.19'
 Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json object `ConnectionStrings\MySqlDbConnection` with your MySql instance.
 The following command will create a database and add all the tables necessary to run the solution.
 The instructions assume that you are in the **API project** of the repository.
@@ -77,8 +78,8 @@ Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json sect
 
 ### How to run the project
 
-You can build the tool using the following commands. The instructions assume that you are in the root of the repository.
-As explained above, the develop branch is an active development branch.
+You can build the tool using the following commands. The instructions assume that you are in the `H2020.IPMDecisions.IDP.API` folder of the repository.
+As explained above, you should be on the develop branch, as it is an active development branch.
 
 ```console
 dotnet run

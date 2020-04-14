@@ -63,7 +63,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             if (!isValidRefreshToken.IsSuccessful)
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidRefreshToken.ResponseMessage);
 
-            var isAuthorize = await this.authenticationProvider.FindUserAsync(isValidRefreshToken.Result.UserId);
+            var isAuthorize = await this.authenticationProvider.ValidateUserAsync(isValidRefreshToken.Result.UserId);
             if (!isAuthorize.IsSuccessful)
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
 
