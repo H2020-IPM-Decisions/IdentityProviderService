@@ -31,7 +31,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             {
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
             }
-            if (!propertyCheckerService.TypeHasProperties<UserDto>(fields))
+            if (!propertyCheckerService.TypeHasProperties<UserWithRolesClaimsDto>(fields))
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
 
             var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
