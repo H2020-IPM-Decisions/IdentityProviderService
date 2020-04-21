@@ -1,1392 +1,1206 @@
-openapi: 3.0.1
-info:
-  title: H2020 IPM Decisions - Identity Provider API
-  description: Identity Provider for the H2020 IPM Decisions project
-  contact:
-    name: ADAS Modelling and Informatics Team
-    url: 'https://www.adas.uk/'
-    email: software@adas.co.uk
-  license:
-    name: Use under GNU General Public License v3.0
-    url: 'https://www.gnu.org/licenses/gpl-3.0.txt'
-  version: v1
-paths:
-  /api/accounts/register:
-    post:
-      tags:
-        - Accounts
-      operationId: RegisterUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserForRegistrationDto'
-      responses:
-        '201':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-  /api/accounts/authenticate:
-    post:
-      tags:
-        - Accounts
-      operationId: AuthenticateUser
-      parameters:
-        - name: client_id
-          in: header
-          description: Client ID
-          required: true
-          style: simple
-        - name: client_secret
-          in: header
-          description: Client Secret
-          allowEmptyValue: true
-          style: simple
-        - name: grant_type
-          in: header
-          description: Grant Type
-          required: true
-          style: simple
-        - name: refresh_token
-          in: header
-          description: Refresh Token
-          allowEmptyValue: true
-          style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserForAuthenticationDto'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-  /api/accounts/authenticate/token:
-    post:
-      tags:
-        - Accounts
-      operationId: AuthenticateUserWithToken
-      parameters:
-        - name: client_id
-          in: header
-          description: Client ID
-          required: true
-          style: simple
-        - name: client_secret
-          in: header
-          description: Client Secret
-          allowEmptyValue: true
-          style: simple
-        - name: grant_type
-          in: header
-          description: Grant Type
-          required: true
-          style: simple
-        - name: refresh_token
-          in: header
-          description: Refresh Token
-          allowEmptyValue: true
-          style: simple
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-  /api/accounts:
-    options:
-      tags:
-        - Accounts
-      responses:
-        '200':
-          description: Success
-  /api/applicationclients:
-    get:
-      tags:
-        - ApplicationClients
-      operationId: GetApplicationClients
-      parameters:
-        - name: isEnabled
-          in: query
-          schema:
-            type: boolean
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: orderBy
-          in: query
-          schema:
-            type: string
-        - name: searchQuery
-          in: query
-          schema:
-            type: string
-        - name: pageNumber
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    head:
-      tags:
-        - ApplicationClients
-      parameters:
-        - name: isEnabled
-          in: query
-          schema:
-            type: boolean
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: orderBy
-          in: query
-          schema:
-            type: string
-        - name: searchQuery
-          in: query
-          schema:
-            type: string
-        - name: pageNumber
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    post:
-      tags:
-        - ApplicationClients
-      parameters:
-        - name: accept
-          in: header
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApplicationClientForCreationDto'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApplicationClientDto'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ApplicationClientDto'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-    options:
-      tags:
-        - ApplicationClients
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-  '/api/applicationclients/{id}':
-    delete:
-      tags:
-        - ApplicationClients
-      operationId: DeleteApplicationClient
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-    patch:
-      tags:
-        - ApplicationClients
-      operationId: PartialUpdateApplicationClient
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        content:
-          application/json-patch+json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Operation'
-      responses:
-        '201':
-          description: Success
-        '204':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-    get:
-      tags:
-        - ApplicationClients
-      operationId: GetApplicationClient
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-  /api/refreshtokens:
-    get:
-      tags:
-        - RefreshTokens
-      operationId: GetRefreshTokens
-      parameters:
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: pageNumber
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    head:
-      tags:
-        - RefreshTokens
-      parameters:
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: pageNumber
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-  '/api/refreshtokens/{id}':
-    get:
-      tags:
-        - RefreshTokens
-      operationId: GetRefreshToken
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    delete:
-      tags:
-        - RefreshTokens
-      operationId: DeleteRefreshToken
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-  /api/roles:
-    get:
-      tags:
-        - Roles
-      operationId: GetRoles
-      parameters:
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '204':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-    head:
-      tags:
-        - Roles
-      parameters:
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '204':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-    post:
-      tags:
-        - Roles
-      operationId: CreateRole
-      parameters:
-        - name: accept
-          in: header
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleForManipulationDto'
-      responses:
-        '201':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-    options:
-      tags:
-        - Roles
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-  '/api/roles/{id}':
-    get:
-      tags:
-        - Roles
-      operationId: GetRole
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '204':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-    delete:
-      tags:
-        - Roles
-      operationId: DeleteRole
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-  /api:
-    get:
-      tags:
-        - Root
-      operationId: GetRoot
-      responses:
-        '200':
-          description: Success
-  '/api/users/{userId}/claims':
-    post:
-      tags:
-        - UserClaims
-      operationId: AssignClaimsToUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/ClaimForManipulationDto'
-      responses:
-        '201':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    delete:
-      tags:
-        - UserClaims
-      operationId: RemoveClaimsFromUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        content:
-          application/json-patch+json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/ClaimForManipulationDto'
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/ClaimForManipulationDto'
-          text/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/ClaimForManipulationDto'
-          application/*+json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/ClaimForManipulationDto'
-      responses:
-        '204':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    get:
-      tags:
-        - UserClaims
-      operationId: GetClaimsFromUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    options:
-      tags:
-        - UserClaims
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-  '/api/users/{userId}/roles':
-    post:
-      tags:
-        - UserRoles
-      operationId: AssignRolesToUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/RoleForManipulationDto'
-      responses:
-        '201':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    delete:
-      tags:
-        - UserRoles
-      operationId: RemoveRolesFromUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        content:
-          application/json-patch+json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/RoleForManipulationDto'
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/RoleForManipulationDto'
-          text/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/RoleForManipulationDto'
-          application/*+json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/RoleForManipulationDto'
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    get:
-      tags:
-        - UserRoles
-      operationId: GetRolesFromUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    options:
-      tags:
-        - UserRoles
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-  /api/users:
-    get:
-      tags:
-        - Users
-      operationId: GetUsers
-      parameters:
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: orderBy
-          in: query
-          schema:
-            type: string
-        - name: searchQuery
-          in: query
-          schema:
-            type: string
-        - name: pageNumber
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    head:
-      tags:
-        - Users
-      parameters:
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: orderBy
-          in: query
-          schema:
-            type: string
-        - name: searchQuery
-          in: query
-          schema:
-            type: string
-        - name: pageNumber
-          in: query
-          schema:
-            type: integer
-            format: int32
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    options:
-      tags:
-        - Users
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-      security:
-        - bearer: []
-  '/api/users/{id}':
-    get:
-      tags:
-        - Users
-      operationId: GetUser
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: fields
-          in: query
-          schema:
-            type: string
-        - name: accept
-          in: header
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-    delete:
-      tags:
-        - Users
-      operationId: DeleteUser
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Success
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/vnd.h2020ipmdecisions.hateoas+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-      security:
-        - bearer: []
-components:
-  schemas:
-    UserForRegistrationDto:
-      required:
-        - email
-        - password
-        - username
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        username:
-          type: string
-        password:
-          type: string
-          format: password
-      additionalProperties: false
-    ProblemDetails:
-      type: object
-      properties:
-        type:
-          type: string
-          nullable: true
-        title:
-          type: string
-          nullable: true
-        status:
-          type: integer
-          format: int32
-          nullable: true
-        detail:
-          type: string
-          nullable: true
-        instance:
-          type: string
-          nullable: true
-        extensions:
-          type: object
-          additionalProperties:
-            type: object
-            additionalProperties: false
-          nullable: true
-          readOnly: true
-      additionalProperties: false
-    UserForAuthenticationDto:
-      required:
-        - password
-        - username
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-          format: password
-      additionalProperties: false
-    ApplicationClientType:
-      enum:
-        - 0
-        - 1
-      type: integer
-      format: int32
-    ApplicationClientForCreationDto:
-      required:
-        - applicationClientType
-        - enabled
-        - name
-        - refreshTokenLifeTime
-        - url
-      type: object
-      properties:
-        name:
-          type: string
-        applicationClientType:
-          allOf:
-            - $ref: '#/components/schemas/ApplicationClientType'
-        enabled:
-          type: boolean
-        refreshTokenLifeTime:
-          type: integer
-          format: int32
-        url:
-          type: string
-      additionalProperties: false
-    ApplicationClientDto:
-      required:
-        - applicationClientType
-        - enabled
-        - name
-        - refreshTokenLifeTime
-        - url
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        base64Secret:
-          type: string
-          nullable: true
-        name:
-          type: string
-        applicationClientType:
-          allOf:
-            - $ref: '#/components/schemas/ApplicationClientType'
-        enabled:
-          type: boolean
-        refreshTokenLifeTime:
-          type: integer
-          format: int32
-        url:
-          type: string
-      additionalProperties: false
-    Operation:
-      type: object
-      properties:
-        value:
-          type: object
-          additionalProperties: false
-          nullable: true
-        path:
-          type: string
-          nullable: true
-        op:
-          type: string
-          nullable: true
-        from:
-          type: string
-          nullable: true
-      additionalProperties: false
-    RoleForManipulationDto:
-      required:
-        - name
-      type: object
-      properties:
-        name:
-          type: string
-      additionalProperties: false
-    ClaimForManipulationDto:
-      type: object
-      properties:
-        type:
-          maxLength: 50
-          type: string
-          nullable: true
-        value:
-          maxLength: 50
-          type: string
-          nullable: true
-      additionalProperties: false
-  securitySchemes:
-    bearer:
-      type: apiKey
-      description: "JWT Authorization header using the Bearer scheme. \r\n                      Enter 'Bearer' [space] and then your token in the text input below.\r\n                      Example: 'Bearer 12345abcdef'"
-      name: Authorization
-      in: header
+FORMAT: 1A
+
+# H2020 IPM Decisions - Identity Provider Service
+The H2020 IPM Decisions Identity Provider Service is charge of managing Authorization and Authentification of the other H2020 IPM Decisions microservices. 
+
+## Authentication and Authorization
+The API uses [Bearer Token Authorization.](https://tools.ietf.org/html/rfc6750)
+Tokens will be provided by this service.
+
+## Contact
+* Name: ADAS Modelling and Informatics Team
+* Url: 'https://www.adas.uk/'
+* Email: software@adas.co.uk
+
+## License
+* [Use under GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.txt)
+
+## API Version
+* Version: v1
+
+# Group Root
+
+This services has two main areas:
+* Authorization: This area of the API is on charge of the authentification and authorization of the users, so `Anonymous` requests are allowed.
+* Admin: This area of the API is on charge of the administration of the IDP, so only users with `Admin` privileges will be allowed to make requests.
+
+## Root [/api]
+
+### Root [GET]
+
+This request allows you to check if the API is working and some valid requests.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+
++ Response 200
+        
+        Succes
+
+    + Attributes (array[LinkDto])
+
+    
+# Group Authorization
+
+## Register  [/api/accounts/register]
+
+### Register a New User [POST]
+
+Use this request to register/create a new user into the database. This request is anonymous. If `User Type` is ommited, a default value defined on the configuration file will be added.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+
+    + Attributes (UserForRegistrationDto)
+
++ Response 200
+
+        Succes
+    
+    + Attributes (UserDto)
+
++ Response 400
+
+        Bad Request 
+            
+## Authenticatation [/api/accounts/authenticate]
+
+An existing user can authenticate and get a token that will be used to access the rest of the API.
+
+### AuthenticateUserWithPassword [POST /api/accounts/authenticate]
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+            grant_type: password (required)
+            client_id: string (required)
+            client_secret: string 
+
+    + Attributes (UserForAuthenticationDto)
+
++ Response 200
+
+        Success
+        
+    + Headers
+    
+            Accept: application/json
+    
+    + Attributes (AuthenticationDto)
+
++ Response 400
+
+        Bad Request
+
+### AuthenticateUserWithToken [POST /api/accounts/authenticate/authenticate/token] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+            grant_type: refresh_token (required)
+            client_id: string (required)
+            client_secret: string
+            refresh_token: string (required)
+
++ Response 200
+
+    Success
+
+    + Headers
+    
+            Accept: application/json
+    
+    + Attributes (AuthenticationDto)
+
++ Response 400
+
+        Bad Request
+        
+# Group ApplicationClients
+
+## Application Clients [/api/applicationclients]
+
+Application clients are APIs, JavaScript Clients, etc., that are allowed to use this API.
+
+Use the **Accept** header `application/vnd.h2020ipmdecisions.hateoas+json` to return HATEOAS links of each ApplicationClientDto object
+
+### Get Application Clients [GET /api/applicationclients{?isEnabled,pageSize,orderBy,searchQuery,pageNumber,fields}]
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+
++ Parameters
+
+    + isEnabled (boolean, optional, `true`) ... Application Clients Filter
+
+    + pageSize (number, optional, `5`) ... Default 10; Maximun 20
+
+    + orderBy (string, optional, `name desc`) ... name or url - add `desc` at the end for descending order 
+
+    + searchQuery (string, optional, `test`) ... Search against name and url properties
+
+    + pageNumber (number, optional, `1`)
+
+    + fields (string, optional, `id, name`) ... Any property and `id` is required.
+
+
++ Response 200 
+
+    + Headers
+        
+            X-Pagination: {`TotalCount`(number),`PageSize`(number),`CurrentPage`(number),`TotalPages`(number)}
+                
+    + Attributes (ShapedDataWithLinksApplicationClients)
+                
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+        
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Get Application Client By Id [GET /api/applicationclients/{id}{?fields}] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+            
++ Parameters
+
+    + id (string, required)
+    
+    + fields (string, optional, `name, refreshTokenLifeTime`) ... Any property.
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (ApplicationClientDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+
+### Create Application Client [POST]
+
++ Request (application/json)
+
+    + Attributes (ApplicationClientForCreationDto)
+    
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (ApplicationClientDto)
+    
+    + Headers
+    
+            Location: http://theurl/api/applicationclients/{userId}
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+### Partial Update Application Client [PATCH /api/applicationclients/{id}]
+
+Learn more about patch operation using [json-patch+json object](http://jsonpatch.com/).
+
+If a no existing `ID` is passed and the json-patch document has enough information for creating an AplicationClient (see ApplicationClientForCreationDto), a new AplicationClient will be created.
+
++ Parameters
+
+    + id (string, required)
+    
++ Request (application/json-patch+json)
+
+    + Attributes (ApplicationClientDto)
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 201 
+
+    + Attributes (array[JsonPatchOperation])
+    + Headers
+    
+            Location: http://theurl/api/applicationclients/{userId}
+
++ Response 204
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+        
++ Response 403 
+
+        Forbidden
+        
+### Delete Application Client [DELETE /api/applicationclients/{id}]
+
++ Parameters
+
+    + id (string, required)
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 204 
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+### Options [OPTIONS]
+
+This request allows you to know what type of methods are allowed in this endpoint
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
++ Response 200
+    
+    + Headers
+    
+            Allow: OPTIONS, POST, GET, DELETE, PATCH
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+### Head [HEAD]
+
+This request allows you to know if the endpoint is correct and is working.
+
++ Request
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 200
+
++ Response 401
+
++ Response 403 
+
+# Group RefeshTokens
+
+## RefeshTokens [/api/refreshtokens]
+
+Refresh Tokens are unique tokens linked to a user that allows to authentificate into the API without the need for username and password.
+
+Use the **Accept** header `application/vnd.h2020ipmdecisions.hateoas+json` to return HATEOAS links of each RefreshTokenDto object
+
+### Get Refresh Tokens [GET /api/refreshtokens{?pageSize,pageNumber,fields}]
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+
++ Parameters
+
+    + pageSize (number, optional, `5`) ... Default 10; Maximun 20
+
+    + pageNumber (number, optional, `1`)
+
+    + fields (string, optional, `id, name`) ... Any property and `id` is required.
+
++ Response 200 
+
+    + Headers
+        
+            X-Pagination: {`TotalCount`(number),`PageSize`(number),`CurrentPage`(number),`TotalPages`(number)}
+                
+    + Attributes (ShapedDataWithLinksRefreshTokens)
+                
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Get Refresh Token By Id [GET /api/refreshtokens/{id}{?fields}] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+            
++ Parameters
+
+    + id (string, required)
+    
+    + fields (string, optional, `userId, applicationClientId`) ... Any property.
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (ApplicationClientDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+
+### Delete Refresh Token [DELETE /api/refreshtokens/{id}]
+
++ Parameters
+
+    + id (string, required)
+    
++ Request
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 204 
+
++ Response 401 
+
+        Unauthorized
+        
++ Response 403 
+
+        Forbidden
+        
+### Head [HEAD]
+
+This request allows you to know if the endpoint is correct and is working.
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 200
+
++ Response 401 
+
++ Response 403 
+
+# Group Roles
+
+## Roles [/api/roles]
+
+In these end points, it will be managed the different roles available for users.
+
+Use the **Accept** header `application/vnd.h2020ipmdecisions.hateoas+json` to return HATEOAS links of each RefreshTokenDto object
+
+### Get Roles [GET /api/roles{?fields}]
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+
++ Parameters
+
+    + fields (string, optional, `id, name`) ... Any property and `id` is required.
+
++ Response 200 
+                
+    + Attributes (ShapedDataWithLinksRoles)
+                
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Get Role By Id [GET /api/roles/{id}{?fields}] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+            
++ Parameters
+
+    + id (string, required)
+    
+    + fields (string, optional, `normalizedName`) ... Any property.
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (ApplicationClientDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Create Role [POST]
+
++ Request (application/json)
+
+    + Attributes (RoleForManipulationDto)
+    
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (RoleForManipulationDto)
+    
+    + Headers
+    
+            Location: http://theurl/api/roles/{userId}
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+
+### Delete Role [DELETE /api/roles/{id}]
+
++ Parameters
+
+    + id (string, required)
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 204 
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+### Options [OPTIONS]
+
+This request allows you to know what type of methods are allowed in this endpoint
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
++ Response 200
+    
+    + Headers
+    
+            Allow: OPTIONS, POST, GET, DELETE
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+### Head [HEAD]
+
+This request allows you to know if the endpoint is correct and is working.
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 200
+
++ Response 401 
+
++ Response 403 
+
+# Group UserClaims
+
+## User Claims [/api/{userid}/claims]
+
+### Get Claims From User [GET] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
++ Parameters
+
+    + userid (string, required)
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (array[Claim])
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Add Claims To User [POST] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
+    + Attributes(array[ClaimForManipulationDto])
+            
++ Parameters
+
+    + userid (string, required)
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (UserDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Remove Claims From User [DELETE] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
+    + Attributes(array[ClaimForManipulationDto])
+            
++ Parameters
+
+    + userid (string, required)
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (UserDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+
+### Options [OPTIONS]
+
+This request allows you to know what type of methods are allowed in this endpoint
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
++ Response 200
+    
+    + Headers
+    
+            Allow: OPTIONS, POST, GET, DELETE
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+# Group UserRoles
+
+## User Roles [/api/{userid}/roles]
+
+### Get Roles From User [GET] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
++ Parameters
+
+    + userid (string, required)
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (array[RoleDto])
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Add Roles To User [POST] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
+    + Attributes(array[RoleForManipulationDto])
+            
++ Parameters
+
+    + userid (string, required)
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (UserDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Remove Roles From User [DELETE] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
+    + Attributes(array[RoleForManipulationDto])
+            
++ Parameters
+
+    + userid (string, required)
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (UserDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+
+### Options [OPTIONS]
+
+This request allows you to know what type of methods are allowed in this endpoint
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
++ Response 200
+    
+    + Headers
+    
+            Allow: OPTIONS, POST, GET, DELETE
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+# Group Users
+
+## Users [/api/users]
+
+Use the **Accept** header `application/vnd.h2020ipmdecisions.hateoas+json` to return HATEOAS links of each ApplicationClientDto object
+
+### Get Users [GET /api/users{?pageSize,orderBy,searchQuery,pageNumber,fields}]
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+
++ Parameters
+
+    + pageSize (number, optional, `5`) ... Default 10; Maximun 20
+
+    + orderBy (string, optional, `email desc`) ... email - add `desc` at the end for descending order 
+
+    + searchQuery (string, optional, `test`) ... Search against the email property
+
+    + pageNumber (number, optional, `1`)
+
+    + fields (string, optional, `id, email`) ... Any property and `id` is required.
+
+
++ Response 200 
+
+    + Headers
+        
+            X-Pagination: {`TotalCount`(number),`PageSize`(number),`CurrentPage`(number),`TotalPages`(number)}
+                
+    + Attributes (ShapedDataWithLinksUsers)
+                
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+        
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Get User By Id [GET /api/users/{id}{?fields}] 
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json; application/vnd.h2020ipmdecisions.hateoas+json
+            Authorization: Bearer JWT
+            
++ Parameters
+
+    + id (string, required)
+    
+    + fields (string, optional, `email`) ... Any property.
+    
++ Response 200 (application/json)
+
+        Success
+
+    + Attributes (UserWithRolesClaimsDto)
+
++ Response 400 (application/json)
+
+        Bad Request
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
++ Response 404
+
+        Not Found
+        
+### Delete User [DELETE /api/users/{id}]
+
++ Parameters
+
+    + id (string, required)
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 204 
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+### Options [OPTIONS]
+
+This request allows you to know what type of methods are allowed in this endpoint
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer JWT
+            
++ Response 200
+    
+    + Headers
+    
+            Allow: OPTIONS, POST, GET, DELETE
+
++ Response 401 
+
+        Unauthorized
+
++ Response 403 
+
+        Forbidden
+        
+### Head [HEAD]
+
+This request allows you to know if the endpoint is correct and is working.
+
++ Request
+
+    + Headers
+    
+            Authorization: Bearer JWT
+
++ Response 200
+
++ Response 401
+
++ Response 403 
+
+# Data Structures
+
+## AuthenticationDto (object)
+###  Properties
++ `id` (string) 
++ `email` (string) 
++ `roles` (array[RoleDto]) - List of roles
++ `claims` (array[Claim]) - List of claims applied to the user
++ `token` (string) 
++ `tokenType`: bearer(string) 
++ `refreshToken` (string)
+
+## ApplicationClientDto (object)
+### Properties
++ `id` (string) 
++ `base64Secret` (string) 
++ `name` (string) 
++ `applicationClientType` (enum[number]) 
+    + `0` 
+    Public - Doesn't need client secret to log in
+    + `1`
+    Confidential - Needs client secret to log in
++ `enabled` (boolean) 
++ `refreshTokenLifeTime` (number) 
++ `url` (string) 
+
+## ApplicationClientForCreationDto (object)
+### Properties
++ `name` (string, required) 
++ `applicationClientType` (enum[number], required) 
+    + `0` - Public - Doesn't need client secret to log in
+    + `1` - Confidential - Needs client secret to log in
++ `enabled` (boolean, required) 
++ `refreshTokenLifeTime` (number, required) 
++ `url` (string, required)
+
+## Claim (object)
+### Properties
++ `issuer` (string)
++ `originalIssuer` (string)
++ `properties` (string)
++ `subject` (string)
++ `type` (string) 
+    This is used for user authorization
++ `value` (string)
+    This is used for user authorization
++ `valueType` (string)
+
+## ClaimDto (object)
+### Properties
++ `type` (string) 
+    This is used for user authorization
++ `value` (string)
+    This is used for user authorization
+
+## ClaimForManipulationDto (object)
+### Properties
++ `type` (string, required, nullable) 
++ `value` (string, required, nullable)
+
+## JsonPatchOperation (object)
+### Properties
++ `value` (object, optional, nullable) - For `add`, `replace` or `test` operations
++ `path` (string, optional, nullable) - Property name
++ `op` (string, optional, nullable) - add, remove, replace, copy, move or test
++ `from` (string, optional, nullable) - For `copy` or `move` operations
+
+## LinkDto (object)
+### Properties
++ `href` (string)
++ `rel` (enum[string]) 
+    + `self` 
+    + `next_page`
+    + `previous_page`
++ `method` (string)
+
+## RoleDto (object)
+### Properties
++ `id` (string) 
++ `name` (string) 
++ `normalizedName` (string) 
+
+## RoleForManipulationDto (object)
+### Properties
++ `name` (string, required)
+
+## ShapedDataWithLinksApplicationClients (object)
+### Properties
++ `value` (array[ApplicationClientDto])
+    Returns a list of application clients 
++ `links` (array[LinkDto])
+    Returns a list of links
+    
+## ShapedDataWithLinksRefreshTokens (object)
+### Properties
++ `value` (array[ApplicationClientDto])
+    Returns a list of application clients 
++ `links` (array[LinkDto])
+    Returns a list of links
+    
+## ShapedDataWithLinksRoles (object)
+### Properties
++ `value` (array[RoleDto])
+    Returns a list of roles
++ `links` (array[LinkDto])
+    Returns a list of links
+    
+## ShapedDataWithLinksUsers (object)
+### Properties
++ `value` (array[UserDto])
+    Returns a list of users
++ `links` (array[LinkDto])
+    Returns a list of links
+
+## UserDto (object)
+### Properties
++ `id` (string) 
++ `email` (string) 
+
+## UserForAuthenticationDto (object)
+### Properties
++ `email`: myemail@test.com (string, required) 
++ `password`: Password1! (string, required)
+
+## UserForRegistrationDto (object)
+### Properties
++ `userType` (string, optional, nullable) 
++ `email`: myemail@test.com (string, required) 
++ `password`: Password1! (string, required) - Min 6 characters , requires a digit, lowecase, uppercase and special character
+
+## UserWithRolesClaimsDto (object)
+### Properties
++ `id` (string) 
++ `email` (string) 
++ `roles` (array[RoleDto]) - List of roles
++ `claims` (array[Claim]) - List of claims applied to the user
