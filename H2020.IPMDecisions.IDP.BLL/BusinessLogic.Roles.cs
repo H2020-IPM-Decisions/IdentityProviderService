@@ -15,116 +15,148 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         public async Task<GenericResponse> CreateRole(RoleForManipulationDto role, string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue parsedMediaType))
+            try
             {
-                return GenericResponseBuilder.NoSuccess("Wrong media type");
+                if (!MediaTypeHeaderValue.TryParse(mediaType,
+                    out MediaTypeHeaderValue parsedMediaType))
+                {
+                    return GenericResponseBuilder.NoSuccess("Wrong media type");
+                }
+                var roleEntity = this.mapper.Map<IdentityRole>(role);
+                var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
+
+                if (!result.Succeeded) return GenericResponseBuilder.NoSuccess<IdentityResult>(result);
+
+                var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
+                    .ShapeData()
+                    as IDictionary<string, object>; ;
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+                if (includeLinks)
+                {
+                    var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
+                    roleToReturn.Add("links", links);
+                }
+
+                return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
             }
-            var roleEntity = this.mapper.Map<IdentityRole>(role);
-            var result = await this.dataService.RoleManager.CreateAsync(roleEntity);
-
-            if (!result.Succeeded) return GenericResponseBuilder.NoSuccess<IdentityResult>(result);
-
-            var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                .ShapeData()
-                as IDictionary<string, object>; ;
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-            .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-            if (includeLinks)
+            catch (Exception ex)
             {
-                var links = CreateLinksForRole(Guid.Parse(roleEntity.Id));
-                roleToReturn.Add("links", links);
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
-
-            return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
         }
 
         public async Task<GenericResponse> DeleteRole(Guid id)
         {
-            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
-            if (roleEntity == null) return GenericResponseBuilder.Success();
+            try
+            {
+                var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
+                if (roleEntity == null) return GenericResponseBuilder.Success();
 
-            var result = await this.dataService.RoleManager.DeleteAsync(roleEntity);
-            
-            if (!result.Succeeded)
-                return GenericResponseBuilder.NoSuccess(result);
+                var result = await this.dataService.RoleManager.DeleteAsync(roleEntity);
 
-            return GenericResponseBuilder.Success();
+                if (!result.Succeeded)
+                    return GenericResponseBuilder.NoSuccess(result);
+
+                return GenericResponseBuilder.Success();
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
+            }
         }
 
         public async Task<GenericResponse<IDictionary<string, object>>> GetRole(Guid id, string fields, string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-            out MediaTypeHeaderValue parsedMediaType))
+            try
             {
-                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
+                if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue parsedMediaType))
+                {
+                    return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
+                }
+                if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
+                    return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
+
+                var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
+
+                if (roleEntity == null)
+                {
+                    var emptyDictionary = new Dictionary<string, object>();
+                    return GenericResponseBuilder.Success<IDictionary<string, object>>(emptyDictionary);
+                }
+
+                var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
+                    .ShapeData(fields)
+                    as IDictionary<string, object>;
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                                 .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+                if (includeLinks)
+                {
+                    var links = CreateLinksForRole(id, fields);
+                    roleToReturn.Add("links", links);
+                }
+
+                return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
             }
-            if (!propertyCheckerService.TypeHasProperties<RoleDto>(fields))
-                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
-
-            var roleEntity = await this.dataService.RoleManager.FindByIdAsync(id.ToString());
-
-            if (roleEntity == null)
+            catch (Exception ex)
             {
-                var emptyDictionary = new Dictionary<string, object>();
-                return GenericResponseBuilder.Success<IDictionary<string, object>>(emptyDictionary);
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
-
-            var roleToReturn = this.mapper.Map<RoleDto>(roleEntity)
-                .ShapeData(fields)
-                as IDictionary<string, object>;
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                             .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-            if (includeLinks)
-            {
-                var links = CreateLinksForRole(id, fields);
-                roleToReturn.Add("links", links);
-            }
-
-            return GenericResponseBuilder.Success<IDictionary<string, object>>(roleToReturn);
         }
 
         public async Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRoles(string fields, string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-               out MediaTypeHeaderValue parsedMediaType))
+            try
             {
-                return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, "Wrong media type");
-            }
-
-            if (!this.propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
-            {
-                return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, "Wrong fields entered");
-            }
-
-            var roles = await this.dataService.RoleManager.Roles.ToListAsync();
-
-            var rolesToReturn = this.mapper
-                .Map<IEnumerable<RoleDto>>(roles)
-                .ShapeData(fields);
-
-            if (roles.Count == 0)
-                return GenericResponseBuilder.Success<IEnumerable<IDictionary<string, object>>>(rolesToReturn);
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-               .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-            var rolesToReturnWithLinks = rolesToReturn.Select(role =>
-            {
-                var roleAsDictionary = role as IDictionary<string, object>;
-                if (includeLinks)
+                if (!MediaTypeHeaderValue.TryParse(mediaType,
+                   out MediaTypeHeaderValue parsedMediaType))
                 {
-                    var rolesLinks = CreateLinksForRole((Guid)roleAsDictionary["Id"], fields);
-                    roleAsDictionary.Add("links", rolesLinks);
+                    return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, "Wrong media type");
                 }
-                return roleAsDictionary;
-            });
 
-            return GenericResponseBuilder.Success<IEnumerable<IDictionary<string, object>>>(rolesToReturn);
+                if (!this.propertyCheckerService.TypeHasProperties<RoleDto>(fields, true))
+                {
+                    return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, "Wrong fields entered");
+                }
+
+                var roles = await this.dataService.RoleManager.Roles.ToListAsync();
+
+                var rolesToReturn = this.mapper
+                    .Map<IEnumerable<RoleDto>>(roles)
+                    .ShapeData(fields);
+
+                if (roles.Count == 0)
+                    return GenericResponseBuilder.Success<IEnumerable<IDictionary<string, object>>>(rolesToReturn);
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                   .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+                var rolesToReturnWithLinks = rolesToReturn.Select(role =>
+                {
+                    var roleAsDictionary = role as IDictionary<string, object>;
+                    if (includeLinks)
+                    {
+                        var rolesLinks = CreateLinksForRole((Guid)roleAsDictionary["Id"], fields);
+                        roleAsDictionary.Add("links", rolesLinks);
+                    }
+                    return roleAsDictionary;
+                });
+
+                return GenericResponseBuilder.Success<IEnumerable<IDictionary<string, object>>>(rolesToReturn);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, ex.Message.ToString());
+            }
         }
 
         #region helpers

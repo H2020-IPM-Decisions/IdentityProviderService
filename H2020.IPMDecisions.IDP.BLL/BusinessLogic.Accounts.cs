@@ -12,21 +12,29 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user)
         {
-            var userEntity = this.mapper.Map<ApplicationUser>(user);
-            var identityResult = await this.dataService.UserManager.CreateAsync(userEntity, user.Password);
+            try
+            { 
+                var userEntity = this.mapper.Map<ApplicationUser>(user);
+                var identityResult = await this.dataService.UserManager.CreateAsync(userEntity, user.Password);
 
-            if (identityResult.Succeeded)
-            {
-                await AddInitialClaim(userEntity, user.UserType);
+                if (identityResult.Succeeded)
+                {
+                    await AddInitialClaim(userEntity, user.UserType);
 
-                //ToDo Generate Email token and return
-                var userToReturn = this.mapper.Map<UserDto>(userEntity);
-                var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
-                return successResponse;
+                    //ToDo Generate Email token and return
+                    var userToReturn = this.mapper.Map<UserDto>(userEntity);
+                    var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
+                    return successResponse;
+                }
+
+                var failResponse = GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
+                return failResponse;
             }
-
-            var failResponse = GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
-            return failResponse;
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
+            }
         }
 
         public async Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request)
@@ -73,9 +81,9 @@ namespace H2020.IPMDecisions.IDP.BLL
                 if (!isValidRefreshToken.IsSuccessful)
                     return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidRefreshToken.ResponseMessage);
 
-            var isAuthorize = await this.authenticationProvider.ValidateUserAsync(isValidRefreshToken.Result.UserId);
-            if (!isAuthorize.IsSuccessful)
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
+                var isAuthorize = await this.authenticationProvider.ValidateUserAsync(isValidRefreshToken.Result.UserId);
+                if (!isAuthorize.IsSuccessful)
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
 
                 AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
                 return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);

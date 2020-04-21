@@ -15,91 +15,115 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         public async Task<GenericResponse> DeleteRefreshToken(Guid id)
         {
-            var refreshTokenToDelete = await this.dataService.RefreshTokens.FindByIdAsync(id);
-            if (refreshTokenToDelete == null) return GenericResponseBuilder.Success();
+            try
+            {
+                var refreshTokenToDelete = await this.dataService.RefreshTokens.FindByIdAsync(id);
+                if (refreshTokenToDelete == null) return GenericResponseBuilder.Success();
 
-            this.dataService.RefreshTokens.Delete(refreshTokenToDelete);
-            await this.dataService.CompleteAsync();
+                this.dataService.RefreshTokens.Delete(refreshTokenToDelete);
+                await this.dataService.CompleteAsync();
 
-            return GenericResponseBuilder.Success();
+                return GenericResponseBuilder.Success();
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
+            }
         }
 
         public async Task<GenericResponse<IDictionary<string, object>>> GetRefreshToken(Guid id, string fields, string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue parsedMediaType))
+            try
             {
-                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
+                if (!MediaTypeHeaderValue.TryParse(mediaType,
+                    out MediaTypeHeaderValue parsedMediaType))
+                {
+                    return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
+                }
+
+                if (!propertyCheckerService.TypeHasProperties<RefreshToken>(fields))
+                    return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
+
+                var refreshTokenFromRepository = await this.dataService.RefreshTokens.FindByIdAsync(id);
+                if (refreshTokenFromRepository == null) return GenericResponseBuilder.Success<IDictionary<string, object>>(null);
+
+                var tokenToReturn = this.mapper
+                    .Map<RefreshTokenDto>(refreshTokenFromRepository)
+                    .ShapeData(fields)
+                    as IDictionary<string, object>;
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                    .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+                if (includeLinks)
+                {
+                    var links = CreateLinksForRefreshToken(id, fields);
+                    tokenToReturn.Add("links", links);
+                }
+                return GenericResponseBuilder.Success<IDictionary<string, object>>(tokenToReturn);
             }
-
-            if (!propertyCheckerService.TypeHasProperties<RefreshToken>(fields))
-                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
-
-            var refreshTokenFromRepository = await this.dataService.RefreshTokens.FindByIdAsync(id);
-            if (refreshTokenFromRepository == null) return GenericResponseBuilder.Success<IDictionary<string, object>>(null);
-
-            var tokenToReturn = this.mapper
-                .Map<RefreshTokenDto>(refreshTokenFromRepository)
-                .ShapeData(fields)
-                as IDictionary<string, object>;
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-            if (includeLinks)
+            catch (Exception ex)
             {
-                var links = CreateLinksForRefreshToken(id, fields);
-                tokenToReturn.Add("links", links);
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
-            return GenericResponseBuilder.Success<IDictionary<string, object>>(tokenToReturn);
         }
 
         public async Task<GenericResponse<ShapedDataWithLinks>> GetRefreshTokens(RefreshTokenResourceParameter resourceParameter, string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-               out MediaTypeHeaderValue parsedMediaType))
+            try
             {
-                return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong media type");
-            }
-
-            var refreshTokens = await this.dataService.RefreshTokens.FindAllAsync(resourceParameter);
-            if (refreshTokens.Count == 0) return GenericResponseBuilder.Success<ShapedDataWithLinks>(null);
-
-            var paginationMetaData = new PaginationMetaData
-            {
-                TotalCount = refreshTokens.TotalCount,
-                PageSize = refreshTokens.PageSize,
-                CurrentPage = refreshTokens.CurrentPage,
-                TotalPages = refreshTokens.TotalPages
-            };
-
-            var links = CreateLinksForRefreshTokens(resourceParameter, refreshTokens.HasNext, refreshTokens.HasPrevious);
-
-            var shapedRefreshTokens = this.mapper
-                .Map<IEnumerable<RefreshTokenDto>>(refreshTokens)
-                .ShapeData(resourceParameter.Fields);
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-            var refreshTokensToReturnWithLinks = shapedRefreshTokens.Select(token =>
-            {
-                var tokenAsDictionary = token as IDictionary<string, object>;
-                if (includeLinks)
+                if (!MediaTypeHeaderValue.TryParse(mediaType,
+                   out MediaTypeHeaderValue parsedMediaType))
                 {
-                    var userLinks = CreateLinksForRefreshToken((Guid)tokenAsDictionary["Id"], resourceParameter.Fields);
-                    tokenAsDictionary.Add("links", userLinks);
+                    return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong media type");
                 }
-                return tokenAsDictionary;
-            });
 
-            var refreshTokensToReturn = new ShapedDataWithLinks()
+                var refreshTokens = await this.dataService.RefreshTokens.FindAllAsync(resourceParameter);
+                if (refreshTokens.Count == 0) return GenericResponseBuilder.Success<ShapedDataWithLinks>(null);
+
+                var paginationMetaData = new PaginationMetaData
+                {
+                    TotalCount = refreshTokens.TotalCount,
+                    PageSize = refreshTokens.PageSize,
+                    CurrentPage = refreshTokens.CurrentPage,
+                    TotalPages = refreshTokens.TotalPages
+                };
+
+                var links = CreateLinksForRefreshTokens(resourceParameter, refreshTokens.HasNext, refreshTokens.HasPrevious);
+
+                var shapedRefreshTokens = this.mapper
+                    .Map<IEnumerable<RefreshTokenDto>>(refreshTokens)
+                    .ShapeData(resourceParameter.Fields);
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                    .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+                var refreshTokensToReturnWithLinks = shapedRefreshTokens.Select(token =>
+                {
+                    var tokenAsDictionary = token as IDictionary<string, object>;
+                    if (includeLinks)
+                    {
+                        var userLinks = CreateLinksForRefreshToken((Guid)tokenAsDictionary["Id"], resourceParameter.Fields);
+                        tokenAsDictionary.Add("links", userLinks);
+                    }
+                    return tokenAsDictionary;
+                });
+
+                var refreshTokensToReturn = new ShapedDataWithLinks()
+                {
+                    Value = refreshTokensToReturnWithLinks,
+                    Links = links,
+                    PaginationMetaData = paginationMetaData
+                };
+
+                return GenericResponseBuilder.Success<ShapedDataWithLinks>(refreshTokensToReturn);
+            }
+            catch (Exception ex)
             {
-                Value = refreshTokensToReturnWithLinks,
-                Links = links,
-                PaginationMetaData = paginationMetaData
-            };
-
-            return GenericResponseBuilder.Success<ShapedDataWithLinks>(refreshTokensToReturn);
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, ex.Message.ToString());
+            }
         }
 
         #region helpers
