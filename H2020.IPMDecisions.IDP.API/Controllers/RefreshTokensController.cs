@@ -61,7 +61,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetRefreshToken")]
-        // GET: api/applicationclient/1
+        // GET: api/refreshtokens/1
         public async Task<IActionResult> Get(
             [FromRoute] Guid id,
             [FromQuery] string fields,

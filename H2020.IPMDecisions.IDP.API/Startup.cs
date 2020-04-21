@@ -48,10 +48,10 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddScoped<IBusinessLogic, BusinessLogic>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddScoped<IUrlHelper>(x =>
+            services.AddScoped<IUrlHelper>(serviceProvider =>
             {
-                var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
-                var factory = x.GetRequiredService<IUrlHelperFactory>();
+                var actionContext = serviceProvider.GetRequiredService<IActionContextAccessor>().ActionContext;
+                var factory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
                 return factory.GetUrlHelper(actionContext);
             });
 
