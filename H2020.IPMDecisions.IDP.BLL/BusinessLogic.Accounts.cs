@@ -33,6 +33,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             catch (Exception ex)
             {
                 //TODO: log error
+                logger.Error(ex.Message, "Stopped program because of exception");
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
             }
         }

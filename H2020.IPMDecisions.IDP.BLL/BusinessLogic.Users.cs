@@ -71,7 +71,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
-
+        
         public async Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType)
         {
             try

@@ -61,7 +61,7 @@ namespace H2020.IPMDecisions.IDP.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -79,7 +79,7 @@ namespace H2020.IPMDecisions.IDP.API
                     });
                 });
             }
-            
+
             app.UseCors("IdentityProviderCORS");
             app.UseHttpsRedirection();
             app.UseRouting();
@@ -96,6 +96,12 @@ namespace H2020.IPMDecisions.IDP.API
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "H2020 IPM Decisions - Identity Provider API");
             });
+
+            applicationLifetime.ApplicationStopping.Register(OnShutdown);
+        }
+        private void OnShutdown()
+        {
+            NLog.LogManager.Shutdown();
         }
     }
 }

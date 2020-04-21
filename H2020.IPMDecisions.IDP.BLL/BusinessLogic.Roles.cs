@@ -150,11 +150,15 @@ namespace H2020.IPMDecisions.IDP.BLL
                     return roleAsDictionary;
                 });
 
+                //EXAMPLE: to be removed!
+                logger.Info("BLL method has retrieved rolls");
+
                 return GenericResponseBuilder.Success<IEnumerable<IDictionary<string, object>>>(rolesToReturn);
             }
             catch (Exception ex)
             {
                 //TODO: log error
+                logger.Error(ex.Message, "Stopped program because of exception");
                 return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, ex.Message.ToString());
             }
         }
