@@ -44,7 +44,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL CreateRole");
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -65,7 +65,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL DeleteRole");
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -107,7 +107,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetRole");
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -150,15 +150,11 @@ namespace H2020.IPMDecisions.IDP.BLL
                     return roleAsDictionary;
                 });
 
-                //EXAMPLE: to be removed!
-                logger.Info("BLL method has retrieved rolls");
-
                 return GenericResponseBuilder.Success<IEnumerable<IDictionary<string, object>>>(rolesToReturn);
             }
             catch (Exception ex)
             {
-                //TODO: log error
-                logger.Error(ex.Message, "Stopped program because of exception");
+                logger.Error(ex.Message, "Error is BLL GetRoles");
                 return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, ex.Message.ToString());
             }
         }

@@ -32,8 +32,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
-                logger.Error(ex.Message, "Stopped program because of exception");
+                logger.Error(ex.Message, "Error is BLL AddNewUser");
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
             }
         }
@@ -61,7 +60,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL AuthenticateUser");
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
             }
         }
@@ -91,7 +90,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL AuthenticateUser");
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
             }
         }

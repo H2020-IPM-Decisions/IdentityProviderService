@@ -17,6 +17,11 @@ namespace H2020.IPMDecisions.IDP.API
             CreateHostBuilder(args).Build().Run();
         }
 
+        /*
+        Notice that one might have to pay special attention to the Hosting Lifetime Startup Messages, 
+        if removing all other LoggingProviders (Like Console) and only using NLog. As it can cause 
+        hosting environment (Visual Studio / Docker / Azure Container) to not see application as started.
+        */
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -26,6 +31,8 @@ namespace H2020.IPMDecisions.IDP.API
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
+                    //See nlong.config
+                    //logging.AddConsole();
                     logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                 })
                 .UseNLog();

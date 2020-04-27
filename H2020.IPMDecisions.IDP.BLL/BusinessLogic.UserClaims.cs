@@ -24,7 +24,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetUserClaims");
                 return GenericResponseBuilder.NoSuccess<IList<Claim>>(null, ex.Message.ToString());
             }
         }
@@ -53,7 +53,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL ManageUserClaims");
                 return GenericResponseBuilder.NoSuccess<UserDto>(null, ex.Message.ToString());
             }
         }

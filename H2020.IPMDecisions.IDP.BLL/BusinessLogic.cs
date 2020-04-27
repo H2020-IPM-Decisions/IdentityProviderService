@@ -54,9 +54,10 @@ namespace H2020.IPMDecisions.IDP.BLL
             this.configuration = configuration 
                 ?? throw new ArgumentNullException(nameof(configuration));
 
-            logger.Debug("BusinessLogic Initialising");
-            logger.Info("BusinessLogic Initialising Information");
-            logger.Error("BusinessLogic Initialising Error Example");
+            //Dummy logger output to assist initial testing of NLog
+            //logger.Debug("BusinessLogic Initialising");
+            //logger.Info("BusinessLogic Initialising Information");
+            //logger.Error("BusinessLogic Initialising Error Example");
         }        
     }
 }

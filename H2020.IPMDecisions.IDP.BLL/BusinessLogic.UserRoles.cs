@@ -25,6 +25,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             catch (Exception ex)
             {
                 //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetUserRoles");
                 return GenericResponseBuilder.NoSuccess<IList<string>>(null, ex.Message.ToString());
             }
         }
@@ -60,6 +61,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             catch (Exception ex)
             {
                 //TODO: log error
+                logger.Error(ex.Message, "Error is BLL ManageUserRoles");
                 return GenericResponseBuilder.NoSuccess<UserDto>(null, ex.Message.ToString());
             }
         }

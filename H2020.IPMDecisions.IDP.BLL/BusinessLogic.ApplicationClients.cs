@@ -56,7 +56,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL CreateApplicationClient");
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -76,7 +76,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL CreateApplicationClient");
                 return GenericResponseBuilder.NoSuccess<ApplicationClientDto>(null, ex.Message.ToString());
             }
         }
@@ -96,7 +96,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL DeleteApplicationClient");
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -110,7 +110,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetApplicationClient");
                 return GenericResponseBuilder.NoSuccess<ApplicationClient>(null, ex.Message.ToString());
             }
         }
@@ -145,7 +145,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetApplicationClient");
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -204,7 +204,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetApplicationClients");
                 return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, ex.Message.ToString());
             }
         }
@@ -234,7 +234,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL UpdateApplicationClient");
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }

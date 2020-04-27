@@ -27,7 +27,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL DeleteUser");
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -67,7 +67,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetUser");
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -127,7 +127,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.Error(ex.Message, "Error is BLL GetUsers");
                 return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, ex.Message.ToString());
             }
         }
