@@ -114,7 +114,7 @@ The following commands assumes that you are in the root directory of the applica
 * The container created will be called `IDP` and will be running in the port `8086`
 * The command bellow assumes that the URL port `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json` is 5000
 ```Console
-docker build . --rm --pull -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=latest 
+docker build . --rm --pull -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg BUILDER_VERSION=latest 
 
 docker run  -d -p 443:443/tcp -p 8086:5000/tcp --name IDP ipmdecisions/identityproviderservice:latest 
 ```
