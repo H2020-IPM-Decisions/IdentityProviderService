@@ -1,8 +1,8 @@
 version: "3.7" 
 services:
-    idpdb:
+    idp.db:
         image: mysql:8.0.19
-        container_name: ipmdecisions.idp.mysql
+        container_name: idp-mysql
         environment:
             # change root password -> Change it before loading DB
             MYSQL_ROOT_PASSWORD: root
@@ -16,31 +16,32 @@ services:
                 ipv4_address: 172.18.1.6
     phpmyadmin:
         depends_on:
-        - idpdb
+        - idp.db
         image: phpmyadmin/phpmyadmin
         container_name: ipmdecisions.idp.phpmyadmin
         restart: always
         ports:
             - '9080:80'
         environment:
-            PMA_HOST: idpdb
+            PMA_HOST: idp.db
         networks:
             idp_network:
                 ipv4_address: 172.18.1.7
-    idp:
+    idp.api:
         depends_on:
-            - idpdb
+            - idp.db
         image: ipmdecisions/identityproviderservice:latest
-        container_name: ipmdecisions.idp.api
+        container_name: idp-api
+        hostname: idp.api
         restart: always
         ports:
-            - "8086:5000"
+            - "80:80" 
+            - "443:443"
         build:
             context: ../
             dockerfile: ./Docker/Dockerfile
             args:
                 BUILDER_VERSION: latest
-                URL_PORT: 5000
                 RELEASE_DATE: "2020-03-03"
         environment:
             # The following db username and password are create in line 32 in the MySQL_Init_Script/init.sql -> Change them before loading DB
@@ -51,6 +52,15 @@ services:
             # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
             - JwtSettings:ValidAudiencesUrls=https://testclient.com
             - AllowedHosts=*
+            - ASPNETCORE_ENVIRONMENT=Development # Development, Staging or Production. Production enforces HTTPS, so only use when certificates installed
+            - ASPNETCORE_URLS=http://+:80            
+            # Comment line above and uncomment the following 4 lines once you have a valid certificate
+            # - ASPNETCORE_URLS=https://+:443;http://+:80
+            # - ASPNETCORE_HTTPS_PORT=443
+            # - ASPNETCORE_Kestrel__Certificates__Default__Password=YourCertificatePassword
+            # - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/YourCertificate.pfx
+        # volumes: 
+        #     - ~/.aspnet/https:/https:ro # Path certificate in Host machine
         networks:
             idp_network:
                 ipv4_address: 172.18.1.5

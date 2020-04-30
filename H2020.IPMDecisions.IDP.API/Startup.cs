@@ -9,6 +9,7 @@ using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -21,16 +22,23 @@ namespace H2020.IPMDecisions.IDP.API
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        private IWebHostEnvironment CurrentEnvironment { get; set; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            CurrentEnvironment = environment;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureCors(Configuration);
+            if (!CurrentEnvironment.IsDevelopment())
+            {
+                services.ConfigureHttps(Configuration);
+            }
 
+            services.ConfigureKestrelWebServer(Configuration);
+            services.ConfigureCors(Configuration);
             services.ConfigureContentNegotiation();
 
             services.ConfigureIdentity();
@@ -61,15 +69,30 @@ namespace H2020.IPMDecisions.IDP.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (CurrentEnvironment.IsProduction())
+            {
+                app.UseForwardedHeaders();
+
+                app.UseHsts();
+                app.UseExceptionHandler(appBuilder =>
+                {
+                    appBuilder.Run(async context =>
+                    {
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("An unexpected error happened. Try again later.");
+                    });
+                });
+
+                app.UseHttpsRedirection();
+            }
+            else if (CurrentEnvironment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                // app.UseHsts();
                 app.UseExceptionHandler(appBuilder =>
                 {
                     appBuilder.Run(async context =>
@@ -79,9 +102,8 @@ namespace H2020.IPMDecisions.IDP.API
                     });
                 });
             }
-            
+
             app.UseCors("IdentityProviderCORS");
-            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
