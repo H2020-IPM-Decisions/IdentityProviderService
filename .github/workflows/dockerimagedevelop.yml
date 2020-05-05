@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Test with dotnet
-      run: dotnet test H2020.IPMDecisions.IDP.Tests
+      run: dotnet test H2020.IPMDecisions.IDP.Tests --filter Category!=Docker
     - name: Build image with develop
       run: docker build . -f "./Docker/Dockerfile" -t "${{ env.DOCKER_IMAGE_NAME }}:develop" --build-arg BUILDER_VERSION=develop --build-arg RELEASE_DATE=${{ steps.current-time.outputs.time }}
     - name: Login to docker hub

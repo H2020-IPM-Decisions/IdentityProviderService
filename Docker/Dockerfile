@@ -23,7 +23,7 @@ WORKDIR /src/H2020.IPMDecisions.IDP.API
 RUN dotnet build "H2020.IPMDecisions.IDP.API.csproj" -c Release -o /app/build
 
 WORKDIR /src/H2020.IPMDecisions.IDP.Tests
-RUN dotnet test "H2020.IPMDecisions.IDP.Tests.csproj"
+RUN dotnet test "H2020.IPMDecisions.IDP.Tests.csproj" --filter Category!=Docker
 
 WORKDIR /src/H2020.IPMDecisions.IDP.API
 FROM build AS publish

@@ -21,7 +21,7 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async void Post_ValidCall_Created()
+        public async void Post_RegisterValidCall_Created()
         {
             // Arrange
             var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
@@ -48,7 +48,6 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             responseDeserialized.Email.Should().Be(userEmail);
-
         }    
     }
 }
