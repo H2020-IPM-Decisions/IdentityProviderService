@@ -188,7 +188,6 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
               .Add("grant_type", "password");
 
             var jsonObject = new System.Json.JsonObject();
-            const string userEmail = "newuser@test.com";
             jsonObject.Add("password", "Password1!");
             var content = new StringContent(
                 jsonObject.ToString(),

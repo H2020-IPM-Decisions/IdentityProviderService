@@ -1,4 +1,5 @@
 
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -51,7 +52,7 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async void PostAuthenticate_MissingClientIdHeader_NotFound()
+        public async void PostAuthenticate_ValidCall_Ok()
         {
             // Arrange
             var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
@@ -62,18 +63,18 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
                 .Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient
               .DefaultRequestHeaders
-              .Add("client_id", "");
+              .Add("client_id", fakeWebHost.DefaultApplicationClientId.ToString());
             httpClient
               .DefaultRequestHeaders
-              .Add("client_secret", "123");
+              .Add("client_secret", fakeWebHost.DefaultApplicationClientSecret.ToString());
             httpClient
               .DefaultRequestHeaders
               .Add("grant_type", "password");
 
             var jsonObject = new System.Json.JsonObject();
-            const string userEmail = "newuser@test.com";
+            string userEmail = fakeWebHost.DefaultNormalUserEmail.ToString();
             jsonObject.Add("email", userEmail);
-            jsonObject.Add("password", "Password1!");
+            jsonObject.Add("password", fakeWebHost.DefaultUserPassword.ToString());
             var content = new StringContent(
                 jsonObject.ToString(),
                 Encoding.UTF8,
@@ -83,7 +84,197 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
             var response = await httpClient.PostAsync("/api/accounts/authenticate", content);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+
+        [Fact]
+        public async void PostAuthenticate_InvalidPassword_BadRequest()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                .DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_id", fakeWebHost.DefaultApplicationClientId.ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_secret", fakeWebHost.DefaultApplicationClientSecret.ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("grant_type", "password");
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = fakeWebHost.DefaultNormalUserEmail.ToString();
+            jsonObject.Add("email", userEmail);
+            jsonObject.Add("password", "BadPassword");
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("/api/accounts/authenticate", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            responseContent.Should().Contain("Username or password is incorrect");
+        }
+
+        [Fact]
+        public async void PostAuthenticate_InvalidClientId_BadRequest()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                .DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_id", new Guid().ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_secret", fakeWebHost.DefaultApplicationClientSecret.ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("grant_type", "password");
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = fakeWebHost.DefaultNormalUserEmail.ToString();
+            jsonObject.Add("email", userEmail);
+            jsonObject.Add("password", fakeWebHost.DefaultUserPassword.ToString());
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("/api/accounts/authenticate", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            responseContent.Should().Contain("Invalid client Id");
+        }
+
+        [Fact]
+        public async void PostAuthenticate_PublicApplicationClientClientSecretNotNeeded_Ok()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                .DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_id", fakeWebHost.DefaultApplicationClientId.ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_secret", "needsTohaveSomething");
+            httpClient
+              .DefaultRequestHeaders
+              .Add("grant_type", "password");
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = fakeWebHost.DefaultNormalUserEmail.ToString();
+            jsonObject.Add("email", userEmail);
+            jsonObject.Add("password", fakeWebHost.DefaultUserPassword.ToString());
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("/api/accounts/authenticate", content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async void PostAuthenticate_ConfidentialApplicationClientNeedsClientSecret_BadRequest()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                .DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_id", fakeWebHost.ConfidentialApplicationClientId.ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_secret", "invalidSecret");
+            httpClient
+              .DefaultRequestHeaders
+              .Add("grant_type", "password");
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = fakeWebHost.DefaultNormalUserEmail.ToString();
+            jsonObject.Add("email", userEmail);
+            jsonObject.Add("password", fakeWebHost.DefaultUserPassword.ToString());
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("/api/accounts/authenticate", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            responseContent.Should().Contain("Client secret do not match");
+        }
+
+        [Fact]
+        public async void PostAuthenticate_DisableApplicationClient_BadRequest()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                .DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_id", fakeWebHost.DisableApplicationClientId.ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_secret", fakeWebHost.DefaultApplicationClientSecret.ToString());
+            httpClient
+              .DefaultRequestHeaders
+              .Add("grant_type", "password");
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = fakeWebHost.DefaultNormalUserEmail.ToString();
+            jsonObject.Add("email", userEmail);
+            jsonObject.Add("password", fakeWebHost.DefaultUserPassword.ToString());
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("/api/accounts/authenticate", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            responseContent.Should().Contain("Client is inactive");
+
+        }
+
     }
 }
