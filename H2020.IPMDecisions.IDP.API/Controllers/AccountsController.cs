@@ -35,7 +35,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Register([FromBody] UserForRegistrationDto userForRegistration)
         {
             var response = await businessLogic.AddNewUser(userForRegistration);
-
             if (response.IsSuccessful)
             {
                 var responseAsUser = (GenericResponse<UserDto>)response;
@@ -43,6 +42,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             }
 
             var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null) return BadRequest(response);
             return BadRequest(responseAsIdentityResult.Result);
         }
 
