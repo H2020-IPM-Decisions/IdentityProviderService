@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace H2020.IPMDecisions.IDP.API.Providers
+namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
     public class JWTProvider : IJWTProvider
     {
@@ -50,23 +50,21 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
             return tokenString;
         }
-
-        public async Task<List<Claim>> GetValidClaims(ApplicationUser user)
+        
+        public async Task<List<Claim>> GetValidClaims(ApplicationUser user, IList<string> userRoles, IList<Claim> userClaims)
         {
             IdentityOptions _options = new IdentityOptions();
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, await JtiGenerator()),
                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64),
                 new Claim(_options.ClaimsIdentity.UserIdClaimType, user.Id.ToString()),
                 new Claim(_options.ClaimsIdentity.UserNameClaimType, user.UserName)
             };
 
-            var userClaims = await this.dataService.UserManager.GetClaimsAsync(user);
             claims.AddRange(userClaims);
 
-            var userRoles = await this.dataService.UserManager.GetRolesAsync(user);
             foreach (var userRole in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, userRole));

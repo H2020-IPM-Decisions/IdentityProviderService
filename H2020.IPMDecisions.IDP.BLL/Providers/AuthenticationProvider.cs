@@ -1,12 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
-namespace H2020.IPMDecisions.IDP.API.Providers
+namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
     public class AuthenticationProvider : IAuthenticationProvider
     {
@@ -24,7 +27,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
         }
 
         public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
-        {            
+        {
             var response = new AuthenticationProviderResult<ApplicationClient>()
             {
                 IsSuccessful = false,
@@ -38,7 +41,13 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
             }
 
-            var client = await this.dataService.ApplicationClients.FindByIdAsync(Guid.Parse(clientId));
+            if (!Guid.TryParse(clientId, out Guid validClientID))
+            {
+                response.ResponseMessage = "Invalid client Id";
+                return response;
+            }
+
+            var client = await this.dataService.ApplicationClients.FindByIdAsync(validClientID);
             if (client == null)
             {
                 response.ResponseMessage = "Invalid client Id";
@@ -81,7 +90,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 Result = null
             };
 
-            var user = await this.dataService.UserManager.FindByNameAsync(userDto.Username);
+            var user = await this.dataService.UserManager.FindByEmailAsync(userDto.Email);
 
             if (user == null)
             {
@@ -91,7 +100,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
 
             // ToDo When Email confirmation available
             //if (!user.EmailConfirmed) 
-            // return Tuple.Create(false, "Email not confirmed"", user);"
+            // return Tuple.Create(false, "Email not confirmed", user);
 
             var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
@@ -113,7 +122,7 @@ namespace H2020.IPMDecisions.IDP.API.Providers
             }
         }
 
-        public async Task<AuthenticationProviderResult<ApplicationUser>> FindUserAsync(Guid userId)
+        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAsync(Guid userId)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -131,13 +140,32 @@ namespace H2020.IPMDecisions.IDP.API.Providers
                 return response;
 
             if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
+            {
+                response.ResponseMessage = "User is lockout";
                 return response;
+            }
+
+            // ToDo When Email confirmation available
+            // if (!user.EmailConfirmed)
+            // {
+            //     response.ResponseMessage = "Email not confirmed";
+            //     return response;
+            // }
 
             response.IsSuccessful = true;
             response.ResponseMessage = "";
             response.Result = user;
             return response;
+        }
+        
+        public async Task<IList<string>> GetUserRolesAsync(ApplicationUser user)
+        {
+            return await this.dataService.UserManager.GetRolesAsync(user);
+        }
 
+        public async Task<IList<Claim>> GetUserClaimsAsync(ApplicationUser user)
+        {
+            return await this.dataService.UserManager.GetClaimsAsync(user);
         }
     }
 }

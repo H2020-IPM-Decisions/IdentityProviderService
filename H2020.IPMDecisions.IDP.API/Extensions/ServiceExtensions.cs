@@ -7,12 +7,19 @@ using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 
 namespace H2020.IPMDecisions.IDP.API.Extensions
 {
@@ -67,7 +74,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(options =>
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
@@ -98,11 +105,13 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             });
         }
 
-        public static void ConfigureSwagger(this IServiceCollection services){
+        public static void ConfigureSwagger(this IServiceCollection services)
+        {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { 
-                    Title = "H2020 IPM Decisions - Identity Provider API", 
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "H2020 IPM Decisions - Identity Provider API",
                     Version = "v1",
                     Description = "Identity Provider for the H2020 IPM Decisions project",
                     // TermsOfService = new Uri("https://example.com/terms"),
@@ -116,14 +125,15 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                     {
                         Name = "Use under GNU General Public License v3.0",
                         Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.txt"),
-                    }});
+                    }
+                });
                 c.DescribeAllParametersInCamelCase();
 
-                c.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey,
-                    Scheme = "bearer",
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Description = @"JWT Authorization header using the Bearer scheme. 
@@ -133,10 +143,9 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
                 c.OperationFilter<AddRequiredClientHeaderParameter>();
-                
-            });
 
-            services.AddSwaggerGenNewtonsoftSupport();            
+            });
+            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         public static void ConfigureCors(this IServiceCollection services, IConfiguration config)
@@ -148,6 +157,59 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 {
                     builder.WithOrigins(allowedHosts);
                 });
+            });
+        }
+
+        public static void ConfigureContentNegotiation(this IServiceCollection services)
+        {
+            services.AddControllers(setupAction =>
+                {
+                    setupAction.ReturnHttpNotAcceptable = true;
+                })
+            .AddNewtonsoftJson(setupAction =>
+                {
+                    setupAction.SerializerSettings.ContractResolver =
+                    new CamelCasePropertyNamesContractResolver();
+                });
+
+            services.Configure<MvcOptions>(config =>
+            {
+                var newtonsoftJsonOutputFormatter = config.OutputFormatters
+                      .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+                if (newtonsoftJsonOutputFormatter != null)
+                {
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.h2020ipmdecisions.hateoas+json");
+                }
+            });
+        }
+
+        public static void ConfigureKestrelWebServer(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<KestrelServerOptions>(
+                config.GetSection("Kestrel")
+            );
+        }
+
+        public static void ConfigureHttps(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(60);
+            });
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+                options.HttpsPort = int.Parse(config["ASPNETCORE_HTTPS_PORT"]);
             });
         }
 

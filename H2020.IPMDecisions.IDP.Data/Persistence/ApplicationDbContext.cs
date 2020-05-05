@@ -15,7 +15,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
             : base(options)
         {
         }
-
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

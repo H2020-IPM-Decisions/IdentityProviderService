@@ -134,7 +134,7 @@ CREATE TABLE `User` (
 --
 
 INSERT INTO `User` (`Id`, `UserName`, `NormalizedUserName`, `Email`, `NormalizedEmail`, `EmailConfirmed`, `PasswordHash`, `SecurityStamp`, `ConcurrencyStamp`, `PhoneNumber`, `PhoneNumberConfirmed`, `TwoFactorEnabled`, `LockoutEnd`, `LockoutEnabled`, `AccessFailedCount`) VALUES
-('380f0a69-a009-4c34-8496-9a43c2e069be', 'initialadminuser', 'INITIALADMINUSER', 'admin@test.com', 'ADMIN@TEST.COM', 0, 'AQAAAAEAACcQAAAAEJfYkkq/P/d3+GZjsDeGS4HCjukw0vJNN9fg0mdDBzVbKEdNCHMc8bTtUyo/UGVsSw==', 'KYK2EHHFUNXK62Z7E7H7BNCAABMUL5PE', '963515b9-8e57-4a9c-9286-d86dcf9e5fa0', NULL, 0, 0, NULL, 1, 0);
+('380f0a69-a009-4c34-8496-9a43c2e069be', 'admin@test.com', 'ADMIN@TEST.COM', 'admin@test.com', 'ADMIN@TEST.COM', 0, 'AQAAAAEAACcQAAAAEJfYkkq/P/d3+GZjsDeGS4HCjukw0vJNN9fg0mdDBzVbKEdNCHMc8bTtUyo/UGVsSw==', 'KYK2EHHFUNXK62Z7E7H7BNCAABMUL5PE', '963515b9-8e57-4a9c-9286-d86dcf9e5fa0', NULL, 0, 0, NULL, 1, 0);
 
 -- --------------------------------------------------------
 

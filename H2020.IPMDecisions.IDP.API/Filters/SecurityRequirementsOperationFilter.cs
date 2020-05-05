@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -19,7 +18,7 @@ namespace H2020.IPMDecisions.IDP.API.Filters
             operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
             operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
 
-            var jwtbearerScheme = new OpenApiSecurityScheme
+            var jwtBearerScheme = new OpenApiSecurityScheme
             {
                 Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "bearer" }
             };
@@ -28,7 +27,7 @@ namespace H2020.IPMDecisions.IDP.API.Filters
         {
             new OpenApiSecurityRequirement
             {
-                [ jwtbearerScheme ] = new string [] { }
+                [ jwtBearerScheme ] = new string [] { }
             }
         };
         }
