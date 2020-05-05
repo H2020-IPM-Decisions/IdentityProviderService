@@ -33,7 +33,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             catch (Exception ex)
             {
                 //TODO: log error
-                return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
+                return GenericResponseBuilder.NoSuccess<IdentityResult>(null, ex.Message.ToString());
             }
         }
 
@@ -121,6 +121,10 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
             string userTypeClaimValue = !string.IsNullOrEmpty(userType) ? userType : this.configuration["AccessClaims:DefaultUserAccessLevel"];
+            if(userTypeClaim == null | userTypeClaimValue == null)
+            {
+                throw new Exception("AccessClaims section missing on appsettings.json file");
+            }
             await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue));
         }
     }
