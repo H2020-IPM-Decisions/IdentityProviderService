@@ -71,28 +71,18 @@ namespace H2020.IPMDecisions.IDP.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            if (CurrentEnvironment.IsProduction())
-            {
-                app.UseForwardedHeaders();
-
-                app.UseHsts();
-                app.UseExceptionHandler(appBuilder =>
-                {
-                    appBuilder.Run(async context =>
-                    {
-                        context.Response.StatusCode = 500;
-                        await context.Response.WriteAsync("An unexpected error happened. Try again later.");
-                    });
-                });
-
-                app.UseHttpsRedirection();
-            }
-            else if (CurrentEnvironment.IsDevelopment())
+            if (CurrentEnvironment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
+                if (CurrentEnvironment.IsProduction())
+                {
+                    app.UseForwardedHeaders();
+                    app.UseHsts();
+                    app.UseHttpsRedirection();
+                }
                 app.UseExceptionHandler(appBuilder =>
                 {
                     appBuilder.Run(async context =>
@@ -102,7 +92,7 @@ namespace H2020.IPMDecisions.IDP.API
                     });
                 });
             }
-
+            
             app.UseCors("IdentityProviderCORS");
             app.UseRouting();
             app.UseAuthentication();
