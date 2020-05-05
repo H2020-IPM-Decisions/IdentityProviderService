@@ -1,4 +1,3 @@
-using System.Net.Http;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.API;
 using Microsoft.AspNetCore.Hosting;
@@ -11,8 +10,7 @@ namespace H2020.IPMDecisions.IDP.Tests
 {
     public class FakeWebHost : IAsyncLifetime
     {
-        private IHost Host;
-        public HttpClient httpClient;
+        public IHost Host;
         public async Task InitializeAsync()
         {
             var configuration = new ConfigurationBuilder()
@@ -29,13 +27,11 @@ namespace H2020.IPMDecisions.IDP.Tests
                    .UseConfiguration(configuration);
               })
               .StartAsync();
-
-            httpClient = Host.GetTestServer().CreateClient();
+            
         }
 
         public async Task DisposeAsync()
         {
-            httpClient?.Dispose();
             await Host?.StopAsync();
             Host?.Dispose();
         }

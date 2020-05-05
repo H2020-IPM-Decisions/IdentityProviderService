@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http;
 using FluentAssertions;
 using Xunit;
+using Microsoft.AspNetCore.TestHost;
 
 namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
 {
@@ -19,9 +20,9 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
         public async void Get_NoToken_ShouldReturnOK()
         {
             // Arrange
-
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
             // Act
-            var response = await fakeWebHost.httpClient.GetAsync("api/");
+            var response = await httpClient.GetAsync("api/");
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -31,10 +32,11 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
         public async void Post_NoToken_ShouldReturnNotAllowed()
         {
             // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
             var stringContent = new StringContent("");
 
             // Act
-            var response = await fakeWebHost.httpClient.PostAsync("api/", stringContent);
+            var response = await httpClient.PostAsync("api/", stringContent);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.MethodNotAllowed);

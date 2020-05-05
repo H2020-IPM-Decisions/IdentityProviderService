@@ -80,7 +80,7 @@ namespace H2020.IPMDecisions.IDP.Tests.UnitTests.RepositoryTests
                 var clients = await repository.FindAllAsync(resourceParameter);
 
                 // Assert
-                Assert.Equal(1, clients.Count);
+                Assert.Single(clients);
             };
         }
 

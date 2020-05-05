@@ -12,10 +12,10 @@ using Xunit;
 namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
 {
     [Trait("Category", "Docker")]
-    public class UserProfilesControllerTests : IClassFixture<FakeWebHostWithDb>
+    public class AccountsControllerTests : IClassFixture<FakeWebHostWithDb>
     {
         private FakeWebHostWithDb fakeWebHost;
-        public UserProfilesControllerTests(FakeWebHostWithDb fakeWebHost)
+        public AccountsControllerTests(FakeWebHostWithDb fakeWebHost)
         {
             this.fakeWebHost = fakeWebHost;
         }
@@ -48,6 +48,42 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             responseDeserialized.Email.Should().Be(userEmail);
-        }    
+        }
+
+        [Fact]
+        public async void PostAuthenticate_MissingClientIdHeader_NotFound()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                .DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_id", "");
+            httpClient
+              .DefaultRequestHeaders
+              .Add("client_secret", "123");
+            httpClient
+              .DefaultRequestHeaders
+              .Add("grant_type", "password");
+
+            var jsonObject = new System.Json.JsonObject();
+            const string userEmail = "newuser@test.com";
+            jsonObject.Add("email", userEmail);
+            jsonObject.Add("password", "Password1!");
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("/api/accounts/authenticate", content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
     }
 }
