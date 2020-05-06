@@ -36,9 +36,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
             if (!string.IsNullOrEmpty(resourceParameter.SearchQuery))
             {
                 var searchQuery = resourceParameter.SearchQuery.Trim();
-                collection = collection.Where(u =>
-                    u.UserName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-                    || u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+                collection = collection.Where(u => u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
             }
 
             if (!string.IsNullOrEmpty(resourceParameter.OrderBy))

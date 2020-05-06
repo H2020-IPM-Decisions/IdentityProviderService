@@ -15,94 +15,121 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         public async Task<GenericResponse> DeleteUser(Guid id)
         {
-            var userToDelete = await this.dataService.UserManager.FindByIdAsync(id.ToString());
-            if (userToDelete == null) return GenericResponseBuilder.Success();
+            try
+            {
+                var userToDelete = await this.dataService.UserManager.FindByIdAsync(id.ToString());
+                if (userToDelete == null) return GenericResponseBuilder.Success();
 
-            var result = await this.dataService.UserManager.DeleteAsync(userToDelete);
-            if (!result.Succeeded) return GenericResponseBuilder.NoSuccess(result);
+                var result = await this.dataService.UserManager.DeleteAsync(userToDelete);
+                if (!result.Succeeded) return GenericResponseBuilder.NoSuccess(result);
 
-            return GenericResponseBuilder.Success();
+                return GenericResponseBuilder.Success();
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
+            }
         }
 
         public async Task<GenericResponse<IDictionary<string, object>>> GetUser(Guid id, string fields, string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-               out MediaTypeHeaderValue parsedMediaType))
+            try
             {
-                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
+                if (!MediaTypeHeaderValue.TryParse(mediaType,
+                    out MediaTypeHeaderValue parsedMediaType))
+                    return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong media type");
+
+                if (!propertyCheckerService.TypeHasProperties<UserWithRolesClaimsDto>(fields))
+                    return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
+
+                var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
+                if (user == null) return GenericResponseBuilder.Success<IDictionary<string, object>>(null);
+
+                var userToReturn = this.mapper.Map<UserWithRolesClaimsDto>(user);
+                userToReturn.Roles = await this.dataService.UserManager.GetRolesAsync(user);
+                userToReturn.Claims = await this.dataService.UserManager.GetClaimsAsync(user);
+
+                var userToReturnShaped = userToReturn
+                    .ShapeData(fields)
+                    as IDictionary<string, object>;
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                    .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+                if (includeLinks)
+                {
+                    var links = CreateLinksForUser(id, fields);
+                    userToReturnShaped.Add("links", links);
+                }
+
+                return GenericResponseBuilder.Success<IDictionary<string, object>>(userToReturnShaped);
             }
-            if (!propertyCheckerService.TypeHasProperties<UserDto>(fields))
-                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, "Wrong fields entered");
-
-            var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
-            if (user == null) return GenericResponseBuilder.Success<IDictionary<string, object>>(null);
-
-            var userToReturn = this.mapper.Map<UserDto>(user)
-                .ShapeData(fields)
-                as IDictionary<string, object>;
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-            if (includeLinks)
+            catch (Exception ex)
             {
-                var links = CreateLinksForUser(id, fields);
-                userToReturn.Add("links", links);
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
-
-            return GenericResponseBuilder.Success<IDictionary<string, object>>(userToReturn);
         }
 
         public async Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType)
         {
-            if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue parsedMediaType))
+            try
             {
-                return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong media type");
-            }
-
-            if (!propertyMappingService.ValidMappingExistsFor<UserDto, ApplicationUser>(resourceParameter.OrderBy))
-                return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong OrderBy entered");
-            if (!propertyCheckerService.TypeHasProperties<UserDto>(resourceParameter.Fields, true))
-                return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong fields entered");
-
-            var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
-            if (users.Count == 0) return GenericResponseBuilder.Success<ShapedDataWithLinks>(null);
-
-            var paginationMetaData = new PaginationMetaData
-            {
-                TotalCount = users.TotalCount,
-                PageSize = users.PageSize,
-                CurrentPage = users.CurrentPage,
-                TotalPages = users.TotalPages
-            };
-            var links = CreateLinksForUsers(resourceParameter, users.HasNext, users.HasPrevious);
-
-            var shapedUsersToReturn = this.mapper
-                .Map<IEnumerable<UserDto>>(users)
-                .ShapeData(resourceParameter.Fields);
-
-            var includeLinks = parsedMediaType.SubTypeWithoutSuffix
-                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-            var shapedUsersToReturnWithLinks = shapedUsersToReturn.Select(user =>
-            {
-                var userAsDictionary = user as IDictionary<string, object>;
-                if (includeLinks)
+                if (!MediaTypeHeaderValue.TryParse(mediaType,
+                    out MediaTypeHeaderValue parsedMediaType))
                 {
-                    var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"], resourceParameter.Fields);
-                    userAsDictionary.Add("links", userLinks);
+                    return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong media type");
                 }
-                return userAsDictionary;
-            });
 
-            var usersToReturn = new ShapedDataWithLinks()
+                if (!propertyMappingService.ValidMappingExistsFor<UserDto, ApplicationUser>(resourceParameter.OrderBy))
+                    return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong OrderBy entered");
+                if (!propertyCheckerService.TypeHasProperties<UserDto>(resourceParameter.Fields, true))
+                    return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, "Wrong fields entered");
+
+                var users = await this.dataService.UserManagerExtensions.FindAllAsync(resourceParameter);
+                if (users.Count == 0) return GenericResponseBuilder.Success<ShapedDataWithLinks>(null);
+
+                var paginationMetaData = new PaginationMetaData
+                {
+                    TotalCount = users.TotalCount,
+                    PageSize = users.PageSize,
+                    CurrentPage = users.CurrentPage,
+                    TotalPages = users.TotalPages
+                };
+                var links = CreateLinksForUsers(resourceParameter, users.HasNext, users.HasPrevious);
+
+                var shapedUsersToReturn = this.mapper
+                    .Map<IEnumerable<UserDto>>(users)
+                    .ShapeData(resourceParameter.Fields);
+
+                var includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                    .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+                var shapedUsersToReturnWithLinks = shapedUsersToReturn.Select(user =>
+                {
+                    var userAsDictionary = user as IDictionary<string, object>;
+                    if (includeLinks)
+                    {
+                        var userLinks = CreateLinksForUser((Guid)userAsDictionary["Id"], resourceParameter.Fields);
+                        userAsDictionary.Add("links", userLinks);
+                    }
+                    return userAsDictionary;
+                });
+
+                var usersToReturn = new ShapedDataWithLinks()
+                {
+                    Value = shapedUsersToReturnWithLinks,
+                    Links = links,
+                    PaginationMetaData = paginationMetaData
+                };
+
+                return GenericResponseBuilder.Success<ShapedDataWithLinks>(usersToReturn);
+            }
+            catch (Exception ex)
             {
-                Value = shapedUsersToReturnWithLinks,
-                Links = links,
-                PaginationMetaData = paginationMetaData
-            };
-
-            return GenericResponseBuilder.Success<ShapedDataWithLinks>(usersToReturn);
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, ex.Message.ToString());
+            }
         }
 
         #region Helpers

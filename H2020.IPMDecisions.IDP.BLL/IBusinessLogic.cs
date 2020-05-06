@@ -14,8 +14,8 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         #region Accounts Controller
         Task<GenericResponse> AddNewUser(UserForRegistrationDto user);
-        Task<GenericResponse<BearerToken>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
-        Task<GenericResponse<BearerToken>> AuthenticateUser(HttpRequest request);
+        Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
+        Task<GenericResponse<AuthenticationDto>> AuthenticateUser(HttpRequest request);
         #endregion
 
         #region ApplicationClients Controller
@@ -27,7 +27,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse<ShapedDataWithLinks>> GetApplicationClients(ApplicationClientResourceParameter resourceParameter, string mediaType);
         ApplicationClient MapToApplicationClientAddingClientSecret(ApplicationClientForUpdateDto applicationClient);
         ApplicationClientForUpdateDto MapToApplicationClientForUpdateDto(ApplicationClient applicationClient);
-        Task<GenericResponse<ApplicationClientDto>> UpdateApplicationClient(ApplicationClient applicationClient, ApplicationClientForUpdateDto applicationClientForUpdate);
+        Task<GenericResponse> UpdateApplicationClient(ApplicationClient applicationClient, ApplicationClientForUpdateDto applicationClientForUpdate);
         #endregion
 
         #region RefreshTokens Controller

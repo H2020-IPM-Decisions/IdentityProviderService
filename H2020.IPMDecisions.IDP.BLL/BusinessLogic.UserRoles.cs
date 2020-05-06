@@ -12,40 +12,56 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         public async Task<GenericResponse<IList<string>>> GetUserRoles(Guid id)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
-            if (user == null) return GenericResponseBuilder.Success<IList<string>>(null);
+            try
+            {
+                var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
+                if (user == null) return GenericResponseBuilder.Success<IList<string>>(null);
 
-            var claimsToReturn = await this.dataService.UserManager.GetRolesAsync(user);
-            if (claimsToReturn.Count == 0) return GenericResponseBuilder.Success<IList<string>>(null);
+                var rolesToReturn = await this.dataService.UserManager.GetRolesAsync(user);
+                if (rolesToReturn.Count == 0) return GenericResponseBuilder.Success<IList<string>>(null);
 
-            return GenericResponseBuilder.Success<IList<string>>(claimsToReturn);
+                return GenericResponseBuilder.Success<IList<string>>(rolesToReturn);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IList<string>>(null, ex.Message.ToString());
+            }
         }
 
         public async Task<GenericResponse<UserDto>> ManageUserRoles(Guid id, List<RoleForManipulationDto> roles, bool remove = false)
         {
-            var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
-            if (user == null) return GenericResponseBuilder.Success<UserDto>(null);
-
-            var currentUserRoles = await this.dataService.UserManager.GetRolesAsync(user);
-
-            foreach (var role in roles)
+            try
             {
-                if (currentUserRoles.Any(r => r.Equals(role.Name, StringComparison.OrdinalIgnoreCase)) & remove)
+                var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
+                if (user == null) return GenericResponseBuilder.Success<UserDto>(null);
+
+                var currentUserRoles = await this.dataService.UserManager.GetRolesAsync(user);
+
+                foreach (var role in roles)
                 {
-                    await this.dataService.UserManager.RemoveFromRoleAsync(user, role.Name);
-                }
-                else if (!currentUserRoles.Any(r => r.Equals(role.Name, StringComparison.OrdinalIgnoreCase)) & !remove)
-                {
-                    var roleEntity = await this.dataService.RoleManager.FindByNameAsync(role.Name);
-                    if (roleEntity == null)
+                    if (currentUserRoles.Any(r => r.Equals(role.Name, StringComparison.OrdinalIgnoreCase)) & remove)
                     {
-                        roleEntity = this.mapper.Map<IdentityRole>(role);
-                        await this.dataService.RoleManager.CreateAsync(roleEntity);
+                        await this.dataService.UserManager.RemoveFromRoleAsync(user, role.Name);
                     }
-                    await this.dataService.UserManager.AddToRoleAsync(user, role.Name);
+                    else if (!currentUserRoles.Any(r => r.Equals(role.Name, StringComparison.OrdinalIgnoreCase)) & !remove)
+                    {
+                        var roleEntity = await this.dataService.RoleManager.FindByNameAsync(role.Name);
+                        if (roleEntity == null)
+                        {
+                            roleEntity = this.mapper.Map<IdentityRole>(role);
+                            await this.dataService.RoleManager.CreateAsync(roleEntity);
+                        }
+                        await this.dataService.UserManager.AddToRoleAsync(user, role.Name);
+                    }
                 }
+                return GenericResponseBuilder.Success<UserDto>(this.mapper.Map<UserDto>(user));
             }
-            return GenericResponseBuilder.Success<UserDto>(this.mapper.Map<UserDto>(user));
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<UserDto>(null, ex.Message.ToString());
+            }
         }
     }
 }

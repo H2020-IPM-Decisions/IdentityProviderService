@@ -53,9 +53,9 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
         public async Task<RefreshToken> FindByCondition(Expression<Func<RefreshToken, bool>> expression)
         {
             return await this.context
-            .RefreshToken
-            .Where(expression)
-            .FirstOrDefaultAsync();
+                .RefreshToken
+                .Where(expression)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<RefreshToken> FindByIdAsync(Guid id)

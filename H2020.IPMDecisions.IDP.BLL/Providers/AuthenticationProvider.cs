@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -119,7 +122,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
         }
 
-        public async Task<AuthenticationProviderResult<ApplicationUser>> FindUserAsync(Guid userId)
+        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAsync(Guid userId)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -153,7 +156,16 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             response.ResponseMessage = "";
             response.Result = user;
             return response;
+        }
+        
+        public async Task<IList<string>> GetUserRolesAsync(ApplicationUser user)
+        {
+            return await this.dataService.UserManager.GetRolesAsync(user);
+        }
 
+        public async Task<IList<Claim>> GetUserClaimsAsync(ApplicationUser user)
+        {
+            return await this.dataService.UserManager.GetClaimsAsync(user);
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
+using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Data.Core;
 
 namespace H2020.IPMDecisions.IDP.BLL.Providers
@@ -71,7 +72,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 response.ResponseMessage = "Token expired";
                 return response;
             }
-            
+
             response.IsSuccessful = true;
             response.Result = existingRefreshToken;
             return response;

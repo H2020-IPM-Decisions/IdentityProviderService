@@ -15,7 +15,7 @@ These instructions will get you a copy of the project up and running on your loc
 The Identity Provider Service uses the following technologies:
 
 ```
-ASP.NET Core 3.1
+ASP.NET Core 3.1.101
 MySql 8
 ```
 1. [Install](https://dotnet.microsoft.com/download/dotnet-core/3.1) the required .NET Core SDK.
@@ -50,6 +50,7 @@ dotnet build
 
 ### How to connect and start the database
 
+'docker run -p 3306:3306 --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:8.0.19'
 Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json object `ConnectionStrings\MySqlDbConnection` with your MySql instance.
 The following command will create a database and add all the tables necessary to run the solution.
 The instructions assume that you are in the **API project** of the repository.
@@ -60,7 +61,7 @@ dotnet ef database update
 
 Open your MySQL instance and check that the database has been created and tables added.
 
-If new tables are added to the project, to add new migrations to the database run this commands:
+If new tables are added to the project using [CodeFirst approach](https://entityframeworkcore.com/approach-code-first), to add new migrations to the database run these commands:
 
 ```console
 dotnet ef migrations add YourMessage --project ..\H2020.IPMDecisions.IDP.Data\H2020.IPMDecisions.IDP.Data.csproj
@@ -77,8 +78,8 @@ Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json sect
 
 ### How to run the project
 
-You can build the tool using the following commands. The instructions assume that you are in the root of the repository.
-As explained above, the develop branch is an active development branch.
+You can build the tool using the following commands. The instructions assume that you are in the `H2020.IPMDecisions.IDP.API` folder of the repository.
+As explained above, you should be on the develop branch, as it is an active development branch.
 
 ```console
 dotnet run
@@ -110,10 +111,10 @@ This docker build image doesn't include the "MySQL" database with a user with `A
 Remember to change the **EXPOSE** ports in the `Dockerfile` if the default ports are taken (80 and 443).
 The following commands assumes that you are in the root directory of the application.
 * The image created will be called: `h2020.ipmdecisions.identityproviderservice`
-* The container created will be called `IDP` and will be running in the port `80`
+* The container created will be called `IDP` and will be running in the port `8086`
 * The command bellow assumes that the URL port `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json` is 5000
 ```Console
-docker build . --rm --pull -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg URL_PORT=5000 --build-arg BUILDER_VERSION=latest 
+docker build . --rm --pull -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg BUILDER_VERSION=latest 
 
 docker run  -d -p 443:443/tcp -p 8086:5000/tcp --name IDP ipmdecisions/identityproviderservice:latest 
 ```
@@ -122,7 +123,7 @@ Now you should be able to user your API in the docker container. Try to navigate
 ## Deployment with Docker Compose
 
 You can deploy the Identity Provider Service API, including a MySQL database with test data and a phpMyAdmin UI to manage the database, using a docker compose.
-A file called `docker-compose.yml` is located in the following folder `Docker` locate in the rrot of the project. 
+A file called `docker-compose.yml` is located in the following folder `Docker` locate in the root of the project. 
 To run the following command:
 
 ```console
@@ -139,6 +140,10 @@ To help modifying the default data, a postman collection has been created with t
 ## Versioning
 
 For the versions available, see the [tags on this repository](https://github.com/H2020-IPM-Decisions/IdentityProviderService/tags). 
+
+## ToDo
+- Add Exception handling and login message
+- HATEOAS to return API Gateway URL
 
 ## Authors
 

@@ -19,7 +19,6 @@ namespace H2020.IPMDecisions.IDP.Core.Services
         private Dictionary<string, PropertyMappingValue> _applicationUserMappingService =
            new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
            {
-                { "Username", new PropertyMappingValue(new List<string>() { "Username" })},
                 { "Email", new PropertyMappingValue(new List<string>() { "Email" })}
            };
 
