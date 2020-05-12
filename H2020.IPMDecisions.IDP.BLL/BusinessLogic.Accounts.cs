@@ -21,7 +21,14 @@ namespace H2020.IPMDecisions.IDP.BLL
                 {
                     await AddInitialClaim(userEntity, user.UserType);
 
-                    //ToDo Generate Email token and return
+                    //ToDo Send Email to User
+                    var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(userEntity);  
+                    var link = url.Link("ConfirmEmail",
+                        new {
+                            userId = userEntity.Id,
+                            token 
+                        });
+
                     var userToReturn = this.mapper.Map<UserDto>(userEntity);
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
@@ -126,6 +133,26 @@ namespace H2020.IPMDecisions.IDP.BLL
                 throw new Exception("AccessClaims section missing on appsettings.json file");
             }
             await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue));
+        }
+
+        public async Task<GenericResponse> ConfirmEmail(Guid userId, string token)
+        {
+            try
+            {
+                var userToConfirm = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
+                if (userToConfirm == null) return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Not found");
+
+                var identityResult = await this.dataService.UserManager.ConfirmEmailAsync(userToConfirm, token);
+                if (identityResult.Succeeded)
+                    return GenericResponseBuilder.Success();
+
+                return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IdentityResult>(null, ex.Message.ToString());
+            }
         }
     }
 }

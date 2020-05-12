@@ -39,8 +39,8 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
         public static void ConfigureIdentity(this IServiceCollection services)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>()
-             .AddEntityFrameworkStores<ApplicationDbContext>()
-             .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {

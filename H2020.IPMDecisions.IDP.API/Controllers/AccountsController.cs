@@ -80,6 +80,23 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(new { message = tokenResponse.ErrorMessage });
         }
 
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpGet("confirmemail", Name = "ConfirmEmail")]
+        // GET: api/Accounts/ConfirmEmail
+        public async Task<IActionResult> ConfirmEmail([RequiredFromQuery] Guid userId, [RequiredFromQuery] string token)
+        {
+            var response = await businessLogic.ConfirmEmail(userId, token);
+
+            if (response.IsSuccessful)
+                return Ok();
+                
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null) return BadRequest(new { message = response.ErrorMessage });
+            return BadRequest(responseAsIdentityResult.Result);
+        }
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         public IActionResult Options()
