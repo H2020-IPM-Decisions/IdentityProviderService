@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
@@ -31,11 +26,12 @@ namespace H2020.IPMDecisions.IDP.API
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    //See nlong.config
-                    //logging.AddConsole();
+                    /*Allow console logging to assist system testing, because without, if there are problems with NLog.config 
+                    then no error messages are visible.*/
+                    logging.AddConsole();
                     logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                 })
-                .UseNLog();
+                .UseNLog();              
     }
 }
 
