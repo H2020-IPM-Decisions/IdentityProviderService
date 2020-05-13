@@ -5,6 +5,8 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Net.Http;
+using System.Text;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -28,6 +30,24 @@ namespace H2020.IPMDecisions.IDP.BLL
                             userId = userEntity.Id,
                             token 
                         });
+
+                    using (var httpClient = new HttpClient())
+                    {
+                        var jsonObject = new System.Json.JsonObject();
+                        jsonObject.Add("toAddress", userEntity.Email);
+                        jsonObject.Add("confirmEmailUrl", link);
+                        var content = new StringContent(
+                            jsonObject.ToString(),
+                            Encoding.UTF8,
+                            "application/json");
+
+                        var emailResponse = await httpClient.PostAsync("https://localhost:5003/eml/api/accounts/registrationemail",content);
+
+                        if (!emailResponse.IsSuccessStatusCode)
+                        {
+
+                        }
+                    } 
 
                     var userToReturn = this.mapper.Map<UserDto>(userEntity);
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
