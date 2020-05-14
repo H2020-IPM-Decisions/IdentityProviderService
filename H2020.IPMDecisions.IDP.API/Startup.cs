@@ -9,7 +9,6 @@ using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -43,6 +42,7 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.ConfigureIdentity();
             services.ConfigureJwtAuthentication(Configuration);
+            services.ConfigureEmailService(Configuration);
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();

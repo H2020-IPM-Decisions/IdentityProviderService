@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.API.Filters;
+using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -211,6 +212,14 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
                 options.HttpsPort = int.Parse(config["ASPNETCORE_HTTPS_PORT"]);
             });
+        }
+
+        public static void ConfigureEmailService(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddHttpClient<IEmailProvider, EmailProvider>(client =>
+           {
+               client.BaseAddress = new Uri(config["IPMEmailMicroservice:ApiGatewayAddress"] + config["IPMEmailMicroservice:EmailMicroservice"]);
+           });
         }
 
         public static IEnumerable<string> Audiences(string audiences)
