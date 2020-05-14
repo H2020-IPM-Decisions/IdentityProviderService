@@ -31,23 +31,12 @@ namespace H2020.IPMDecisions.IDP.BLL
                             token 
                         });
 
-                    using (var httpClient = new HttpClient())
-                    {
-                        var jsonObject = new System.Json.JsonObject();
-                        jsonObject.Add("toAddress", userEntity.Email);
-                        jsonObject.Add("confirmEmailUrl", link);
-                        var content = new StringContent(
-                            jsonObject.ToString(),
-                            Encoding.UTF8,
-                            "application/json");
+                    var registrationEmailObject = new RegistrationEmail(){
+                        ToAddress = userEntity.Email,
+                        ConfirmEmailUrl = link
+                    };
 
-                        var emailResponse = await httpClient.PostAsync("https://localhost:5003/eml/api/accounts/registrationemail",content);
-
-                        if (!emailResponse.IsSuccessStatusCode)
-                        {
-
-                        }
-                    } 
+                    var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmailObject);
 
                     var userToReturn = this.mapper.Map<UserDto>(userEntity);
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
