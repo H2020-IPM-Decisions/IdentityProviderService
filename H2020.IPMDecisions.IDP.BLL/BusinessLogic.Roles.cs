@@ -8,6 +8,7 @@ using H2020.IPMDecisions.IDP.Core.Helpers;
 using System.Linq;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Identity;
+using System.IO;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -113,7 +114,31 @@ namespace H2020.IPMDecisions.IDP.BLL
         }
 
         public async Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRoles(string fields, string mediaType)
-        {
+        {         
+            /**************************************************************************************************************/          
+            //For debugging, to see if we can write to volume in docker
+            /*string path = Path.Combine(Directory.GetCurrentDirectory(), "logs","example.txt");
+            Console.WriteLine($"PATH {path}");
+                using (System.IO.StreamWriter file =
+                    new System.IO.StreamWriter(path, true))
+                    {
+                        file.WriteLine("Hello CS");
+                    }
+            */
+            //For debugging, test the logger           
+            /*NLog.LogManager.ThrowExceptions = true; // TODO Remove this when done trouble-shooting
+            NLog.Common.InternalLogger.LogLevel = NLog.LogLevel.Debug;
+            NLog.Common.InternalLogger.LogToConsole = true;
+            NLog.Common.InternalLogger.LogFile = "/app/logs/NLog.Internal.txt";
+            NLog.Logger loggerx = NLog.LogManager.GetLogger("foo");
+            loggerx.Info("Program started");
+            */
+            //NLog.LogManager.Shutdown();  // Remember to flush
+            
+            //For debugging, test the logger using NLog.config 
+            //logger.Error("Hello CS");
+            /**************************************************************************************************************/ 
+
             try
             {
                 if (!MediaTypeHeaderValue.TryParse(mediaType,

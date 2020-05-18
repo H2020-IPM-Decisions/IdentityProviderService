@@ -44,6 +44,10 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRoles(string fields, string mediaType);
         #endregion
 
+        #region UserAccounts Controller
+        Task<GenericResponse> ChangePassword(Guid userId, ChangePasswordDto changePasswordDto);
+        #endregion
+
         #region UserClaims Controller
         Task<GenericResponse<IList<Claim>>> GetUserClaims(Guid id);
         Task<GenericResponse<UserDto>> ManageUserClaims(Guid id, List<ClaimForManipulationDto> claims, bool remove = false);

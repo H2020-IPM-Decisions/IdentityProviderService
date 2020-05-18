@@ -1,5 +1,6 @@
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
+using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Profiles;
@@ -54,6 +55,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IJWTProvider, JWTProvider>();
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
             services.AddScoped<IBusinessLogic, BusinessLogic>();
+            services.AddScoped<UserAccessingOwnDataActionFilter>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(serviceProvider =>
