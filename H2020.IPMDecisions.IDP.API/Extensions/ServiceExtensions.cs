@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.API.Filters;
@@ -219,6 +220,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             services.AddHttpClient<IEmailProvider, EmailProvider>(client =>
            {
                client.BaseAddress = new Uri(config["IPMEmailMicroservice:ApiGatewayAddress"] + config["IPMEmailMicroservice:EmailMicroservice"]);
+               client.DefaultRequestHeaders.Add(config["IPMEmailMicroservice:SecurityTokenCustomHeader"], config["IPMEmailMicroservice:SecurityToken"]);
            });
         }
 
