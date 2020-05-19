@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,27 +18,37 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
         public async Task<bool> SendRegistrationEmail(RegistrationEmail registrationEmail)
         {
-            using (httpClient)
+            try
             {
-                var jsonObject = new System.Json.JsonObject();
-                jsonObject.Add("toAddress", registrationEmail.ToAddress);
-                jsonObject.Add("confirmEmailUrl", registrationEmail.ConfirmEmailUrl);
-                var content = new StringContent(
-                    jsonObject.ToString(),
-                    Encoding.UTF8,
-                    "application/vnd.h2020ipmdecisions.email+json");
-
-                var emailResponse = await httpClient.PostAsync("accounts/registrationemail", content);
-
-                if (!emailResponse.IsSuccessStatusCode)
+                using (httpClient)
                 {
-                    // ToDo Log didn't sent email
-                    var responseContent = await emailResponse.Content.ReadAsStringAsync();
-                    //log emailResponse.ReasonPhrase & responseContent 
-                    return false;
+                    var jsonObject = new System.Json.JsonObject();
+                    jsonObject.Add("toAddress", registrationEmail.ToAddress);
+                    jsonObject.Add("confirmEmailUrl", registrationEmail.ConfirmEmailUrl);
+                    var content = new StringContent(
+                        jsonObject.ToString(),
+                        Encoding.UTF8,
+                        "application/vnd.h2020ipmdecisions.email+json");
+
+                    var emailResponse = await httpClient.PostAsync("accounts/registrationemail", content);
+
+                    if (!emailResponse.IsSuccessStatusCode)
+                    {
+                        // ToDo Log didn't sent email
+                        var responseContent = await emailResponse.Content.ReadAsStringAsync();
+                        //log emailResponse.ReasonPhrase & responseContent 
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
             }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                System.Console.WriteLine(ex.Message);
+                return false;
+            }
+            
         }
     }
 }
