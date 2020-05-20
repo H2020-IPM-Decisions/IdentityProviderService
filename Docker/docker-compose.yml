@@ -49,6 +49,10 @@ services:
             - JwtSettings:TokenLifetimeMinutes=80
             - JwtSettings:SecretKey=AddYourSecretKey
             - JwtSettings:IssuerServerUrl=AddYourServer
+            - IPMEmailMicroservice:ApiGatewayAddress=whereApiGatewayIsHosted
+            - IPMEmailMicroservice:EmailMicroservice=api/eml/ # Reroute of API Gateway to microservice
+            - IPMEmailMicroservice:SecurityTokenCustomHeader=ipm-eml-auth # Same as EML service
+            - IPMEmailMicroservice:SecurityToken=1234 # Same as EML service
             # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
             - JwtSettings:ValidAudiencesUrls=https://testclient.com
             - AllowedHosts=*

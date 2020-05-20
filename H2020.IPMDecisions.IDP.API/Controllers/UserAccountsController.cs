@@ -5,6 +5,7 @@ using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -13,9 +14,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
-    [Authorize]  //protected by json token
-    [Route("api/users/{userId:guid}/accounts")] //user id in URL!
-    [ServiceFilter(typeof(UserAccessingOwnDataActionFilter))] //so filter to test user id passed in context matches token user ID
+    [Authorize(AuthenticationSchemes =
+        JwtBearerDefaults.AuthenticationScheme)]
+    [Route("api/users/{userId:guid}/accounts")]
+    [ServiceFilter(typeof(UserAccessingOwnDataActionFilter))]
     public class UserAccountsController : ControllerBase
     {
         private readonly IBusinessLogic businessLogic;
@@ -28,30 +30,26 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
-        //[Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("changepassword", Name = "ChangePassword")]
-        //POST: api/UserAccounts/changepassword
-        //Take in new password
+        //POST: api/users/1/Accounts/changepassword
         public async Task<IActionResult> ChangePassword([FromRoute] Guid userId,[FromBody] ChangePasswordDto changePassword)
         {
-            //UserID in URL
-            //BLL to change password           
             var response = await businessLogic.ChangePassword(userId, changePassword);
-            if (response.IsSuccessful)
-            { 
-                //return Ok();
-                var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
-                return Ok(responseAsIdentityResult.Result);
-            }
-            else
+            if (!response.IsSuccessful)
             {
-                //Need check if this is required
                 var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
-                if (responseAsIdentityResult.Result == null) return BadRequest(response);
-                    return BadRequest(responseAsIdentityResult.Result);
-            } 
+                if (responseAsIdentityResult.Result == null && !string.IsNullOrEmpty(responseAsIdentityResult.ErrorMessage))
+                    return BadRequest(new { message = response.ErrorMessage });
+                if (responseAsIdentityResult.Result == null)
+                    return NotFound();
+
+                return BadRequest(responseAsIdentityResult.Result);                
+            }
+
+            return Ok();
         }       
 
         [ProducesResponseType(StatusCodes.Status200OK)]

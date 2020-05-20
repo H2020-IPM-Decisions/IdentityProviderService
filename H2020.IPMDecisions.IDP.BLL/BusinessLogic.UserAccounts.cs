@@ -1,13 +1,9 @@
 
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
-using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
 using System;
-using System.Net.Http;
-using System.Text;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -15,27 +11,28 @@ namespace H2020.IPMDecisions.IDP.BLL
     {
         public async Task<GenericResponse> ChangePassword(Guid userId, ChangePasswordDto changePasswordDto)
         {
-            var applicationUser = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            if (applicationUser != null)
+            try
             {
-                var identityResult = await this.dataService.UserManager.ChangePasswordAsync(applicationUser,
-                    changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
+                var applicationUser = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
 
-                if (identityResult.Succeeded)
+                if (applicationUser == null) return GenericResponseBuilder.NoSuccess<IdentityResult>(null);
+
+                var identityResult = await this.dataService.UserManager.ChangePasswordAsync(
+                    applicationUser, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
+
+                if (!identityResult.Succeeded)
                 {
-                    var successResponse = GenericResponseBuilder.Success<IdentityResult>(identityResult);
-                    return successResponse;
+                    return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult, "Password change request unsuccessfully");
                 }
-                else
-                {
-                    var noSuccessResponse = GenericResponseBuilder.NoSuccess<IdentityResult>
-                        (identityResult, "Password change request unsuccessfull");
-                    return noSuccessResponse;
-                }
+
+                return GenericResponseBuilder.Success();
+
             }
-            //User Id is not known, but don't want to report this for security reasons.
-            var failResponse = GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Password change request unsuccessfull");
-            return failResponse;
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IdentityResult>(null, ex.Message.ToString());
+            }
         }
     }
 }
