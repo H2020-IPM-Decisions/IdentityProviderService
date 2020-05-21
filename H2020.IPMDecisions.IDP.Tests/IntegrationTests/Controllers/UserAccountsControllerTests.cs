@@ -5,9 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using FluentAssertions;
-using H2020.IPMDecisions.IDP.Core.Dtos;
 using Microsoft.AspNetCore.TestHost;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
@@ -16,17 +14,18 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
     public class UserAccountsControllerTests : IClassFixture<FakeWebHostWithDb>
     {
         private FakeWebHostWithDb fakeWebHost;
-        private string myAdminToken;
+        private string myDefaultUserToken;
+        private Guid defaultUserId;
         public UserAccountsControllerTests(FakeWebHostWithDb fakeWebHost)
         {
             this.fakeWebHost = fakeWebHost;
 
-            var tokenUserId = Guid.NewGuid(); 
-            var myAdminToken = TokenGeneratorTests.GenerateToken(tokenUserId, "admin"); 
+            defaultUserId = Guid.Parse(fakeWebHost.DefaultNormalUserID.ToString());
+            myDefaultUserToken = TokenGeneratorTests.GenerateToken(defaultUserId);           
         }
 
         [Fact]
-        public async void PostUserAccount_Password_Changed_OK()
+        public async void PostChangePassword_RightPassword_OK()
         {
 
             // Arrange
@@ -35,7 +34,7 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
             httpClient
                  .DefaultRequestHeaders
                  .Authorization =
-                    new AuthenticationHeaderValue("Bearer", myAdminToken);
+                    new AuthenticationHeaderValue("Bearer", myDefaultUserToken);
 
             httpClient
               .DefaultRequestHeaders
@@ -43,7 +42,7 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
               .Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var jsonObject = new System.Json.JsonObject();
-            jsonObject.Add("currentPassword", "Password1!");
+            jsonObject.Add("currentPassword", fakeWebHost.DefaultUserPassword.ToString());
             jsonObject.Add("newPassword", "Password2!");
             var content = new StringContent(
                 jsonObject.ToString(),
@@ -52,17 +51,157 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
 
             // Act
             var response = await httpClient.PostAsync(
-                "/api/users/380f0a69-a009-4c34-8496-9a43c2e069be/accounts/changepassword", content);
+                string.Format("api/users/{0}/accounts/changepassword", defaultUserId), content);
+            
             var responseContent = await response.Content.ReadAsStringAsync();
-            var responseDeserialized = JsonConvert.DeserializeObject<UserDto>(responseContent);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-    //TODO: Add method for current password invalid
+        [Fact]
+        public async void PostChangePassword_WrongPassword_BadRequest()
+        {
 
-    //TODO: Add method for userId invalid
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
 
+            httpClient
+                 .DefaultRequestHeaders
+                 .Authorization =
+                    new AuthenticationHeaderValue("Bearer", myDefaultUserToken);
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            jsonObject.Add("currentPassword", "ThisIsWrong");
+            jsonObject.Add("newPassword", "Password2!");
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync(
+                string.Format("api/users/{0}/accounts/changepassword", defaultUserId), content);
+
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async void PostChangePassword_DifferentUserIdUrlAndToken_Unauthorized()
+        {
+
+            // Arrange
+            var newUserId = Guid.NewGuid();
+
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                 .DefaultRequestHeaders
+                 .Authorization =
+                    new AuthenticationHeaderValue("Bearer", myDefaultUserToken);
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            jsonObject.Add("currentPassword", fakeWebHost.DefaultUserPassword.ToString());
+            jsonObject.Add("newPassword", "Password2!");
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync(
+                string.Format("api/users/{0}/accounts/changepassword", newUserId), content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async void PostChangePassword_UserDontExist_NotFound()
+        {
+            // Arrange
+            var notExistingUserId = Guid.NewGuid();
+            var notExistingUserIdToken = TokenGeneratorTests.GenerateToken(notExistingUserId);
+
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                 .DefaultRequestHeaders
+                 .Authorization =
+                    new AuthenticationHeaderValue("Bearer", notExistingUserIdToken);
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            jsonObject.Add("currentPassword", fakeWebHost.DefaultUserPassword.ToString());
+            jsonObject.Add("newPassword", "Password2!");
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync(
+                string.Format("api/users/{0}/accounts/changepassword", notExistingUserId), content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async void PostChangePassword_AdminChangeUsersPassword_Ok()
+        {
+            // Arrange           
+            string myAdminUserToken = TokenGeneratorTests.GenerateToken(Guid.NewGuid(), "admin");
+
+            // Create new WebHost as user has already changed password
+            var newFakeWebHost = new FakeWebHostWithDb();
+            newFakeWebHost.IsDatabaseInitialized = false;
+            await newFakeWebHost.InitializeAsync();
+            var httpClient = newFakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+                 .DefaultRequestHeaders
+                 .Authorization =
+                    new AuthenticationHeaderValue("Bearer", myAdminUserToken);
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            jsonObject.Add("currentPassword", newFakeWebHost.DefaultUserPassword.ToString());
+            jsonObject.Add("newPassword", "Password2!");
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync(
+                string.Format("api/users/{0}/accounts/changepassword", defaultUserId), content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            await newFakeWebHost.DisposeAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
     }
 }
