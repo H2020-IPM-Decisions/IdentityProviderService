@@ -17,7 +17,7 @@ namespace H2020.IPMDecisions.IDP.Tests
     public class FakeWebHostWithDb : IAsyncLifetime
     {
         public IHost Host;
-        private static bool _databaseInitialized;
+        public bool IsDatabaseInitialized;
         private string _connectionString;
         private ApplicationDbContext _context;
 
@@ -27,6 +27,7 @@ namespace H2020.IPMDecisions.IDP.Tests
         public readonly string DefaultApplicationClientSecret = "VdzZzA3lxu-P4krX0n8APfISzujFFKAGn6pbGCd3so8";
         public readonly string DefaultAdminUserEmail = "admin@test.com";
         public readonly string DefaultNormalUserEmail = "user@test.com";
+        public readonly string DefaultNormalUserID = "380f0a69-a009-4c34-8496-9a43c2e069ba";
         public readonly string DefaultUserPassword = "Password1!";
 
         [Trait("Category", "Docker")]
@@ -75,7 +76,7 @@ namespace H2020.IPMDecisions.IDP.Tests
 
         private void Seed()
         {
-            if (!_databaseInitialized)
+            if (!IsDatabaseInitialized)
             {
                 using (_context)
                 {
@@ -179,8 +180,7 @@ namespace H2020.IPMDecisions.IDP.Tests
 
                     _context.SaveChanges();
                 }
-
-                _databaseInitialized = true;
+                IsDatabaseInitialized = true;
             }
         }
 
