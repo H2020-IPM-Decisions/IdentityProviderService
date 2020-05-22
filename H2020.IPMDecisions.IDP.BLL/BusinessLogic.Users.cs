@@ -7,6 +7,7 @@ using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
 namespace H2020.IPMDecisions.IDP.BLL
@@ -27,7 +28,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL DeleteUser");
+                logger.LogError(string.Format("Error in BLL - DeleteUser. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -67,7 +68,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL GetUser");
+                logger.LogError(string.Format("Error in BLL - GetUser. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -127,7 +128,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL GetUsers");
+                logger.LogError(string.Format("Error in BLL - GetUsers. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, ex.Message.ToString());
             }
         }

@@ -5,6 +5,7 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -24,7 +25,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL GetUserClaims");
+                logger.LogError(string.Format("Error in BLL - GetUserClaims. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IList<Claim>>(null, ex.Message.ToString());
             }
         }
@@ -53,7 +54,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL ManageUserClaims");
+                logger.LogError(string.Format("Error in BLL - ManageUserClaims. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<UserDto>(null, ex.Message.ToString());
             }
         }

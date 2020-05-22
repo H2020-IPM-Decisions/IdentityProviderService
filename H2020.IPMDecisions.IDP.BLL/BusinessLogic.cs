@@ -5,10 +5,7 @@ using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using NLog.Web;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Hosting;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -22,8 +19,9 @@ namespace H2020.IPMDecisions.IDP.BLL
         private readonly IPropertyCheckerService propertyCheckerService;
         private readonly IUrlHelper url;
         private readonly IConfiguration configuration;
+        private readonly ILogger<BusinessLogic> logger;
         private readonly IPropertyMappingService propertyMappingService;
-        private static readonly NLog.Logger logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+
         public BusinessLogic(
             IMapper mapper,
             IDataService dataService,
@@ -33,7 +31,8 @@ namespace H2020.IPMDecisions.IDP.BLL
             IPropertyCheckerService propertyCheckerService,
             IPropertyMappingService propertyMappingService,
             IUrlHelper url,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<BusinessLogic> logger)
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
@@ -53,11 +52,8 @@ namespace H2020.IPMDecisions.IDP.BLL
                 ?? throw new ArgumentNullException(nameof(url));
             this.configuration = configuration 
                 ?? throw new ArgumentNullException(nameof(configuration));
-
-            //Dummy logger output to assist initial testing of NLog
-            //logger.Debug("BusinessLogic Initialising");
-            //logger.Info("BusinessLogic Initialising Information");
-            //logger.Error("BusinessLogic Initialising Error Example");
+            this.logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
         }        
     }
 }

@@ -5,6 +5,7 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -32,7 +33,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL AddNewUser");
+                logger.LogError(string.Format("Error in BLL - AddNewUser. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
             }
         }
@@ -60,7 +61,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL AuthenticateUser");
+                logger.LogError(string.Format("Error in BLL - AuthenticateUser. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
             }
         }
@@ -90,7 +91,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL AuthenticateUser");
+                logger.LogError(string.Format("Error in BLL - AuthenticateUser. {0}. {0}. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, ex.Message.ToString());
             }
         }

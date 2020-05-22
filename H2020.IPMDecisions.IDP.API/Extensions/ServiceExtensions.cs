@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using NLog;
+using NLog.Extensions.Logging;
 
 namespace H2020.IPMDecisions.IDP.API.Extensions
 {
@@ -176,6 +178,11 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                     newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.h2020ipmdecisions.hateoas+json");
                 }
             });
+        }
+
+        public static void ConfigureLogger(this IServiceCollection services, IConfiguration config)
+        {
+            LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
         }
 
         public static IEnumerable<string> Audiences(string audiences)

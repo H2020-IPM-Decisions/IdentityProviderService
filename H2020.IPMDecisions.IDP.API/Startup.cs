@@ -40,7 +40,8 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
 
             services.AddAutoMapper(typeof(MainProfile));
-
+            
+            services.ConfigureLogger(Configuration);
             services.AddScoped<IDataService, DataService>();
             services.AddTransient<IAuthenticationProvider, AuthenticationProvider>();
             services.AddTransient<IJWTProvider, JWTProvider>();
@@ -61,7 +62,10 @@ namespace H2020.IPMDecisions.IDP.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
+        public void Configure(
+            IApplicationBuilder app, 
+            IWebHostEnvironment env,
+            IHostApplicationLifetime applicationLifetime)
         {
             if (env.IsDevelopment())
             {

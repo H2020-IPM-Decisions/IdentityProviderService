@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
@@ -12,26 +13,33 @@ namespace H2020.IPMDecisions.IDP.API
             CreateHostBuilder(args).Build().Run();
         }
 
-        /*
-        Notice that one might have to pay special attention to the Hosting Lifetime Startup Messages, 
-        if removing all other LoggingProviders (Like Console) and only using NLog. As it can cause 
-        hosting environment (Visual Studio / Docker / Azure Container) to not see application as started.
-        */
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var host = Host.CreateDefaultBuilder(args); 
+            host.ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureLogging(logging =>
+                    config
+                        .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
+                        .AddJsonFile("appsettings.json")
+                        .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json")
+                        .AddEnvironmentVariables()
+                        .Build();
+                });
+                webBuilder.UseStartup<Startup>();
+            })
+            .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    /*Allow console logging to assist system testing, because without, if there are problems with NLog.config 
+                    /*Allow console logging to assist system testing.
+                    If there are problems with NLog Configuration
                     then no error messages are visible.*/
                     logging.AddConsole();
-                    logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-                })
-                .UseNLog();              
+                }).UseNLog();
+
+            return host;      
+        }
     }
 }
 

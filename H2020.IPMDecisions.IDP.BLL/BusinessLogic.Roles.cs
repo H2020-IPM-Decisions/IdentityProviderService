@@ -8,6 +8,7 @@ using H2020.IPMDecisions.IDP.Core.Helpers;
 using System.Linq;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -44,7 +45,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL CreateRole");
+                logger.LogError(string.Format("Error in BLL - CreateRole. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -65,7 +66,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL DeleteRole");
+                logger.LogError(string.Format("Error in BLL - DeleteRole. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -107,7 +108,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL GetRole");
+                logger.LogError(string.Format("Error in BLL - GetRole. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -154,7 +155,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, "Error is BLL GetRoles");
+                logger.LogError(string.Format("Error in BLL - GetRoles. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IEnumerable<IDictionary<string, object>>>(null, ex.Message.ToString());
             }
         }
