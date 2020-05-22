@@ -17,6 +17,8 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(HttpRequest request);
         Task<GenericResponse> ConfirmEmail(Guid userId, string token);
+        Task<GenericResponse> ResetPasswordEmail(Guid userId);
+        Task<GenericResponse> ResetPassword(ResetPasswordDto resetPasswordDto);
         #endregion
 
         #region ApplicationClients Controller

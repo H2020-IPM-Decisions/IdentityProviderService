@@ -217,7 +217,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
         public static void ConfigureEmailService(this IServiceCollection services, IConfiguration config)
         {
-            services.AddHttpClient<IEmailProvider, EmailProvider>(client =>
+           services.AddHttpClient<IEmailProvider, EmailProvider>(client =>
            {
                client.BaseAddress = new Uri(config["IPMEmailMicroservice:ApiGatewayAddress"] + config["IPMEmailMicroservice:EmailMicroservice"]);
                client.DefaultRequestHeaders.Add(config["IPMEmailMicroservice:SecurityTokenCustomHeader"], config["IPMEmailMicroservice:SecurityToken"]);
