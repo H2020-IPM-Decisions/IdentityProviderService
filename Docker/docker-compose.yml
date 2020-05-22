@@ -56,7 +56,7 @@ services:
             - IPMEmailMicroservice:EmailMicroservice=api/eml/ 
             - IPMEmailMicroservice:SecurityTokenCustomHeader=ipm-eml-auth
             - IPMEmailMicroservice:SecurityToken=1234
-            - NLog:targets:logfile:fileName=./logs/imp-decisions-IDP-${shortdate}.log
+            - NLog:targets:logfile:fileName=./logs/imp-decisions-IDP-$${shortdate}.log
             - NLog:rules:logfile:minLevel=Info
         volumes:
             - logsvolume:/app/logs
