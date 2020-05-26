@@ -15,8 +15,8 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [ApiController]
     [AllowAnonymous]
     [Route ("api/accounts")]
-    public class AccountsController : ControllerBase
-    {
+    public class AccountsController : ControllerBase 
+        {
         private readonly IBusinessLogic businessLogic;
 
         public AccountsController (
@@ -26,15 +26,16 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 throw new ArgumentNullException (nameof (businessLogic));
         }
 
+        [Consumes (MediaTypeNames.Application.Json)]
         [ProducesResponseType (StatusCodes.Status200OK)]
         [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [HttpGet ("ResetPasswordEmail", Name = "ResetPasswordEmail")]
+        [HttpPost ("ResetPasswordEmail", Name = "ResetPasswordEmail")]
 
-        // GET: api/Accounts/ResetPasswordEmail?userId=
+        // POST: api/Accounts/ResetPasswordEmail
         public async Task<IActionResult> ResetPasswordEmail (
-            [RequiredFromQuery] Guid userId)
+            [FromBody] ForgotPasswordDto forgotPasswordDto)
         {
-            var response = await businessLogic.ResetPasswordEmail (userId);
+            var response = await businessLogic.ResetPasswordEmail (forgotPasswordDto.UserName);
 
             if (response.IsSuccessful)
                 return Ok ();
@@ -45,10 +46,11 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes (MediaTypeNames.Application.Json)]
         [ProducesResponseType (StatusCodes.Status200OK)]
         [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [ProducesResponseType (StatusCodes.Status404NotFound)]
         [HttpPost ("resetpassword", Name = "ResetPassword")]
+        [Authorize]
         // POST: api/Accounts/resetpassword
-        public async Task<IActionResult> ResetPassword ([FromBody] ResetPasswordDto resetPasswordDto)
+        public async Task<IActionResult> ResetPassword (
+            [FromBody] ResetPasswordDto resetPasswordDto)
         {
             var response = await businessLogic.ResetPassword (resetPasswordDto);
 

@@ -10,8 +10,6 @@ namespace H2020.IPMDecisions.IDP.Core.Dtos
     public string Password { get; set; }
     [Required]
     [DataType(DataType.Password)]
-    public string ConfirmPassword { get; set; }
-    [Required]
     public string Token { get; set; }
     }
 }

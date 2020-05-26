@@ -11,11 +11,11 @@ namespace H2020.IPMDecisions.IDP.BLL
     public partial class BusinessLogic : IBusinessLogic
     {
 
-        public async Task<GenericResponse> ResetPasswordEmail (Guid userId)
+        public async Task<GenericResponse> ResetPasswordEmail (string userName)
         {
             try
             {
-                var userEntity = await this.dataService.UserManager.FindByNameAsync (userId.ToString ());
+                var userEntity = await this.dataService.UserManager.FindByNameAsync(userName);
 
                 if (userEntity == null)
                 {
@@ -23,7 +23,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                     return GenericResponseBuilder.NoSuccess ();
                 }
 
-                var token = await dataService.UserManager.GeneratePasswordResetTokenAsync (userEntity);
+                var token = await dataService.UserManager.GeneratePasswordResetTokenAsync(userEntity);
                 var link = url.Link ("ResetPassword",
                     new
                     {
@@ -43,7 +43,6 @@ namespace H2020.IPMDecisions.IDP.BLL
                     return GenericResponseBuilder.NoSuccess ("Email send failed");
 
                 return GenericResponseBuilder.Success ("Email sent successfully");
-
             }
             catch (Exception ex)
             {
@@ -54,38 +53,33 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         public async Task<GenericResponse> ResetPassword (ResetPasswordDto resetPasswordDto)
         {
-
             try
             {
-
                 var userEntity = await this.dataService.UserManager.FindByNameAsync (resetPasswordDto.UserName);
 
                 if (userEntity == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return GenericResponseBuilder.NoSuccess<UserDto> (null, "Password reset failed");
+                    return GenericResponseBuilder.NoSuccess<IdentityResult> (null, "Password reset failed");
                 }
 
-                IdentityResult result = await this.dataService.UserManager.ResetPasswordAsync (
+                IdentityResult identityResult = await this.dataService.UserManager.ResetPasswordAsync (
                     userEntity, resetPasswordDto.Token, resetPasswordDto.Password);
 
-                if (!result.Succeeded)
+                if (!identityResult.Succeeded)
                 {
-                    var noSuccessResponse = GenericResponseBuilder.NoSuccess<UserDto> (null, "Password reset failed");
+                    var noSuccessResponse = GenericResponseBuilder.NoSuccess<IdentityResult> (identityResult, "Password reset failed");
                     return noSuccessResponse;
                 }
 
-                var userToReturn = this.mapper.Map<UserDto> (userEntity);
-                var successResponse = GenericResponseBuilder.Success<UserDto> (userToReturn);
+                var successResponse = GenericResponseBuilder.Success<IdentityResult> (identityResult);
                 return successResponse;
-
             }
             catch (Exception ex)
             {
                 //TODO: log error
                 return GenericResponseBuilder.NoSuccess (ex.Message.ToString ());
             }
-
         }
 
         public async Task<GenericResponse> AddNewUser (UserForRegistrationDto user)
