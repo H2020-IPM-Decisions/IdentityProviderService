@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace H2020.IPMDecisions.IDP.Core.Models
 {
-    public class RegistrationEmail : Email
+    public class ForgotPasswordEmail : Email
     {
         [Required]
-        public string ConfirmEmailUrl { get; set; }
+        public string ForgotPasswordUrl { get; set; }
     }
 }

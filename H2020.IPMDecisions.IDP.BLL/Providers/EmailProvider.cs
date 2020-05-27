@@ -48,23 +48,22 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 System.Console.WriteLine(ex.Message);
                 return false;
             }
-            
         }
 
-        public async Task<bool> SendForgotPasswordEmail(RegistrationEmail registrationEmail)
+        public async Task<bool> SendForgotPasswordEmail(ForgotPasswordEmail forgotPasswordEmail)
         {
             using (httpClient)
             {
                 var jsonObject = new System.Json.JsonObject();
-                jsonObject.Add("toAddress", registrationEmail.ToAddress);
-                jsonObject.Add("forgotPasswordUrl", registrationEmail.ConfirmEmailUrl);
+                jsonObject.Add("toAddress", forgotPasswordEmail.ToAddress);
+                jsonObject.Add("forgotPasswordUrl", forgotPasswordEmail.ForgotPasswordUrl);
                 var content = new StringContent(
                     jsonObject.ToString(),
                     Encoding.UTF8,
                     "application/vnd.h2020ipmdecisions.email+json");
 
                 var emailResponse = await httpClient.PostAsync("accounts/ForgotPassword", content);
-  
+
                 if (!emailResponse.IsSuccessStatusCode)
                 {
                     // ToDo Log didn't sent email

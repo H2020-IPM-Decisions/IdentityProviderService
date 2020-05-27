@@ -6,6 +6,6 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
     public interface IEmailProvider
     {
         Task<bool> SendRegistrationEmail(RegistrationEmail registrationEmail);   
-        Task<bool> SendForgotPasswordEmail(RegistrationEmail registrationEmail);     
+        Task<bool> SendForgotPasswordEmail(ForgotPasswordEmail forgotPasswordEmail);     
     }
 }

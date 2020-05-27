@@ -14,129 +14,128 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 {
     [ApiController]
     [AllowAnonymous]
-    [Route ("api/accounts")]
-    public class AccountsController : ControllerBase 
-        {
+    [Route("api/accounts")]
+    public class AccountsController : ControllerBase
+    {
         private readonly IBusinessLogic businessLogic;
 
-        public AccountsController (
+        public AccountsController(
             IBusinessLogic businessLogic)
         {
             this.businessLogic = businessLogic ??
-                throw new ArgumentNullException (nameof (businessLogic));
+                throw new ArgumentNullException(nameof(businessLogic));
         }
 
-        [Consumes (MediaTypeNames.Application.Json)]
-        [ProducesResponseType (StatusCodes.Status200OK)]
-        [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [HttpPost ("ResetPasswordEmail", Name = "ResetPasswordEmail")]
-
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("ResetPasswordEmail", Name = "ResetPasswordEmail")]
         // POST: api/Accounts/ResetPasswordEmail
-        public async Task<IActionResult> ResetPasswordEmail (
-            [FromBody] ForgotPasswordDto forgotPasswordDto)
+        public async Task<IActionResult> ResetPasswordEmail(
+            [FromBody] UserNameDto userNameDto)
         {
-            var response = await businessLogic.ResetPasswordEmail (forgotPasswordDto.UserName);
+            var response = await businessLogic.ResetPasswordEmail(userNameDto.UserName);
 
             if (response.IsSuccessful)
-                return Ok ();
+                return Ok();
 
-            return BadRequest ();
+            return BadRequest();
         }
 
-        [Consumes (MediaTypeNames.Application.Json)]
-        [ProducesResponseType (StatusCodes.Status200OK)]
-        [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [HttpPost ("resetpassword", Name = "ResetPassword")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("resetpassword", Name = "ResetPassword")]
         [Authorize]
         // POST: api/Accounts/resetpassword
-        public async Task<IActionResult> ResetPassword (
+        public async Task<IActionResult> ResetPassword(
             [FromBody] ResetPasswordDto resetPasswordDto)
         {
-            var response = await businessLogic.ResetPassword (resetPasswordDto);
+            var response = await businessLogic.ResetPassword(resetPasswordDto);
 
             if (response.IsSuccessful)
-                return Ok ();
+                return Ok();
 
-            return BadRequest ();
+            return BadRequest();
         }
 
-        [Consumes (MediaTypeNames.Application.Json)]
-        [Produces (MediaTypeNames.Application.Json)]
-        [ProducesResponseType (StatusCodes.Status201Created)]
-        [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [HttpPost ("register", Name = "RegisterUser")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("register", Name = "RegisterUser")]
         // POST: api/Accounts/register
-        public async Task<IActionResult> Register ([FromBody] UserForRegistrationDto userForRegistration)
+        public async Task<IActionResult> Register([FromBody] UserForRegistrationDto userForRegistration)
         {
-            var response = await businessLogic.AddNewUser (userForRegistration);
+            var response = await businessLogic.AddNewUser(userForRegistration);
             if (response.IsSuccessful)
             {
-                var responseAsUser = (GenericResponse<UserDto>) response;
-                return Ok (responseAsUser.Result);
+                var responseAsUser = (GenericResponse<UserDto>)response;
+                return Ok(responseAsUser.Result);
             }
 
-            var responseAsIdentityResult = (GenericResponse<IdentityResult>) response;
-            if (responseAsIdentityResult.Result == null) return BadRequest (response);
-            return BadRequest (responseAsIdentityResult.Result);
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null) return BadRequest(response);
+            return BadRequest(responseAsIdentityResult.Result);
         }
 
-        [Consumes (MediaTypeNames.Application.Json)]
-        [Produces (MediaTypeNames.Application.Json)]
-        [ProducesResponseType (StatusCodes.Status200OK)]
-        [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [HttpPost ("authenticate", Name = "AuthenticateUser")]
-        [RequiredClientHeader ("client_id", "client_secret", "grant_type")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("authenticate", Name = "AuthenticateUser")]
+        [RequiredClientHeader("client_id", "client_secret", "grant_type")]
         // POST: api/Accounts/authenticate
-        public async Task<IActionResult> Authenticate ([FromBody] UserForAuthenticationDto userDto)
+        public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
         {
-            var tokenResponse = await businessLogic.AuthenticateUser (userDto, Request);
+            var tokenResponse = await businessLogic.AuthenticateUser(userDto, Request);
 
             if (tokenResponse.IsSuccessful)
-                return Ok (tokenResponse.Result);
+                return Ok(tokenResponse.Result);
 
-            return BadRequest (new { message = tokenResponse.ErrorMessage });
+            return BadRequest(new { message = tokenResponse.ErrorMessage });
         }
 
-        [Consumes (MediaTypeNames.Application.Json)]
-        [Produces (MediaTypeNames.Application.Json)]
-        [ProducesResponseType (StatusCodes.Status200OK)]
-        [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [HttpPost ("authenticate/token", Name = "AuthenticateUserWithToken")]
-        [RequiredClientHeader ("client_id", "client_secret", "grant_type", "refresh_token")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("authenticate/token", Name = "AuthenticateUserWithToken")]
+        [RequiredClientHeader("client_id", "client_secret", "grant_type", "refresh_token")]
         // POST: api/Accounts/authenticate/token
-        public async Task<IActionResult> AuthenticateToken ()
+        public async Task<IActionResult> AuthenticateToken()
         {
-            var tokenResponse = await businessLogic.AuthenticateUser (Request);
+            var tokenResponse = await businessLogic.AuthenticateUser(Request);
 
             if (tokenResponse.IsSuccessful)
-                return Ok (tokenResponse.Result);
+                return Ok(tokenResponse.Result);
 
-            return BadRequest (new { message = tokenResponse.ErrorMessage });
+            return BadRequest(new { message = tokenResponse.ErrorMessage });
         }
 
-        [Produces (MediaTypeNames.Application.Json)]
-        [ProducesResponseType (StatusCodes.Status200OK)]
-        [ProducesResponseType (StatusCodes.Status400BadRequest)]
-        [HttpGet ("confirmemail", Name = "ConfirmEmail")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpGet("confirmemail", Name = "ConfirmEmail")]
         // GET: api/Accounts/ConfirmEmail
-        public async Task<IActionResult> ConfirmEmail ([RequiredFromQuery] Guid userId, [RequiredFromQuery] string token)
+        public async Task<IActionResult> ConfirmEmail([RequiredFromQuery] Guid userId, [RequiredFromQuery] string token)
         {
-            var response = await businessLogic.ConfirmEmail (userId, token);
+            var response = await businessLogic.ConfirmEmail(userId, token);
 
             if (response.IsSuccessful)
-                return Ok ();
+                return Ok();
 
-            var responseAsIdentityResult = (GenericResponse<IdentityResult>) response;
-            if (responseAsIdentityResult.Result == null) return BadRequest (new { message = response.ErrorMessage });
-            return BadRequest (responseAsIdentityResult.Result);
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null) return BadRequest(new { message = response.ErrorMessage });
+            return BadRequest(responseAsIdentityResult.Result);
         }
 
-        [ProducesResponseType (StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
-        public IActionResult Options ()
+        public IActionResult Options()
         {
-            Response.Headers.Add ("Allow", "OPTIONS,POST");
-            return Ok ();
+            Response.Headers.Add("Allow", "OPTIONS,POST");
+            return Ok();
         }
     }
 }
