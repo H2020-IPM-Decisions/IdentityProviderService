@@ -24,7 +24,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 }
 
                 var token = await dataService.UserManager.GeneratePasswordResetTokenAsync(identityUser);
-                var configKey = "IPMEmailMicroservice:ResetPasswordFormPageAddress";
+                var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
                 var forgotPasswordEmailObject = GenerateEmailLink<ForgotPasswordEmail>(identityUser, configKey, token);
                 var emailSent = await this.emailProvider.SendForgotPasswordEmail(forgotPasswordEmailObject);
 
@@ -75,31 +75,22 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             try
             {
-                var userEntity = this.mapper.Map<ApplicationUser>(user);
-                var identityResult = await this.dataService.UserManager.CreateAsync(userEntity, user.Password);
+                var identityUser = this.mapper.Map<ApplicationUser>(user);
+                var identityResult = await this.dataService.UserManager.CreateAsync(identityUser, user.Password);
 
                 if (identityResult.Succeeded)
                 {
-                    await AddInitialClaim(userEntity, user.UserType);
+                    await AddInitialClaim(identityUser, user.UserType);
 
-                    var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(userEntity);
-                    //TODO: Refactor confirm email
-                    var link = url.Link("ConfirmEmail",
-                        new
-                        {
-                            userId = userEntity.Id,
-                            token
-                        });
-
-                    var registrationEmailObject = new RegistrationEmail()
-                    {
-                        ToAddress = userEntity.Email,
-                        ConfirmEmailUrl = link
-                    };
-
+                    var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(identityUser);
+                    var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
+                    var registrationEmailObject = GenerateEmailLink<RegistrationEmail>(identityUser, configKey, token);
                     var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmailObject);
 
-                    var userToReturn = this.mapper.Map<UserDto>(userEntity);
+                    if (!emailSent)
+                        return GenericResponseBuilder.NoSuccess("Email send failed");
+
+                    var userToReturn = this.mapper.Map<UserDto>(identityUser);
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
                 }
@@ -225,6 +216,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
+        //TODO: Refactor to use single email model, containing email address and Url link
         private T GenerateEmailLink<T>(IdentityUser identityUser, string configKey, string token)
         {
             var uiAddress = this.configuration[configKey];
