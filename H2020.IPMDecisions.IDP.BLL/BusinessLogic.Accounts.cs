@@ -15,29 +15,17 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             try
             {
-                var userEntity = await this.dataService.UserManager.FindByNameAsync(userName);
+                var identityUser = await this.dataService.UserManager.FindByNameAsync(userName);
 
-                if (userEntity == null)
+                if (identityUser == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return GenericResponseBuilder.NoSuccess();
                 }
 
-                var token = await dataService.UserManager.GeneratePasswordResetTokenAsync(userEntity);
-
-                var uiAddress = this.configuration["IPMEmailMicroservice:ResetPasswordFormPageAddress"];
-                var urlParams = "?userID=" + userEntity.Id + "&token=" + token;
-
-                var link = string.Concat(
-                        uiAddress,
-                        urlParams);
-
-                var forgotPasswordEmailObject = new ForgotPasswordEmail()
-                {
-                    ToAddress = userEntity.Email,
-                    ForgotPasswordUrl = link
-                };
-
+                var token = await dataService.UserManager.GeneratePasswordResetTokenAsync(identityUser);
+                var configKey = "IPMEmailMicroservice:ResetPasswordFormPageAddress";
+                var forgotPasswordEmailObject = GenerateEmailLink<ForgotPasswordEmail>(identityUser, configKey, token);
                 var emailSent = await this.emailProvider.SendForgotPasswordEmail(forgotPasswordEmailObject);
 
                 if (!emailSent)
@@ -236,5 +224,27 @@ namespace H2020.IPMDecisions.IDP.BLL
                 return GenericResponseBuilder.NoSuccess<IdentityResult>(null, ex.Message.ToString());
             }
         }
+
+        private T GenerateEmailLink<T>(IdentityUser identityUser, string configKey, string token)
+        {
+            var uiAddress = this.configuration[configKey];
+            var urlParams = "?userID=" + identityUser.Id + "&token=" + token;
+
+            var link = string.Concat(
+                    uiAddress,
+                    urlParams);
+
+            Type type = typeof(T);
+
+            var emailLinkObject = Activator.CreateInstance(type);
+            var properties = emailLinkObject.GetType().GetProperties();
+
+            properties[0].SetValue(emailLinkObject, link, null);
+            properties[1].SetValue(emailLinkObject, identityUser.Email, null);
+
+            return (T)Convert.ChangeType(emailLinkObject, typeof(T));
+
+        }
+
     }
 }
