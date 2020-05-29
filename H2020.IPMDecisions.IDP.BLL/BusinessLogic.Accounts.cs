@@ -44,16 +44,16 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             try
             {
-                var userEntity = await this.dataService.UserManager.FindByNameAsync(resetPasswordDto.UserName);
+                var identityUser = await this.dataService.UserManager.FindByNameAsync(resetPasswordDto.UserName);
 
-                if (userEntity == null)
+                if (identityUser == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Password reset failed");
                 }
 
                 IdentityResult identityResult = await this.dataService.UserManager.ResetPasswordAsync(
-                    userEntity, resetPasswordDto.Token, resetPasswordDto.Password);
+                    identityUser, resetPasswordDto.Token, resetPasswordDto.Password);
 
                 if (!identityResult.Succeeded)
                 {
@@ -235,8 +235,6 @@ namespace H2020.IPMDecisions.IDP.BLL
             properties[1].SetValue(emailLinkObject, identityUser.Email, null);
 
             return (T)Convert.ChangeType(emailLinkObject, typeof(T));
-
         }
-
     }
 }

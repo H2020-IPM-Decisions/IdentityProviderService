@@ -46,8 +46,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("resetpassword", Name = "ResetPassword")]
-        [Authorize]
-        // POST: api/Accounts/resetpassword
         public async Task<IActionResult> ResetPassword(
             [FromBody] ResetPasswordDto resetPasswordDto)
         {
