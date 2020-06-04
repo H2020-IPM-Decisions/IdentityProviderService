@@ -69,7 +69,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
         {
             var jwtSecretKey = config["JwtSettings:SecretKey"];
             var issuerServerUrl = config["JwtSettings:IssuerServerUrl"];
-            var audiencesServersUrl = Audiences(config["JwtSettings:ValidAudiencesUrls"]);
+            var audiencesServersUrl = Audiences(config["JwtSettings:ValidAudiences"]);
 
             services.AddAuthentication(options =>
             {

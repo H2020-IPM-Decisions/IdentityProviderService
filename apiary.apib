@@ -151,9 +151,9 @@ Use the **Accept** header `application/vnd.h2020ipmdecisions.hateoas+json` to re
 
     + pageSize (number, optional, `5`) ... Default 10; Maximun 20
 
-    + orderBy (string, optional, `name desc`) ... name or url - add `desc` at the end for descending order 
+    + orderBy (string, optional, `name desc`) ... name or jwtAudienceCategory - add `desc` at the end for descending order 
 
-    + searchQuery (string, optional, `test`) ... Search against name and url properties
+    + searchQuery (string, optional, `test`) ... Search against name and jwtAudienceCategory properties
 
     + pageNumber (number, optional, `1`)
 
@@ -1094,7 +1094,7 @@ This request allows you to know if the endpoint is correct and is working.
     Confidential - Needs client secret to log in
 + `enabled` (boolean) 
 + `refreshTokenLifeTime` (number) 
-+ `url` (string) 
++ `jwtAudienceCategory` (string) 
 
 ## ApplicationClientForCreationDto (object)
 ### Properties
@@ -1104,7 +1104,7 @@ This request allows you to know if the endpoint is correct and is working.
     + `1` - Confidential - Needs client secret to log in
 + `enabled` (boolean, required) 
 + `refreshTokenLifeTime` (number, required) 
-+ `url` (string, required)
++ `jwtAudienceCategory` (string, required)
 
 ## Claim (object)
 ### Properties

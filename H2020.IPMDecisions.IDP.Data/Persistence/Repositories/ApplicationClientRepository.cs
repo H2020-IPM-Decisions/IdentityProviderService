@@ -64,7 +64,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 var searchQuery = resourceParameter.SearchQuery.Trim();
                 collection = collection.Where(ac =>
                     ac.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-                    || ac.Url.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+                    || ac.JWTAudienceCategory.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
             }
 
             if (!string.IsNullOrEmpty(resourceParameter.OrderBy))

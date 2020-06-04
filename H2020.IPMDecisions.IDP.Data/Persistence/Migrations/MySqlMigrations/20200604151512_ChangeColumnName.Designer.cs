@@ -3,14 +3,16 @@ using System;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200604151512_ChangeColumnName")]
+    partial class ChangeColumnName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                     b.Property<bool>("Enabled")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("JWTAudience")
+                    b.Property<string>("JWTAudienceCategory")
                         .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 

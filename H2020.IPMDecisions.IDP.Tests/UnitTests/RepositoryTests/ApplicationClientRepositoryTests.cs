@@ -27,11 +27,11 @@ namespace H2020.IPMDecisions.IDP.Tests.UnitTests.RepositoryTests
             using (var context = new ApplicationDbContext(options))
             {
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "1", Url = "1.com" });
+                { Name = "1", JWTAudienceCategory = "1.com" });
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "1", Url = "1.com" });
+                { Name = "1", JWTAudienceCategory = "1.com" });
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "1", Url = "1.com" });
+                { Name = "1", JWTAudienceCategory = "1.com" });
 
                 context.SaveChanges();
             }
@@ -64,11 +64,11 @@ namespace H2020.IPMDecisions.IDP.Tests.UnitTests.RepositoryTests
             using (var context = new ApplicationDbContext(options))
             {
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "1", Url = "1.com" });
+                { Name = "1", JWTAudienceCategory = "1.com" });
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "1", Url = "1.com" });
+                { Name = "1", JWTAudienceCategory = "1.com" });
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "1", Url = "1.com" });
+                { Name = "1", JWTAudienceCategory = "1.com" });
 
                 context.SaveChanges();
             }
@@ -93,16 +93,16 @@ namespace H2020.IPMDecisions.IDP.Tests.UnitTests.RepositoryTests
                 .Options;
 
             var applicationToReturn = new ApplicationClient()
-            { Name = "1", Url = "1.com" };
+            { Name = "1", JWTAudienceCategory = "1.com" };
 
             using (var context = new ApplicationDbContext(options))
             {
                 context.ApplicationClient.Add(applicationToReturn);
 
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "2", Url = "3.com" });
+                { Name = "2", JWTAudienceCategory = "3.com" });
                 context.ApplicationClient.Add(new ApplicationClient()
-                { Name = "3", Url = "3.com" });
+                { Name = "3", JWTAudienceCategory = "3.com" });
 
                 context.SaveChanges();
             }

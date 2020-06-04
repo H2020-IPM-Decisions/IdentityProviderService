@@ -103,7 +103,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             var userRoles = await this.authenticationProvider.GetUserRolesAsync(isAuthorize.Result);
 
             var claims = await this.jWTProvider.GetValidClaims(isAuthorize.Result, userRoles, userClaims);
-            var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.Url);
+            var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.JWTAudienceCategory);
             var refreshToken = await this.refreshTokenProvider.GenerateRefreshToken(isAuthorize.Result, isValidClient.Result);
 
             var bearerToken = new AuthenticationDto()

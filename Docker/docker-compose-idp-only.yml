@@ -50,7 +50,7 @@ services:
             - JwtSettings:SecretKey=AddYourSecretKey
             - JwtSettings:IssuerServerUrl=AddYourServer
             # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
-            - JwtSettings:ValidAudiencesUrls=https://testclient.com
+            - JwtSettings:ValidAudiences=https://testclient.com
             - AllowedHosts=*
             - IPMEmailMicroservice:ApiGatewayAddress=whereApiGatewayIsHosted
             - IPMEmailMicroservice:EmailMicroservice=api/eml/ 

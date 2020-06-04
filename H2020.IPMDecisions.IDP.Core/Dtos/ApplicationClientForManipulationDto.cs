@@ -10,6 +10,6 @@ namespace H2020.IPMDecisions.IDP.Core.Dtos
         public virtual ApplicationClientType ApplicationClientType { get; set; }
         public virtual bool Enabled { get; set; }
         public virtual int RefreshTokenLifeTime { get; set; }
-        public virtual string Url { get; set; }
+        public virtual string JWTAudienceCategory { get; set; }
     }
 }

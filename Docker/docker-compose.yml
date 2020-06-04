@@ -50,7 +50,7 @@ services:
             - JwtSettings:SecretKey=AddYourSecretKey
             - JwtSettings:IssuerServerUrl=AddYourServer
             # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
-            - JwtSettings:ValidAudiencesUrls=https://testclient.com
+            - JwtSettings:ValidAudiences=https://testclient.com
             - AllowedHosts=*
             - ASPNETCORE_ENVIRONMENT=Development # Development, Staging or Production. Production enforces HTTPS, so only use when certificates installed
             - ASPNETCORE_URLS=http://+:80            

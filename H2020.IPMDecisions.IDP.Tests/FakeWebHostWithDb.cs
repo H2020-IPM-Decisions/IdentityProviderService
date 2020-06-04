@@ -85,7 +85,7 @@ namespace H2020.IPMDecisions.IDP.Tests
                     var applicationClientPublic = new ApplicationClient()
                     {
                         Name = "My Test Client",
-                        Url = "https://testclient.com",
+                        JWTAudienceCategory = "https://testclient.com",
                         Base64Secret = DefaultApplicationClientSecret,
                         Id = DefaultApplicationClientId,
                         ApplicationClientType = ApplicationClientType.Public,
@@ -98,7 +98,7 @@ namespace H2020.IPMDecisions.IDP.Tests
                     var applicationClientConfidential = new ApplicationClient()
                     {
                         Name = "My Test Client Confidential",
-                        Url = "https://testclientconfidential.com",
+                        JWTAudienceCategory = "https://testclientconfidential.com",
                         Base64Secret = DefaultApplicationClientSecret,
                         Id = ConfidentialApplicationClientId,
                         ApplicationClientType = ApplicationClientType.Confidential,
@@ -111,7 +111,7 @@ namespace H2020.IPMDecisions.IDP.Tests
                     var applicationClientDisable = new ApplicationClient()
                     {
                         Name = "My Test Client Disable",
-                        Url = "https://testclientconfidential.com",
+                        JWTAudienceCategory = "https://testclientconfidential.com",
                         Base64Secret = DefaultApplicationClientSecret,
                         Id = DisableApplicationClientId,
                         ApplicationClientType = ApplicationClientType.Confidential,

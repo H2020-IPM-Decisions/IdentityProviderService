@@ -74,7 +74,7 @@ Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json sect
 1. TokenLifetimeMinutes: Valid lifetime of the JWT in minutes.
 2. SecretKey: This parameter holds a secret key to sign the JWT. Your resource API should have the same secret in the JWT properties.
 3. IssuerServerUrl: This parameter holds who is issuing the certificate, usually will be this server. Your resource API should have the same issuer url in the JWT properties.
-4. ValidAudiencesUrls: This parameter holds which clients URLs can use this IDP service. The different URLS should be separated by a semicolon **";"**. At least one of the client URL should be added into your resource API JWT properties.
+4. ValidAudiences: This parameter holds which clients URLs can use this IDP service. The different URLS should be separated by a semicolon **";"**. At least one of the client URL should be added into your resource API JWT properties.
 
 ### How to run the project
 

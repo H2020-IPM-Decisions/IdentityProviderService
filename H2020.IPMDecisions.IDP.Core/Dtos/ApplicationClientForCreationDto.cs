@@ -14,6 +14,6 @@ namespace H2020.IPMDecisions.IDP.Core.Dtos
         [Required]
         public override int RefreshTokenLifeTime { get => base.RefreshTokenLifeTime; set => base.RefreshTokenLifeTime = value; }
         [Required]
-        public override string Url { get; set; }
+        public override string JWTAudienceCategory { get; set; }
     }
 }
