@@ -93,8 +93,8 @@ services:
             #Volume mounted so that log data persists between container restarts
             - elkvolume:/var/lib/elasticsearch
             #Volume commented since command does not work on all systems. Manual cp required after docker compose run, refer to read me.
-            #docker cp ./Docker/ELK/logstash-conf/02-beats-input.conf  elkstack:/etc/logstash/conf.d/02-beats-input.conf
-            #- ./ELK/logstash-conf/02-beats-input.conf:/etc/logstash/conf.d/02-beats-input.conf:ro
+            #docker cp ./Docker/ELK/logstash-conf/beats-input.conf  elkstack:/etc/logstash/conf.d/beats-input.conf
+            #- ./ELK/logstash-conf/beats-input.conf:/etc/logstash/conf.d/beats-input.conf:ro
         networks:
             idp_network:
                 ipv4_address: 172.18.1.9

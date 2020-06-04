@@ -136,7 +136,7 @@ Logging is by means of ELK stack using Filebeat to harvest with log files being 
 Once docker compose has completed in the console, please run the following commands manually in the console (which set up configuration for filebeat and elk). Please observe that file `filebeat.yml` will require editing before being copied, please edit the IP address in the file to match your docker host.
 
 ```console
-docker cp ./Docker/ELK/logstash-conf/02-beats-input.conf  elkstack:/etc/logstash/conf.d/02-beats-input.conf
+docker cp ./Docker/ELK/logstash-conf/beats-input.conf  elkstack:/etc/logstash/conf.d/beats-input.conf
 docker cp ./Docker/Filebeat/filebeat.yml filebeat:/usr/share/filebeat
 ```
 
