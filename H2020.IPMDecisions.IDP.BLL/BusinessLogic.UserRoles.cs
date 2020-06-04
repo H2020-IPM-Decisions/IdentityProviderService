@@ -5,6 +5,7 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -24,7 +25,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - GetUserRoles. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IList<string>>(null, ex.Message.ToString());
             }
         }
@@ -59,7 +60,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - ManageUserRoles. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<UserDto>(null, ex.Message.ToString());
             }
         }

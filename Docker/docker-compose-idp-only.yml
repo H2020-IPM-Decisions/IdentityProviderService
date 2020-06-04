@@ -1,8 +1,8 @@
 version: "3.7" 
 services:
-    idp.db:
+    idpdb:
         image: mysql:8.0.19
-        container_name: idp-mysql
+        container_name: ipmdecisions.idp.mysql
         environment:
             # change root password -> Change it before loading DB
             MYSQL_ROOT_PASSWORD: root
@@ -16,32 +16,32 @@ services:
                 ipv4_address: 172.18.1.6
     phpmyadmin:
         depends_on:
-        - idp.db
+        - idpdb
         image: phpmyadmin/phpmyadmin
         container_name: ipmdecisions.idp.phpmyadmin
         restart: always
         ports:
             - '9080:80'
         environment:
-            PMA_HOST: idp.db
+            PMA_HOST: idpdb
         networks:
             idp_network:
                 ipv4_address: 172.18.1.7
-    idp.api:
+    idp:
         depends_on:
-            - idp.db
+            - idpdb
         image: ipmdecisions/identityproviderservice:latest
-        container_name: idp-api
-        hostname: idp.api
+        container_name: ipmdecisions.idp.api
+        user: root
         restart: always
         ports:
-            - "80:80" 
-            - "443:443"
+            - "8086:5000"
         build:
             context: ../
             dockerfile: ./Docker/Dockerfile
             args:
                 BUILDER_VERSION: latest
+                URL_PORT: 5000
                 RELEASE_DATE: "2020-03-03"
         environment:
             # The following db username and password are create in line 32 in the MySQL_Init_Script/init.sql -> Change them before loading DB
@@ -52,13 +52,6 @@ services:
             # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
             - JwtSettings:ValidAudiencesUrls=https://testclient.com
             - AllowedHosts=*
-            - ASPNETCORE_ENVIRONMENT=Development # Development, Staging or Production. Production enforces HTTPS, so only use when certificates installed
-            - ASPNETCORE_URLS=http://+:80            
-            # Comment line above and uncomment the following 4 lines once you have a valid certificate
-            # - ASPNETCORE_URLS=https://+:443;http://+:80
-            # - ASPNETCORE_HTTPS_PORT=443
-            # - ASPNETCORE_Kestrel__Certificates__Default__Password=YourCertificatePassword
-            # - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/YourCertificate.pfx
             - IPMEmailMicroservice:ApiGatewayAddress=whereApiGatewayIsHosted
             - IPMEmailMicroservice:EmailMicroservice=api/eml/ 
             - IPMEmailMicroservice:SecurityTokenCustomHeader=ipm-eml-auth
@@ -67,45 +60,9 @@ services:
             - NLog:rules:logfile:minLevel=Info
         volumes:
             - logsvolume:/app/logs
-            - ~/.aspnet/https:/https:ro # Path certificate in Host machine
         networks:
             idp_network:
                 ipv4_address: 172.18.1.5              
-    filebeat:
-        image: docker.elastic.co/beats/filebeat:7.6.1
-        container_name: filebeat
-        restart: always
-        user: root
-        ports:
-            - "8087:80"
-        volumes:
-            - logsvolume:/app/logs
-            #Volume commented since command does not work on all systems. Manual cp required after docker compose run, refer to read me.
-            #docker cp ./Docker/Filebeat/filebeat.yml filebeat:/usr/share/filebeat
-            #- ./Filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-        networks:
-            idp_network:
-                ipv4_address: 172.18.1.8
-    elk:
-        image: sebp/elk
-        container_name: elkstack
-        #Uncommenting may be of help on some systems
-        #environment:
-        #    - ES_CONNECT_RETRY=300
-        restart: always
-        ports:
-            - "5601:5601"
-            - "9200:9200"
-            - "5044:5044"
-        volumes:
-            #Volume mounted so that log data persists between container restarts
-            - elkvolume:/var/lib/elasticsearch
-            #Volume commented since command does not work on all systems. Manual cp required after docker compose run, refer to read me.
-            #docker cp ./Docker/ELK/logstash-conf/beats-input.conf  elkstack:/etc/logstash/conf.d/beats-input.conf
-            #- ./ELK/logstash-conf/beats-input.conf:/etc/logstash/conf.d/beats-input.conf:ro
-        networks:
-            idp_network:
-                ipv4_address: 172.18.1.9
 
 networks:
     idp_network:
@@ -117,5 +74,3 @@ volumes:
     dbdata:
     #Shared volume for log files
     logsvolume:
-    #Volume for log files on ELK
-    elkvolume:

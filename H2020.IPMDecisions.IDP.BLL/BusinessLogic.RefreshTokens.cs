@@ -7,6 +7,7 @@ using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Helpers;
 using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Core.ResourceParameters;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
 namespace H2020.IPMDecisions.IDP.BLL
@@ -27,7 +28,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - DeleteRefreshToken. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -64,7 +65,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - GetRefreshToken. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
@@ -121,7 +122,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - GetRefreshTokens. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<ShapedDataWithLinks>(null, ex.Message.ToString());
             }
         }

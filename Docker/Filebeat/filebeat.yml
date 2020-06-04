@@ -1,0 +1,20 @@
+output:
+  logstash:
+    enabled: true
+    hosts:
+      #Please configure this IP and port to match your setup
+      - 192.168.99.100:5044
+    timeout: 15
+
+filebeat:
+  inputs:
+    -
+      paths:
+        #Matches all log files in nominated volume
+        - /app/logs/*.log
+      document_type: syslog
+
+      #Matches multi-line events using regular expression for timestamps, this is suitable for output from Nlog
+      multiline.pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'
+      multiline.negate: true
+      multiline.match: after
