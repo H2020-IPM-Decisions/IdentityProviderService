@@ -2,9 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace H2020.IPMDecisions.IDP.Core.Dtos
 {
-    public class UserNameDto
+    public class UserEmailDto
     {
         [Required]
-        public string UserName { get; set; }
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
     }
 }

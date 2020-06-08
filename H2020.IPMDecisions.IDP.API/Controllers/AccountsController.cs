@@ -29,12 +29,12 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpPost("ResetPasswordEmail", Name = "ResetPasswordEmail")]
-        // POST: api/Accounts/ResetPasswordEmail
-        public async Task<IActionResult> ResetPasswordEmail(
-            [FromBody] UserNameDto userNameDto)
+        [HttpPost("forgotpassword", Name = "ForgotPassword")]
+        // POST: api/Accounts/forgotpassword
+        public async Task<IActionResult> ForgotPassword(
+            [FromBody] UserEmailDto userEmailDto)
         {
-            var response = await businessLogic.ResetPasswordEmail(userNameDto.UserName);
+            var response = await businessLogic.ForgotPassword(userEmailDto);
 
             if (response.IsSuccessful)
                 return Ok();
@@ -132,7 +132,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpOptions]
         public IActionResult Options()
         {
-            Response.Headers.Add("Allow", "OPTIONS,POST");
+            Response.Headers.Add("Allow", "GET,OPTIONS,POST");
             return Ok();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Web;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
@@ -11,27 +12,27 @@ namespace H2020.IPMDecisions.IDP.BLL
     public partial class BusinessLogic : IBusinessLogic
     {
 
-        public async Task<GenericResponse> ResetPasswordEmail(string userName)
+        public async Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto)
         {
             try
             {
-                var identityUser = await this.dataService.UserManager.FindByNameAsync(userName);
+                var identityUser = await this.dataService.UserManager.FindByEmailAsync(userEmailDto.Email);
 
                 if (identityUser == null)
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
                     return GenericResponseBuilder.NoSuccess();
                 }
 
                 var token = await dataService.UserManager.GeneratePasswordResetTokenAsync(identityUser);
                 var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
-                var forgotPasswordEmailObject = GenerateEmailLink<ForgotPasswordEmail>(identityUser, configKey, token);
-                var emailSent = await this.emailProvider.SendForgotPasswordEmail(forgotPasswordEmailObject);
+                var emailObject = GenerateEmailLink(identityUser, configKey, token, "email");
+                var passwordEmail = this.mapper.Map<ForgotPasswordEmail>(emailObject);
+                var emailSent = await this.emailProvider.SendForgotPasswordEmail(passwordEmail);
 
                 if (!emailSent)
                     return GenericResponseBuilder.NoSuccess("Email send failed");
 
-                return GenericResponseBuilder.Success("Email sent successfully");
+                return GenericResponseBuilder.Success();
             }
             catch (Exception ex)
             {
@@ -44,25 +45,22 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             try
             {
-                var identityUser = await this.dataService.UserManager.FindByNameAsync(resetPasswordDto.UserName);
+                var identityUser = await this.dataService.UserManager.FindByEmailAsync(resetPasswordDto.Email);
 
                 if (identityUser == null)
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
                     return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Password reset failed");
                 }
 
                 IdentityResult identityResult = await this.dataService.UserManager.ResetPasswordAsync(
-                    identityUser, resetPasswordDto.Token, resetPasswordDto.Password);
+                    identityUser, HttpUtility.UrlDecode(resetPasswordDto.Token), resetPasswordDto.Password);
 
                 if (!identityResult.Succeeded)
                 {
-                    var noSuccessResponse = GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult, "Password reset failed");
-                    return noSuccessResponse;
+                    return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult, "Password reset failed");
                 }
 
-                var successResponse = GenericResponseBuilder.Success<IdentityResult>(identityResult);
-                return successResponse;
+                return GenericResponseBuilder.Success<IdentityResult>(identityResult);
             }
             catch (Exception ex)
             {
@@ -84,11 +82,15 @@ namespace H2020.IPMDecisions.IDP.BLL
 
                     var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(identityUser);
                     var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
-                    var registrationEmailObject = GenerateEmailLink<RegistrationEmail>(identityUser, configKey, token);
-                    var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmailObject);
+                    var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");                    
+                    var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
+                    var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmail);
 
                     if (!emailSent)
-                        return GenericResponseBuilder.NoSuccess("Email send failed");
+                    {
+                        //ToDo Log Error or send notification to Admin to check problem
+                        return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Email send failed");
+                    }                       
 
                     var userToReturn = this.mapper.Map<UserDto>(identityUser);
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
@@ -216,25 +218,29 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        //TODO: Refactor to use single email model, containing email address and Url link
-        private T GenerateEmailLink<T>(IdentityUser identityUser, string configKey, string token)
+        private Email GenerateEmailLink(IdentityUser identityUser, string configKey, string token, string userInformation)
         {
+            var queryString = string.Format("token={0}",HttpUtility.UrlEncode(token));
+            switch (userInformation.ToLower())
+            {
+                case "id":
+                    queryString = string.Format("{0}&userId={1}", queryString, identityUser.Id);
+                    break;
+                case "email":
+                    queryString = string.Format("{0}&email={1}", queryString, identityUser.Email);
+                    break;                
+                default:
+                    break;
+            }
             var uiAddress = this.configuration[configKey];
-            var urlParams = "?userID=" + identityUser.Id + "&token=" + token;
+            var link = new Uri(string.Format("{0}?{1}", uiAddress, queryString));
 
-            var link = string.Concat(
-                    uiAddress,
-                    urlParams);
-
-            Type type = typeof(T);
-
-            var emailLinkObject = Activator.CreateInstance(type);
-            var properties = emailLinkObject.GetType().GetProperties();
-
-            properties[0].SetValue(emailLinkObject, link, null);
-            properties[1].SetValue(emailLinkObject, identityUser.Email, null);
-
-            return (T)Convert.ChangeType(emailLinkObject, typeof(T));
+            var email = new Email(){
+                CallbackUrl = link,
+                Token = token,
+                ToAddress = identityUser.Email
+            };
+            return email;
         }
     }
 }

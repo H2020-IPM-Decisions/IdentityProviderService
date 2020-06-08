@@ -3,15 +3,21 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
     public class EmailProvider : IEmailProvider
     {
         private readonly HttpClient httpClient;
+        private readonly IConfiguration config;
 
-        public EmailProvider(HttpClient httpClient)
+        public EmailProvider(
+            HttpClient httpClient,
+            IConfiguration config)
         {
+            this.config = config 
+                ?? throw new ArgumentNullException(nameof(config));
             this.httpClient = httpClient
                 ?? throw new System.ArgumentNullException(nameof(httpClient));
         }
@@ -22,13 +28,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             {
                 using (httpClient)
                 {
-                    var jsonObject = new System.Json.JsonObject();
-                    jsonObject.Add("toAddress", registrationEmail.ToAddress);
-                    jsonObject.Add("confirmEmailUrl", registrationEmail.ConfirmEmailUrl);
-                    var content = new StringContent(
-                        jsonObject.ToString(),
-                        Encoding.UTF8,
-                        "application/vnd.h2020ipmdecisions.email+json");
+                    StringContent content = CreateEmailJsonObject(registrationEmail);
 
                     var emailResponse = await httpClient.PostAsync("accounts/registrationemail", content);
 
@@ -54,13 +54,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         {
             using (httpClient)
             {
-                var jsonObject = new System.Json.JsonObject();
-                jsonObject.Add("toAddress", forgotPasswordEmail.ToAddress);
-                jsonObject.Add("forgotPasswordUrl", forgotPasswordEmail.ForgotPasswordUrl);
-                var content = new StringContent(
-                    jsonObject.ToString(),
-                    Encoding.UTF8,
-                    "application/vnd.h2020ipmdecisions.email+json");
+                StringContent content = CreateEmailJsonObject(forgotPasswordEmail);
 
                 var emailResponse = await httpClient.PostAsync("accounts/ForgotPassword", content);
 
@@ -73,6 +67,23 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 }
                 return true;
             }
+        }
+
+        private static StringContent CreateEmailJsonObject(Email email)
+        {
+            var jsonObject = new System.Json.JsonObject();
+            jsonObject.Add("toAddress", email.ToAddress);
+            jsonObject.Add("callbackUrl", email.CallbackUrl.AbsoluteUri);
+            jsonObject.Add("token", email.Token);          
+              
+            //config["IPMEmailMicroservice:ContentTypeHeader"];
+            var customContentType = "application/vnd.h2020ipmdecisions.email+json"; 
+
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                customContentType);
+            return content;
         }
     }
 }
