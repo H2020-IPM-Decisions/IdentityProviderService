@@ -13,7 +13,7 @@ using Xunit;
 namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
 {
     [Trait("Category", "Docker")]
-    public class AccountsControllerTests : IClassFixture<FakeWebHostWithDb>
+    public class AccountsControllerTests : IClassFixture<FakeWebHostWithDb>, IClassFixture<FakeApiGatewayHost>
     {
         private FakeWebHostWithDb fakeWebHost;
         public AccountsControllerTests(FakeWebHostWithDb fakeWebHost)

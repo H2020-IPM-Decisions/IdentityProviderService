@@ -98,9 +98,11 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
 
-            // ToDo When Email confirmation available
-            //if (!user.EmailConfirmed) 
-            // return Tuple.Create(false, "Email not confirmed", user);
+            // if (!user.EmailConfirmed)
+            // {
+            //     response.ResponseMessage = "Email not confirmed";
+            //     return response;
+            // }
 
             var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
