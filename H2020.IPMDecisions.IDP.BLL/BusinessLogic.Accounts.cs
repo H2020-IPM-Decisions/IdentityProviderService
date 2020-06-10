@@ -19,9 +19,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var identityUser = await this.dataService.UserManager.FindByEmailAsync(userEmailDto.Email);
 
                 if (identityUser == null)
-                {
-                    return GenericResponseBuilder.NoSuccess();
-                }
+                    return GenericResponseBuilder.Success();
 
                 var token = await dataService.UserManager.GeneratePasswordResetTokenAsync(identityUser);
                 var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
@@ -48,19 +46,15 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var identityUser = await this.dataService.UserManager.FindByEmailAsync(resetPasswordDto.Email);
 
                 if (identityUser == null)
-                {
-                    return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Password reset failed");
-                }
+                    return GenericResponseBuilder.Success();
 
                 IdentityResult identityResult = await this.dataService.UserManager.ResetPasswordAsync(
                     identityUser, HttpUtility.UrlDecode(resetPasswordDto.Token), resetPasswordDto.Password);
 
                 if (!identityResult.Succeeded)
-                {
-                    return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult, "Password reset failed");
-                }
+                    return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
 
-                return GenericResponseBuilder.Success<IdentityResult>(identityResult);
+                return GenericResponseBuilder.Success();
             }
             catch (Exception ex)
             {

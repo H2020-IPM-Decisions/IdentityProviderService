@@ -19,18 +19,53 @@ namespace H2020.IPMDecisions.IDP.Tests
                 StartAdminInterface = true
             });
 
+            stub.Given(
+                Request.Create()
+                    .WithPath("/api/eml/accounts/registrationemail")                    
+                    .WithHeader("ipm-eml-auth", "1234")
+                    //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
+                    .WithBody(new WildcardMatcher("*newuser@test.com*"))
+                    .UsingPost())
+                .RespondWith(Response.Create()
+                    .WithStatusCode(200)
+                    .WithHeader("Content-Type", "application/json"));
 
             stub.Given(
                 Request.Create()
                     .WithPath("/api/eml/accounts/registrationemail")
                     .WithHeader("ipm-eml-auth", "1234")
                     //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
-                    .WithBody(new WildcardMatcher("*newuser@test.com*"))
-                    .UsingPost()                   
-                )
+                    .WithBody(new WildcardMatcher("*emailservicedown*"))
+                    .UsingPost())
+                .RespondWith(Response.Create()
+                    .WithStatusCode(400)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(@"{ ""message"": ""No connection could be made because the target machine actively refused it."" }"));
+
+            stub.Given(
+                Request.Create()
+                    .WithPath("/api/eml/accounts/forgotpassword")
+                    .WithHeader("ipm-eml-auth", "1234")
+                    //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
+                    .WithBody(new WildcardMatcher("*"))
+                    .UsingPost())
+                .AtPriority(10)
                 .RespondWith(Response.Create()
                     .WithStatusCode(200)
                     .WithHeader("Content-Type", "application/json"));
+
+            stub.Given(
+                Request.Create()
+                    .WithPath("/api/eml/accounts/forgotpassword")
+                    .WithHeader("ipm-eml-auth", "1234")
+                    //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
+                    .WithBody(new WildcardMatcher("*failemail*"))
+                    .UsingPost())
+                .AtPriority(1)
+                .RespondWith(Response.Create()
+                    .WithStatusCode(400)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(@"{ ""message"": ""No connection could be made because the target machine actively refused it."" }"));
         }
 
         public void Dispose()
@@ -41,7 +76,7 @@ namespace H2020.IPMDecisions.IDP.Tests
 
     public class FakeApiGatewayHostTests : IClassFixture<FakeApiGatewayHost>
     {
-        FakeApiGatewayHost fixture;
+        private readonly FakeApiGatewayHost fixture;
 
         public FakeApiGatewayHostTests(FakeApiGatewayHost fixture)
         {

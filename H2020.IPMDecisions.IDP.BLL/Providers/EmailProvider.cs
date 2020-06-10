@@ -56,7 +56,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             {
                 StringContent content = CreateEmailJsonObject(forgotPasswordEmail);
 
-                var emailResponse = await httpClient.PostAsync("accounts/ForgotPassword", content);
+                var emailResponse = await httpClient.PostAsync("accounts/forgotpassword", content);
 
                 if (!emailResponse.IsSuccessStatusCode)
                 {

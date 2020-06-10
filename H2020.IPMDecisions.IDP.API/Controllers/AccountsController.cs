@@ -39,7 +39,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (response.IsSuccessful)
                 return Ok();
 
-            return BadRequest();
+            return BadRequest(new { message = response.ErrorMessage });
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
@@ -54,7 +54,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (response.IsSuccessful)
                 return Ok();
 
-            return BadRequest();
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null) return BadRequest(new { message = response.ErrorMessage });
+            return BadRequest(responseAsIdentityResult.Result);
         }
 
         [Consumes(MediaTypeNames.Application.Json)]

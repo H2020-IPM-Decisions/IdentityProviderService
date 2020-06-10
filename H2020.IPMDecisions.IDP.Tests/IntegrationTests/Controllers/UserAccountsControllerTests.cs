@@ -129,7 +129,7 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async void PostChangePassword_UserDontExist_NotFound()
+        public async void PostChangePassword_UserDoesntExist_NotFound()
         {
             // Arrange
             var notExistingUserId = Guid.NewGuid();
