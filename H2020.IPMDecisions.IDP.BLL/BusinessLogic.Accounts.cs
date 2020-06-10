@@ -1,29 +1,90 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using System.Web;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
-using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
     public partial class BusinessLogic : IBusinessLogic
     {
+
+        public async Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto)
+        {
+            try
+            {
+                var identityUser = await this.dataService.UserManager.FindByEmailAsync(userEmailDto.Email);
+
+                if (identityUser == null)
+                    return GenericResponseBuilder.Success();
+
+                var token = await dataService.UserManager.GeneratePasswordResetTokenAsync(identityUser);
+                var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
+                var emailObject = GenerateEmailLink(identityUser, configKey, token, "email");
+                var passwordEmail = this.mapper.Map<ForgotPasswordEmail>(emailObject);
+                var emailSent = await this.emailProvider.SendForgotPasswordEmail(passwordEmail);
+
+                if (!emailSent)
+                    return GenericResponseBuilder.NoSuccess("Email send failed");
+
+                return GenericResponseBuilder.Success();
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
+            }
+        }
+
+        public async Task<GenericResponse> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            try
+            {
+                var identityUser = await this.dataService.UserManager.FindByEmailAsync(resetPasswordDto.Email);
+
+                if (identityUser == null)
+                    return GenericResponseBuilder.Success();
+
+                IdentityResult identityResult = await this.dataService.UserManager.ResetPasswordAsync(
+                    identityUser, HttpUtility.UrlDecode(resetPasswordDto.Token), resetPasswordDto.Password);
+
+                if (!identityResult.Succeeded)
+                    return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
+
+                return GenericResponseBuilder.Success();
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
+            }
+        }
+
         public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user)
         {
             try
-            { 
-                var userEntity = this.mapper.Map<ApplicationUser>(user);
-                var identityResult = await this.dataService.UserManager.CreateAsync(userEntity, user.Password);
+            {
+                var identityUser = this.mapper.Map<ApplicationUser>(user);
+                var identityResult = await this.dataService.UserManager.CreateAsync(identityUser, user.Password);
 
                 if (identityResult.Succeeded)
                 {
-                    await AddInitialClaim(userEntity, user.UserType);
+                    await AddInitialClaim(identityUser, user.UserType);
 
-                    //ToDo Generate Email token and return
-                    var userToReturn = this.mapper.Map<UserDto>(userEntity);
+                    var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(identityUser);
+                    var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
+                    var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");                    
+                    var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
+                    var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmail);
+                    
+                    var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
+                    if (!emailSent)
+                        userToReturn.EmailSentDuringRegistration = false;
+                                           
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
                 }
@@ -97,7 +158,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         }
 
         private async Task<AuthenticationDto> CreateAuthentificationDto(AuthenticationProviderResult<ApplicationClient> isValidClient,
-        AuthenticationProviderResult<ApplicationUser> isAuthorize)
+            AuthenticationProviderResult<ApplicationUser> isAuthorize)
         {
             var userClaims = await this.authenticationProvider.GetUserClaimsAsync(isAuthorize.Result);
             var userRoles = await this.authenticationProvider.GetUserRolesAsync(isAuthorize.Result);
@@ -122,11 +183,56 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
             string userTypeClaimValue = !string.IsNullOrEmpty(userType) ? userType : this.configuration["AccessClaims:DefaultUserAccessLevel"];
-            if(userTypeClaim == null | userTypeClaimValue == null)
+            if (userTypeClaim == null | userTypeClaimValue == null)
             {
                 throw new Exception("AccessClaims section missing on appsettings.json file");
             }
             await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue));
+        }
+
+        public async Task<GenericResponse> ConfirmEmail(Guid userId, string token)
+        {
+            try
+            {
+                var userToConfirm = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
+                if (userToConfirm == null) return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Not found");
+
+                var identityResult = await this.dataService.UserManager.ConfirmEmailAsync(userToConfirm, token);
+                if (identityResult.Succeeded)
+                    return GenericResponseBuilder.Success();
+
+                return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log error
+                return GenericResponseBuilder.NoSuccess<IdentityResult>(null, ex.Message.ToString());
+            }
+        }
+
+        private Email GenerateEmailLink(IdentityUser identityUser, string configKey, string token, string userInformation)
+        {
+            var queryString = string.Format("token={0}",HttpUtility.UrlEncode(token));
+            switch (userInformation.ToLower())
+            {
+                case "id":
+                    queryString = string.Format("{0}&userId={1}", queryString, identityUser.Id);
+                    break;
+                case "email":
+                    queryString = string.Format("{0}&email={1}", queryString, identityUser.Email);
+                    break;                
+                default:
+                    break;
+            }
+            var uiAddress = this.configuration[configKey];
+            var link = new Uri(string.Format("{0}?{1}", uiAddress, queryString));
+
+            var email = new Email(){
+                CallbackUrl = link,
+                Token = token,
+                ToAddress = identityUser.Email
+            };
+            return email;
         }
     }
 }

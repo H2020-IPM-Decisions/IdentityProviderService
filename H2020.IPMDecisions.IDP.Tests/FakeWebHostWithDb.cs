@@ -17,7 +17,7 @@ namespace H2020.IPMDecisions.IDP.Tests
     public class FakeWebHostWithDb : IAsyncLifetime
     {
         public IHost Host;
-        private static bool _databaseInitialized;
+        public bool IsDatabaseInitialized;
         private string _connectionString;
         private ApplicationDbContext _context;
 
@@ -27,6 +27,8 @@ namespace H2020.IPMDecisions.IDP.Tests
         public readonly string DefaultApplicationClientSecret = "VdzZzA3lxu-P4krX0n8APfISzujFFKAGn6pbGCd3so8";
         public readonly string DefaultAdminUserEmail = "admin@test.com";
         public readonly string DefaultNormalUserEmail = "user@test.com";
+        public readonly string DefaultFailEmailUserEmail = "failemail@test.com";
+        public readonly string DefaultNormalUserID = "380f0a69-a009-4c34-8496-9a43c2e069ba";
         public readonly string DefaultUserPassword = "Password1!";
 
         [Trait("Category", "Docker")]
@@ -75,7 +77,7 @@ namespace H2020.IPMDecisions.IDP.Tests
 
         private void Seed()
         {
-            if (!_databaseInitialized)
+            if (!IsDatabaseInitialized)
             {
                 using (_context)
                 {
@@ -135,10 +137,10 @@ namespace H2020.IPMDecisions.IDP.Tests
                     var adminUser = new ApplicationUser()
                     {
                         Id = "380f0a69-a009-4c34-8496-9a43c2e069be",
-                        UserName = "admin@test.com",
-                        NormalizedUserName = "ADMIN@TEST.COM",
-                        Email = "admin@test.com",
-                        NormalizedEmail = "ADMIN@TEST.COM",
+                        UserName = DefaultAdminUserEmail,
+                        NormalizedUserName = DefaultAdminUserEmail.ToUpper(),
+                        Email = DefaultAdminUserEmail,
+                        NormalizedEmail = DefaultAdminUserEmail.ToUpper(),
                         EmailConfirmed = false,
                         PasswordHash = "AQAAAAEAACcQAAAAEJfYkkq/P/d3+GZjsDeGS4HCjukw0vJNN9fg0mdDBzVbKEdNCHMc8bTtUyo/UGVsSw==",
                         SecurityStamp = "KYK2EHHFUNXK62Z7E7H7BNCAABMUL5PE",
@@ -154,10 +156,10 @@ namespace H2020.IPMDecisions.IDP.Tests
                     var normalUser = new ApplicationUser()
                     {
                         Id = "380f0a69-a009-4c34-8496-9a43c2e069ba",
-                        UserName = "user@test.com",
-                        NormalizedUserName = "USER@TEST.COM",
-                        Email = "user@test.com",
-                        NormalizedEmail = "USER@TEST.COM",
+                        UserName = DefaultNormalUserEmail,
+                        NormalizedUserName = DefaultNormalUserEmail.ToUpper(),
+                        Email = DefaultNormalUserEmail,
+                        NormalizedEmail = DefaultNormalUserEmail.ToUpper(),
                         EmailConfirmed = false,
                         PasswordHash = "AQAAAAEAACcQAAAAEJfYkkq/P/d3+GZjsDeGS4HCjukw0vJNN9fg0mdDBzVbKEdNCHMc8bTtUyo/UGVsSw==",
                         SecurityStamp = "KYK2EHHFUNXK62Z7E7H7BNCAABMUL5PE",
@@ -170,6 +172,25 @@ namespace H2020.IPMDecisions.IDP.Tests
                     };
                     _context.Users.Add(normalUser);
 
+                    var failEmailUser = new ApplicationUser()
+                    {
+                        Id = "380f0a69-a009-4c34-8496-9a43c2e069bc",
+                        UserName = DefaultFailEmailUserEmail,
+                        NormalizedUserName = DefaultFailEmailUserEmail.ToUpper(),
+                        Email = DefaultFailEmailUserEmail,
+                        NormalizedEmail = DefaultFailEmailUserEmail.ToUpper(),
+                        EmailConfirmed = false,
+                        PasswordHash = "AQAAAAEAACcQAAAAEJfYkkq/P/d3+GZjsDeGS4HCjukw0vJNN9fg0mdDBzVbKEdNCHMc8bTtUyo/UGVsSw==",
+                        SecurityStamp = "KYK2EHHFUNXK62Z7E7H7BNCAABMUL5PE",
+                        ConcurrencyStamp = "963515b9-8e57-4a9c-9286-d86dcf9e5fa2",
+                        PhoneNumber = null,
+                        PhoneNumberConfirmed = false,
+                        LockoutEnd = null,
+                        LockoutEnabled = true,
+                        AccessFailedCount = 0
+                    };
+                    _context.Users.Add(failEmailUser);
+
                     var userRoleAdmin = new IdentityUserRole<string>(){
                         UserId = "380f0a69-a009-4c34-8496-9a43c2e069be",
                         RoleId = "dd2f7616-65b7-4456-a6dd-37b25a2c050d"
@@ -179,8 +200,7 @@ namespace H2020.IPMDecisions.IDP.Tests
 
                     _context.SaveChanges();
                 }
-
-                _databaseInitialized = true;
+                IsDatabaseInitialized = true;
             }
         }
 

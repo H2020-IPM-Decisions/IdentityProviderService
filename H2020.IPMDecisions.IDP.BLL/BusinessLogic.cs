@@ -20,6 +20,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         private readonly IUrlHelper url;
         private readonly IConfiguration configuration;
         private readonly ILogger<BusinessLogic> logger;
+        private readonly IEmailProvider emailProvider;
         private readonly IPropertyMappingService propertyMappingService;
 
         public BusinessLogic(
@@ -32,7 +33,8 @@ namespace H2020.IPMDecisions.IDP.BLL
             IPropertyMappingService propertyMappingService,
             IUrlHelper url,
             IConfiguration configuration,
-            ILogger<BusinessLogic> logger)
+            ILogger<BusinessLogic> logger,
+            IEmailProvider emailProvider)
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
@@ -54,6 +56,8 @@ namespace H2020.IPMDecisions.IDP.BLL
                 ?? throw new ArgumentNullException(nameof(configuration));
             this.logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
+            this.emailProvider = emailProvider
+                ?? throw new ArgumentNullException(nameof(emailProvider));
         }        
     }
 }

@@ -1,5 +1,6 @@
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
+using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Profiles;
@@ -9,7 +10,6 @@ using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -43,6 +43,7 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.ConfigureIdentity();
             services.ConfigureJwtAuthentication(Configuration);
+            services.ConfigureEmailService(Configuration);
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
@@ -55,6 +56,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IJWTProvider, JWTProvider>();
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
             services.AddScoped<IBusinessLogic, BusinessLogic>();
+            services.AddScoped<UserAccessingOwnDataActionFilter>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(serviceProvider =>

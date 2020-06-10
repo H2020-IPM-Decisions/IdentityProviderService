@@ -354,3 +354,5 @@ MigrationBackup/
 H2020.IPMDecisions.IDP.API/appsettings.json
 Docker/docker-compose.local.yml
 Docker/docker-compose.develop.yml
+Docker/docker-compose-sql.yml
+H2020.IPMDecisions.IDP.API/ss_NLogConfigs/local_nlog.config
