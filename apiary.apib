@@ -43,7 +43,7 @@ This request allows you to check if the API is working and some valid requests.
     + Attributes (array[LinkDto])
 
     
-# Group Authorization
+# Group Accounts
 
 ## Register  [/api/accounts/register]
 
@@ -63,11 +63,78 @@ Use this request to register/create a new user into the database. This request i
 
         Succes
     
-    + Attributes (UserDto)
+    + Attributes (UserRegistrationReturnDto)
 
 + Response 400
 
-        Bad Request 
+        Bad Request
+
+## Confirm Email  [/api/accounts/confirmemail{?userId,token}]
+
+### Confirm Email from New User [GET]
+
+Use this request to confirm user email. This request is anonymous.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
++ Parameters
+
+    + userId (boolean, required, `123456`)
+
+    + token (string, required, `abcd1234`)
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
+
+## Passwords  [/api/accounts]
+
+### Forgot Password [POST /api/accounts/forgotpassword]
+
+Use this request to send an email to the user with a reset password token. This request is anonymous.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+
+    + Attributes (UserEmailDto)
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
+
+### Reset Password [POST /api/accounts/resetpassword]
+
+Use this request to change the password from an user. This request is anonymous.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+
+    + Attributes (ResetPasswordDto)
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
             
 ## Authenticatation [/api/accounts/authenticate]
 
@@ -1144,6 +1211,12 @@ This request allows you to know if the endpoint is correct and is working.
     + `previous_page`
 + `method` (string)
 
+## ResetPasswordDto (object)
+### Properties
++ `email` (string, required) 
++ `password` (string, required) 
++ `token` (string, required)
+
 ## RoleDto (object)
 ### Properties
 + `id` (string) 
@@ -1185,6 +1258,10 @@ This request allows you to know if the endpoint is correct and is working.
 ## UserDto (object)
 ### Properties
 + `id` (string) 
++ `email` (string)
+
+## UserEmailDto (object)
+### Properties
 + `email` (string) 
 
 ## UserForAuthenticationDto (object)
@@ -1197,6 +1274,12 @@ This request allows you to know if the endpoint is correct and is working.
 + `userType` (string, optional, nullable) 
 + `email`: myemail@test.com (string, required) 
 + `password`: Password1! (string, required) - Min 6 characters , requires a digit, lowecase, uppercase and special character
+
+## UserRegistrationReturnDto (object)
+### Properties
++ `id` (string)
++ `email` (string)
++ `emailSentDuringRegistration` (boolean)
 
 ## UserWithRolesClaimsDto (object)
 ### Properties
