@@ -79,14 +79,11 @@ namespace H2020.IPMDecisions.IDP.BLL
                     var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");                    
                     var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
                     var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmail);
-
+                    
+                    var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
                     if (!emailSent)
-                    {
-                        //ToDo Log Error or send notification to Admin to check problem
-                        return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Email send failed");
-                    }                       
-
-                    var userToReturn = this.mapper.Map<UserDto>(identityUser);
+                        userToReturn.EmailSentDuringRegistration = false;
+                                           
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
                 }
