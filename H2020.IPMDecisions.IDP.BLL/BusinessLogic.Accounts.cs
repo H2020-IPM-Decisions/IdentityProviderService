@@ -35,7 +35,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - ForgotPassword. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -59,7 +59,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - ResetPassword. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
             }
         }
@@ -205,7 +205,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                //TODO: log error
+                logger.LogError(string.Format("Error in BLL - ConfirmEmail. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<IdentityResult>(null, ex.Message.ToString());
             }
         }

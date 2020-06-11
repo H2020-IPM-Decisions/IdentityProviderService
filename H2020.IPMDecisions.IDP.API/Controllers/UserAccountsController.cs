@@ -38,18 +38,17 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> ChangePassword([FromRoute] Guid userId,[FromBody] ChangePasswordDto changePassword)
         {
             var response = await businessLogic.ChangePassword(userId, changePassword);
-            if (!response.IsSuccessful)
-            {
-                var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
-                if (responseAsIdentityResult.Result == null && !string.IsNullOrEmpty(responseAsIdentityResult.ErrorMessage))
-                    return BadRequest(new { message = response.ErrorMessage });
-                if (responseAsIdentityResult.Result == null)
-                    return NotFound();
+            
+            if (response.IsSuccessful)
+                return Ok();
 
-                return BadRequest(responseAsIdentityResult.Result);                
-            }
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null && !string.IsNullOrEmpty(responseAsIdentityResult.ErrorMessage))
+                return BadRequest(new { message = response.ErrorMessage });
+            if (responseAsIdentityResult.Result == null)
+                return NotFound();
 
-            return Ok();
+            return BadRequest(responseAsIdentityResult.Result);
         }       
 
         [ProducesResponseType(StatusCodes.Status200OK)]

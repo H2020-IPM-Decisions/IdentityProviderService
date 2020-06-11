@@ -47,9 +47,9 @@ This request allows you to check if the API is working and some valid requests.
     
 # Group Accounts
 
-## Register  [/api/accounts/register]
+## Registration  [/api/accounts/register]
 
-### Register a New User [POST]
+### Register a New User [POST /api/accounts/register]
 
 Use this request to register/create a new user into the database. This request is anonymous. If `User Type` is ommited, a default value defined on the configuration file will be added.
 
@@ -71,9 +71,7 @@ Use this request to register/create a new user into the database. This request i
 
         Bad Request
 
-## Confirm Email  [/api/accounts/confirmemail{?userId,token}]
-
-### Confirm Email from New User [GET]
+### Confirm Email from New User [GET /api/accounts/confirmemail{?userId,token}]
 
 Use this request to confirm user email. This request is anonymous.
 
@@ -84,7 +82,7 @@ Use this request to confirm user email. This request is anonymous.
             Accept: application/json
 + Parameters
 
-    + userId (boolean, required, `123456`)
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
 
     + token (string, required, `abcd1234`)
 
@@ -120,7 +118,7 @@ Use this request to send an email to the user with a reset password token. This 
 
 ### Reset Password [POST /api/accounts/resetpassword]
 
-Use this request to change the password from an user. This request is anonymous.
+Use this request to reset the password from an user. This request is anonymous.
 
 + Request (application/json)
 
@@ -137,6 +135,35 @@ Use this request to change the password from an user. This request is anonymous.
 + Response 400
 
         Bad Request
+
+### Change Password [POST /api/user/{userId}/accounts/changepassword]
+
+Use this request to change the password from an user. User needs JWT to do this request.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+            Authorization: Bearer JWT
+
+    + Attributes (ChangePasswordDto)
+
++ Parameters
+
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
+
++ Response 404
+
+        Not Found
             
 ## Authenticatation [/api/accounts/authenticate]
 
@@ -720,7 +747,7 @@ This request allows you to know if the endpoint is correct and is working.
 
 # Group UserClaims
 
-## User Claims [/api/{userid}/claims]
+## User Claims [/api/{userId}/claims]
 
 ### Get Claims From User [GET] 
 
@@ -732,7 +759,7 @@ This request allows you to know if the endpoint is correct and is working.
             
 + Parameters
 
-    + userid (string, required)
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
     
 + Response 200 (application/json)
 
@@ -768,8 +795,8 @@ This request allows you to know if the endpoint is correct and is working.
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+ 
 + Response 200 (application/json)
 
         Success
@@ -804,8 +831,8 @@ This request allows you to know if the endpoint is correct and is working.
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+  
 + Response 200 (application/json)
 
         Success
@@ -854,7 +881,7 @@ This request allows you to know what type of methods are allowed in this endpoin
         
 # Group UserRoles
 
-## User Roles [/api/{userid}/roles]
+## User Roles [/api/{userId}/roles]
 
 ### Get Roles From User [GET] 
 
@@ -866,8 +893,8 @@ This request allows you to know what type of methods are allowed in this endpoin
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+
 + Response 200 (application/json)
 
         Success
@@ -902,7 +929,7 @@ This request allows you to know what type of methods are allowed in this endpoin
             
 + Parameters
 
-    + userid (string, required)
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
     
 + Response 200 (application/json)
 
@@ -938,8 +965,8 @@ This request allows you to know what type of methods are allowed in this endpoin
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+
 + Response 200 (application/json)
 
         Success
@@ -1172,6 +1199,11 @@ This request allows you to know if the endpoint is correct and is working.
 + `enabled` (boolean, required) 
 + `refreshTokenLifeTime` (number, required) 
 + `jwtAudienceCategory` (string, required)
+
+## ChangePasswordDto (object)
+### Properties
++ `currentPassword` : Password1! (string, required)
++ `newPassword` : NewPassword1! (string, required) - Min 6 characters , requires a digit, lowecase, uppercase and special character
 
 ## Claim (object)
 ### Properties
