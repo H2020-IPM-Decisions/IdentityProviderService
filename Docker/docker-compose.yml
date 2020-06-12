@@ -51,6 +51,7 @@ services:
             - JwtSettings:IssuerServerUrl=AddYourServer
             - IPMEmailMicroservice:ApiGatewayAddress=whereApiGatewayIsHosted
             - IPMEmailMicroservice:EmailMicroservice=api/eml/ # Reroute of API Gateway to microservice
+            - IPMEmailMicroservice:ContentTypeHeader:application/vnd.h2020ipmdecisions.email+json
             - IPMEmailMicroservice:SecurityTokenCustomHeader=ipm-eml-auth # Same as EML service
             - IPMEmailMicroservice:SecurityToken=1234 # Same as EML service
             # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
@@ -63,10 +64,6 @@ services:
             # - ASPNETCORE_HTTPS_PORT=443
             # - ASPNETCORE_Kestrel__Certificates__Default__Password=YourCertificatePassword
             # - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/YourCertificate.pfx
-            - IPMEmailMicroservice:ApiGatewayAddress=whereApiGatewayIsHosted
-            - IPMEmailMicroservice:EmailMicroservice=api/eml/ 
-            - IPMEmailMicroservice:SecurityTokenCustomHeader=ipm-eml-auth
-            - IPMEmailMicroservice:SecurityToken=1234
             - NLog:targets:logfile:fileName=./logs/imp-decisions-IDP-$${shortdate}.log
             - NLog:rules:logfile:minLevel=Info
             - UIPageAddresses:ResetPasswordFormPageAddress=https://fakewebsite.com"
