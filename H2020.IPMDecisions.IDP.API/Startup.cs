@@ -1,5 +1,6 @@
 using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
+using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Profiles;
@@ -9,7 +10,6 @@ using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -43,17 +43,20 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.ConfigureIdentity();
             services.ConfigureJwtAuthentication(Configuration);
+            services.ConfigureEmailService(Configuration);
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
 
             services.AddAutoMapper(typeof(MainProfile));
-
+            
+            services.ConfigureLogger(Configuration);
             services.AddScoped<IDataService, DataService>();
             services.AddTransient<IAuthenticationProvider, AuthenticationProvider>();
             services.AddTransient<IJWTProvider, JWTProvider>();
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
             services.AddScoped<IBusinessLogic, BusinessLogic>();
+            services.AddScoped<UserAccessingOwnDataActionFilter>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(serviceProvider =>
@@ -69,7 +72,10 @@ namespace H2020.IPMDecisions.IDP.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(
+            IApplicationBuilder app, 
+            IWebHostEnvironment env,
+            IHostApplicationLifetime applicationLifetime)
         {
             if (CurrentEnvironment.IsDevelopment())
             {
@@ -92,7 +98,7 @@ namespace H2020.IPMDecisions.IDP.API
                     });
                 });
             }
-            
+
             app.UseCors("IdentityProviderCORS");
             app.UseRouting();
             app.UseAuthentication();
@@ -108,6 +114,12 @@ namespace H2020.IPMDecisions.IDP.API
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "H2020 IPM Decisions - Identity Provider API");
             });
+
+            applicationLifetime.ApplicationStopping.Register(OnShutdown);
+        }
+        private void OnShutdown()
+        {
+            NLog.LogManager.Shutdown();
         }
     }
 }

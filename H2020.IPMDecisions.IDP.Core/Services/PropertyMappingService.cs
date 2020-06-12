@@ -13,7 +13,7 @@ namespace H2020.IPMDecisions.IDP.Core.Services
             new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
             {
                 { "Name", new PropertyMappingValue(new List<string>() { "Name" })},
-                { "Url", new PropertyMappingValue(new List<string>() { "Url" })}
+                { "JWTAudienceCategory", new PropertyMappingValue(new List<string>() { "JWTAudienceCategory" })}
             };
 
         private Dictionary<string, PropertyMappingValue> _applicationUserMappingService =

@@ -27,7 +27,6 @@ namespace H2020.IPMDecisions.IDP.Tests
                    .UseConfiguration(configuration);
               })
               .StartAsync();
-            
         }
 
         public async Task DisposeAsync()

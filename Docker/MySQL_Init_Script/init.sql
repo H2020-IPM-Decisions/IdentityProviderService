@@ -48,14 +48,14 @@ CREATE TABLE `ApplicationClient` (
   `Enabled` tinyint(1) NOT NULL,
   `RefreshTokenLifeTime` int NOT NULL,
   `Id` char(36) NOT NULL,
-  `Url` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+  `JWTAudienceCategory` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `ApplicationClient`
 --
 
-INSERT INTO `ApplicationClient` (`Base64Secret`, `Name`, `ApplicationClientType`, `Enabled`, `RefreshTokenLifeTime`, `Id`, `Url`) VALUES
+INSERT INTO `ApplicationClient` (`Base64Secret`, `Name`, `ApplicationClientType`, `Enabled`, `RefreshTokenLifeTime`, `Id`, `JWTAudienceCategory`) VALUES
 ('VdzZzA3lxu-P4krX0n8APfISzujFFKAGn6pbGCd3so8', 'My Test Client', 0, 1, 90, '08d7aa5b-e23c-496e-8946-6d8af6b98dd6', 'https://testclient.com');
 
 -- --------------------------------------------------------

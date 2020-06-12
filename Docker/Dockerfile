@@ -16,6 +16,7 @@ EXPOSE ${URL_EXPOSE_PORT_HTTPS}
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["H2020.IPMDecisions.IDP.API/H2020.IPMDecisions.IDP.API.csproj", "H2020.IPMDecisions.IDP.API/"]
+COPY ["H2020.IPMDecisions.IDP.API/appsettingsTemplate.json", "H2020.IPMDecisions.IDP.API/appsettings.json"]
 RUN dotnet restore "H2020.IPMDecisions.IDP.API/H2020.IPMDecisions.IDP.API.csproj"
 
 COPY . .
@@ -35,17 +36,5 @@ ARG URL_PORT_HTTPS=443
 
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-# Uncomment if you have SSL Certificate
-#ENV ASPNETCORE_URLS=https://*:${URL_PORT_HTTPS};http://*:${URL_PORT}
-ENV ASPNETCORE_URLS=http://*:${URL_PORT}
-ENV ConnectionStrings:MySqlDbConnection=""
-ENV JwtSettings:TokenLifetimeMinutes="80"
-ENV JwtSettings:SecretKey=""
-ENV JwtSettings:IssuerServerUrl=""
-ENV JwtSettings:ValidAudiencesUrls=""
-ENV AllowedHosts="*"
-ENV AccessClaims:ClaimTypeName="UserAccessType"
-ENV AccessClaims:DefaultUserAccessLevel="Level0"
 
 ENTRYPOINT ["dotnet", "H2020.IPMDecisions.IDP.API.dll"]

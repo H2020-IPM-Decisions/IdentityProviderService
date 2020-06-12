@@ -4,7 +4,7 @@ APS.NET Core service in charge to authenticate and authorise users and clients t
 
 ## Branch structure
 
-The project development will follow [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/) branching model where active development will happen in the develop branch. Master branch will only have release ans stable versions of the service.
+The project development will follow [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/) branching model where active development will happen in the develop branch. Master branch will only have release and stable versions of the service.
 
 ## Getting Started
 
@@ -74,7 +74,7 @@ Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json sect
 1. TokenLifetimeMinutes: Valid lifetime of the JWT in minutes.
 2. SecretKey: This parameter holds a secret key to sign the JWT. Your resource API should have the same secret in the JWT properties.
 3. IssuerServerUrl: This parameter holds who is issuing the certificate, usually will be this server. Your resource API should have the same issuer url in the JWT properties.
-4. ValidAudiencesUrls: This parameter holds which clients URLs can use this IDP service. The different URLS should be separated by a semicolon **";"**. At least one of the client URL should be added into your resource API JWT properties.
+4. ValidAudiences: This parameter holds which clients URLs can use this IDP service. The different URLS should be separated by a semicolon **";"**. At least one of the client URL should be added into your resource API JWT properties.
 
 ### How to run the project
 
@@ -114,21 +114,39 @@ The following commands assumes that you are in the root directory of the applica
 * The container created will be called `IDP` and will be running in the port `8086`
 * The command bellow assumes that the URL port `H2020.IPMDecisions.IDP.API\Properties\launchSettings.json` is 5000
 ```Console
-docker build . --rm --pull -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg BUILDER_VERSION=latest 
+docker build . --rm --pull --no-cache  -f ".\Docker\Dockerfile" -t "ipmdecisions/identityproviderservice:latest" --build-arg BUILDER_VERSION=latest 
 
-docker run  -d -p 443:443/tcp -p 8086:5000/tcp --name IDP ipmdecisions/identityproviderservice:latest 
+docker run  -d -v ./app/logs:/app/logs -p 443:443/tcp -p 8086:5000/tcp --name IDP ipmdecisions/identityproviderservice:latest 
 ```
 Now you should be able to user your API in the docker container. Try to navigate to: `http://localhost/swagger/index.html`
+
+Please note that log files will be output to the `/app/logs` directory in your container. The log files will record when the application starts up and when exceptions occur.
 
 ## Deployment with Docker Compose
 
 You can deploy the Identity Provider Service API, including a MySQL database with test data and a phpMyAdmin UI to manage the database, using a docker compose.
-A file called `docker-compose.yml` is located in the following folder `Docker` locate in the root of the project. 
-To run the following command:
+
 
 ```console
 docker-compose -f "./Docker/Docker-compose.yml" up -d
 ```
+
+Logging is by means of ELK stack using Filebeat to harvest with log files being transfered into Elasticsearch through Logstash.
+
+Once docker compose has completed in the console, please run the following commands manually in the console (which set up configuration for filebeat and elk). Please observe that file `filebeat.yml` will require editing before being copied, please edit the IP address in the file to match your docker host.
+
+```console
+docker cp ./Docker/ELK/logstash-conf/beats-input.conf  elkstack:/etc/logstash/conf.d/beats-input.conf
+docker cp ./Docker/Filebeat/filebeat.yml filebeat:/usr/share/filebeat
+```
+
+Please ensure you docker contain virtual memory for containers is set to 2GB. You can use the following Powershell command:
+
+docker-machine ssh
+sudo sysctl -w vm.max_map_count=262144
+exit
+
+Then stop and restart the containers `ELKstack` and `Filebeat`. 
 
 If no data have been modified in the `docker-compose.yml` the solution will be working in the URL `localhost:8086`, so you can check that the API works navigating to `http://localhost:8086/swagger/index.html`
 
@@ -136,6 +154,11 @@ The docker compose file will also load data into the database. Please read more 
 
 To help modifying the default data, a postman collection has been created with the calls needed. Also, please note that if a new Client is added into the database, this one will be needed added into the `H2020.IPMDecisions.IDP.API\appsettings.Development.json`. You can achieve this modifying the `docker-compose.yml` file and running `docker-compose up -d` again. 
 
+Once up and running, log files can be inspected using Kibana which can be accessed using the following URL `http://<your-host>:5601/app/kibana#/home` where `<your-host>` should be the IP address of your docker virtual machine. In Kibana please make sure that the drop-down "Time Filter field name" field is pre-populated with the value @timestamp, then click on "Create".  When logs have been generated you will be able to see them in Kinbana.
+
+For help using ELK stack you can refer to `https://elk-docker.readthedocs.io/`. 
+
+To simplify the ELK Stack implementation SSL has not been included in the ELK stack configuration. 
 
 ## Versioning
 

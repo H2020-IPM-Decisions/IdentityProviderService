@@ -18,11 +18,13 @@ Tokens will be provided by this service.
 ## API Version
 * Version: v1
 
-# Group Root
+# Group General Information
 
 This services has two main areas:
 * Authorization: This area of the API is on charge of the authentification and authorization of the users, so `Anonymous` requests are allowed.
 * Admin: This area of the API is on charge of the administration of the IDP, so only users with `Admin` privileges will be allowed to make requests.
+
+# Group Root
 
 ## Root [/api]
 
@@ -43,11 +45,11 @@ This request allows you to check if the API is working and some valid requests.
     + Attributes (array[LinkDto])
 
     
-# Group Authorization
+# Group Accounts
 
-## Register  [/api/accounts/register]
+## Registration  [/api/accounts/register]
 
-### Register a New User [POST]
+### Register a New User [POST /api/accounts/register]
 
 Use this request to register/create a new user into the database. This request is anonymous. If `User Type` is ommited, a default value defined on the configuration file will be added.
 
@@ -63,11 +65,105 @@ Use this request to register/create a new user into the database. This request i
 
         Succes
     
-    + Attributes (UserDto)
+    + Attributes (UserRegistrationReturnDto)
 
 + Response 400
 
-        Bad Request 
+        Bad Request
+
+### Confirm Email from New User [GET /api/accounts/confirmemail{?userId,token}]
+
+Use this request to confirm user email. This request is anonymous.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
++ Parameters
+
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+
+    + token (string, required, `abcd1234`)
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
+
+## Passwords  [/api/accounts]
+
+### Forgot Password [POST /api/accounts/forgotpassword]
+
+Use this request to send an email to the user with a reset password token. This request is anonymous.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+
+    + Attributes (UserEmailDto)
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
+
+### Reset Password [POST /api/accounts/resetpassword]
+
+Use this request to reset the password from an user. This request is anonymous.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+
+    + Attributes (ResetPasswordDto)
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
+
+### Change Password [POST /api/user/{userId}/accounts/changepassword]
+
+Use this request to change the password from an user. User needs JWT to do this request.
+
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/json
+            Authorization: Bearer JWT
+
+    + Attributes (ChangePasswordDto)
+
++ Parameters
+
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+
++ Response 200
+
+        Succes
+
++ Response 400
+
+        Bad Request
+
++ Response 404
+
+        Not Found
             
 ## Authenticatation [/api/accounts/authenticate]
 
@@ -149,9 +245,9 @@ Use the **Accept** header `application/vnd.h2020ipmdecisions.hateoas+json` to re
 
     + pageSize (number, optional, `5`) ... Default 10; Maximun 20
 
-    + orderBy (string, optional, `name desc`) ... name or url - add `desc` at the end for descending order 
+    + orderBy (string, optional, `name desc`) ... name or jwtAudienceCategory - add `desc` at the end for descending order 
 
-    + searchQuery (string, optional, `test`) ... Search against name and url properties
+    + searchQuery (string, optional, `test`) ... Search against name and jwtAudienceCategory properties
 
     + pageNumber (number, optional, `1`)
 
@@ -651,7 +747,7 @@ This request allows you to know if the endpoint is correct and is working.
 
 # Group UserClaims
 
-## User Claims [/api/{userid}/claims]
+## User Claims [/api/{userId}/claims]
 
 ### Get Claims From User [GET] 
 
@@ -663,7 +759,7 @@ This request allows you to know if the endpoint is correct and is working.
             
 + Parameters
 
-    + userid (string, required)
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
     
 + Response 200 (application/json)
 
@@ -699,8 +795,8 @@ This request allows you to know if the endpoint is correct and is working.
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+ 
 + Response 200 (application/json)
 
         Success
@@ -735,8 +831,8 @@ This request allows you to know if the endpoint is correct and is working.
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+  
 + Response 200 (application/json)
 
         Success
@@ -785,7 +881,7 @@ This request allows you to know what type of methods are allowed in this endpoin
         
 # Group UserRoles
 
-## User Roles [/api/{userid}/roles]
+## User Roles [/api/{userId}/roles]
 
 ### Get Roles From User [GET] 
 
@@ -797,8 +893,8 @@ This request allows you to know what type of methods are allowed in this endpoin
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+
 + Response 200 (application/json)
 
         Success
@@ -833,7 +929,7 @@ This request allows you to know what type of methods are allowed in this endpoin
             
 + Parameters
 
-    + userid (string, required)
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
     
 + Response 200 (application/json)
 
@@ -869,8 +965,8 @@ This request allows you to know what type of methods are allowed in this endpoin
             
 + Parameters
 
-    + userid (string, required)
-    
+    + userId (guid, required, `08ff7052-2e95-11e3-a1fc-000c294eede0`) ... Unique User ID
+
 + Response 200 (application/json)
 
         Success
@@ -1092,7 +1188,7 @@ This request allows you to know if the endpoint is correct and is working.
     Confidential - Needs client secret to log in
 + `enabled` (boolean) 
 + `refreshTokenLifeTime` (number) 
-+ `url` (string) 
++ `jwtAudienceCategory` (string) 
 
 ## ApplicationClientForCreationDto (object)
 ### Properties
@@ -1102,7 +1198,12 @@ This request allows you to know if the endpoint is correct and is working.
     + `1` - Confidential - Needs client secret to log in
 + `enabled` (boolean, required) 
 + `refreshTokenLifeTime` (number, required) 
-+ `url` (string, required)
++ `jwtAudienceCategory` (string, required)
+
+## ChangePasswordDto (object)
+### Properties
++ `currentPassword` : Password1! (string, required)
++ `newPassword` : NewPassword1! (string, required) - Min 6 characters , requires a digit, lowecase, uppercase and special character
 
 ## Claim (object)
 ### Properties
@@ -1143,6 +1244,12 @@ This request allows you to know if the endpoint is correct and is working.
     + `next_page`
     + `previous_page`
 + `method` (string)
+
+## ResetPasswordDto (object)
+### Properties
++ `email` (string, required) 
++ `password` (string, required) 
++ `token` (string, required)
 
 ## RoleDto (object)
 ### Properties
@@ -1185,6 +1292,10 @@ This request allows you to know if the endpoint is correct and is working.
 ## UserDto (object)
 ### Properties
 + `id` (string) 
++ `email` (string)
+
+## UserEmailDto (object)
+### Properties
 + `email` (string) 
 
 ## UserForAuthenticationDto (object)
@@ -1197,6 +1308,12 @@ This request allows you to know if the endpoint is correct and is working.
 + `userType` (string, optional, nullable) 
 + `email`: myemail@test.com (string, required) 
 + `password`: Password1! (string, required) - Min 6 characters , requires a digit, lowecase, uppercase and special character
+
+## UserRegistrationReturnDto (object)
+### Properties
++ `id` (string)
++ `email` (string)
++ `emailSentDuringRegistration` (boolean)
 
 ## UserWithRolesClaimsDto (object)
 ### Properties

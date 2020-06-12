@@ -13,7 +13,7 @@ using Xunit;
 namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
 {
     [Trait("Category", "Docker")]
-    public class AccountsControllerTests : IClassFixture<FakeWebHostWithDb>
+    public class AccountsControllerTests : IClassFixture<FakeWebHostWithDb>, IClassFixture<FakeApiGatewayHost>
     {
         private FakeWebHostWithDb fakeWebHost;
         public AccountsControllerTests(FakeWebHostWithDb fakeWebHost)
@@ -22,7 +22,7 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async void Post_RegisterValidCall_Created()
+        public async void Post_RegisterValidCall_Ok()
         {
             // Arrange
             var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
@@ -44,11 +44,43 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
             // Act
             var response = await httpClient.PostAsync("api/accounts/register", content);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var responseDeserialized = JsonConvert.DeserializeObject<UserDto>(responseContent);
+            var responseDeserialized = JsonConvert.DeserializeObject<UserRegistrationReturnDto>(responseContent);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             responseDeserialized.Email.Should().Be(userEmail);
+            responseDeserialized.EmailSentDuringRegistration.Should().Be(true);
+        }
+
+        [Fact]
+        public async void Post_RegisterEmailServiceDown_OK()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            const string userEmail = "emailservicedown@test.com";
+            jsonObject.Add("email", userEmail);
+            jsonObject.Add("password", "Password1!");
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("api/accounts/register", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var responseDeserialized = JsonConvert.DeserializeObject<UserRegistrationReturnDto>(responseContent);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            responseDeserialized.Email.Should().Be(userEmail);
+            responseDeserialized.EmailSentDuringRegistration.Should().Be(false);
         }
 
         [Fact]
@@ -273,8 +305,86 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             responseContent.Should().Contain("Client is inactive");
-
         }
 
+        [Fact]
+        public async void PostForgotPassword_ValidCall_OK()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = fakeWebHost.DefaultNormalUserEmail.ToString();
+            jsonObject.Add("email", userEmail);           
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("api/accounts/ForgotPassword", content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async void PostForgotPassword_UserDoesntExist_Ok()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = "Idontexist@test.com";
+            jsonObject.Add("email", userEmail);           
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("api/accounts/ForgotPassword", content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async void PostForgotPassword_EmailServiceDown_BadRequest()
+        {
+            // Arrange
+            var httpClient = fakeWebHost.Host.GetTestServer().CreateClient();
+
+            httpClient
+              .DefaultRequestHeaders
+              .Accept
+              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var jsonObject = new System.Json.JsonObject();
+            string userEmail = fakeWebHost.DefaultFailEmailUserEmail.ToString();
+            jsonObject.Add("email", userEmail);
+            var content = new StringContent(
+                jsonObject.ToString(),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await httpClient.PostAsync("api/accounts/ForgotPassword", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            responseContent.Should().Contain("Email send failed");
+        }
     }
 }

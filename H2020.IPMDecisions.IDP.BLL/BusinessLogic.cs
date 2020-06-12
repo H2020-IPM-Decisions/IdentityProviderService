@@ -5,6 +5,7 @@ using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -18,6 +19,8 @@ namespace H2020.IPMDecisions.IDP.BLL
         private readonly IPropertyCheckerService propertyCheckerService;
         private readonly IUrlHelper url;
         private readonly IConfiguration configuration;
+        private readonly ILogger<BusinessLogic> logger;
+        private readonly IEmailProvider emailProvider;
         private readonly IPropertyMappingService propertyMappingService;
 
         public BusinessLogic(
@@ -29,7 +32,9 @@ namespace H2020.IPMDecisions.IDP.BLL
             IPropertyCheckerService propertyCheckerService,
             IPropertyMappingService propertyMappingService,
             IUrlHelper url,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<BusinessLogic> logger,
+            IEmailProvider emailProvider)
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
@@ -49,6 +54,10 @@ namespace H2020.IPMDecisions.IDP.BLL
                 ?? throw new ArgumentNullException(nameof(url));
             this.configuration = configuration 
                 ?? throw new ArgumentNullException(nameof(configuration));
+            this.logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
+            this.emailProvider = emailProvider
+                ?? throw new ArgumentNullException(nameof(emailProvider));
         }        
     }
 }

@@ -22,8 +22,41 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public AccountsController(
             IBusinessLogic businessLogic)
         {
-            this.businessLogic = businessLogic
-                ?? throw new ArgumentNullException(nameof(businessLogic));
+            this.businessLogic = businessLogic ??
+                throw new ArgumentNullException(nameof(businessLogic));
+        }
+
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("forgotpassword", Name = "ForgotPassword")]
+        // POST: api/Accounts/forgotpassword
+        public async Task<IActionResult> ForgotPassword(
+            [FromBody] UserEmailDto userEmailDto)
+        {
+            var response = await businessLogic.ForgotPassword(userEmailDto);
+
+            if (response.IsSuccessful)
+                return Ok();
+
+            return BadRequest(new { message = response.ErrorMessage });
+        }
+
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("resetpassword", Name = "ResetPassword")]
+        public async Task<IActionResult> ResetPassword(
+            [FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            var response = await businessLogic.ResetPassword(resetPasswordDto);
+
+            if (response.IsSuccessful)
+                return Ok();
+
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null) return BadRequest(new { message = response.ErrorMessage });
+            return BadRequest(responseAsIdentityResult.Result);
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
@@ -80,11 +113,28 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(new { message = tokenResponse.ErrorMessage });
         }
 
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpGet("confirmemail", Name = "ConfirmEmail")]
+        // GET: api/Accounts/ConfirmEmail
+        public async Task<IActionResult> ConfirmEmail([RequiredFromQuery] Guid userId, [RequiredFromQuery] string token)
+        {
+            var response = await businessLogic.ConfirmEmail(userId, token);
+
+            if (response.IsSuccessful)
+                return Ok();
+
+            var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
+            if (responseAsIdentityResult.Result == null) return BadRequest(new { message = response.ErrorMessage });
+            return BadRequest(responseAsIdentityResult.Result);
+        }
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         public IActionResult Options()
         {
-            Response.Headers.Add("Allow", "OPTIONS,POST");
+            Response.Headers.Add("Allow", "GET,OPTIONS,POST");
             return Ok();
         }
     }

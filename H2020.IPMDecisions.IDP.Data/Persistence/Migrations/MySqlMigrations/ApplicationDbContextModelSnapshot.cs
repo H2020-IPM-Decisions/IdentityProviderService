@@ -34,6 +34,10 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                     b.Property<bool>("Enabled")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("JWTAudience")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
@@ -41,10 +45,6 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
 
                     b.Property<int>("RefreshTokenLifeTime")
                         .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
 

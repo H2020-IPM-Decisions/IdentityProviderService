@@ -16,6 +16,9 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse> AddNewUser(UserForRegistrationDto user);
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(HttpRequest request);
+        Task<GenericResponse> ConfirmEmail(Guid userId, string token);
+        Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto);
+        Task<GenericResponse> ResetPassword(ResetPasswordDto resetPasswordDto);
         #endregion
 
         #region ApplicationClients Controller
@@ -41,6 +44,10 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse> DeleteRole(Guid id);
         Task<GenericResponse<IDictionary<string, object>>> GetRole(Guid id, string fields, string mediaType);
         Task<GenericResponse<IEnumerable<IDictionary<string, object>>>> GetRoles(string fields, string mediaType);
+        #endregion
+
+        #region UserAccounts Controller
+        Task<GenericResponse> ChangePassword(Guid userId, ChangePasswordDto changePasswordDto);
         #endregion
 
         #region UserClaims Controller

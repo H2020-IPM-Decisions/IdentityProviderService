@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.API.Filters;
+using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using NLog;
+using NLog.Extensions.Logging;
 
 namespace H2020.IPMDecisions.IDP.API.Extensions
 {
@@ -39,8 +42,8 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
         public static void ConfigureIdentity(this IServiceCollection services)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>()
-             .AddEntityFrameworkStores<ApplicationDbContext>()
-             .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -67,7 +70,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
         {
             var jwtSecretKey = config["JwtSettings:SecretKey"];
             var issuerServerUrl = config["JwtSettings:IssuerServerUrl"];
-            var audiencesServersUrl = Audiences(config["JwtSettings:ValidAudiencesUrls"]);
+            var audiencesServersUrl = Audiences(config["JwtSettings:ValidAudiences"]);
 
             services.AddAuthentication(options =>
             {
@@ -211,6 +214,20 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
                 options.HttpsPort = int.Parse(config["ASPNETCORE_HTTPS_PORT"]);
             });
+        }
+
+        public static void ConfigureLogger(this IServiceCollection services, IConfiguration config)
+        {
+            LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
+        }
+
+        public static void ConfigureEmailService(this IServiceCollection services, IConfiguration config)
+        {
+           services.AddHttpClient<IEmailProvider, EmailProvider>(client =>
+           {
+               client.BaseAddress = new Uri(config["IPMEmailMicroservice:ApiGatewayAddress"] + config["IPMEmailMicroservice:EmailMicroservice"]);
+               client.DefaultRequestHeaders.Add(config["IPMEmailMicroservice:SecurityTokenCustomHeader"], config["IPMEmailMicroservice:SecurityToken"]);
+           });
         }
 
         public static IEnumerable<string> Audiences(string audiences)
