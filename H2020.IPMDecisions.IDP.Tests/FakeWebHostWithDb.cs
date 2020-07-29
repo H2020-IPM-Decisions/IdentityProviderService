@@ -18,7 +18,6 @@ namespace H2020.IPMDecisions.IDP.Tests
     {
         public IHost Host;
         public bool IsDatabaseInitialized;
-        private string _connectionString;
         private ApplicationDbContext _context;
 
         public readonly Guid DefaultApplicationClientId = Guid.Parse("08d7aa5b-e23c-496e-8946-6d8af6b98dd6");
@@ -39,9 +38,9 @@ namespace H2020.IPMDecisions.IDP.Tests
               .Build();
 
             string _databaseName = Guid.NewGuid().ToString();
-            _connectionString = $"Server=127.0.0.1,3306;Database=H2020.IPMDecisions.IDP.{_databaseName};Uid=root;Pwd=secret;";
+            var connectionString = $"Server=127.0.0.1,3306;Database=H2020.IPMDecisions.IDP.{_databaseName};Uid=root;Pwd=secret;";
 
-            configuration["ConnectionStrings:MySqlDbConnection"] = _connectionString;
+            configuration["ConnectionStrings:MySqlDbConnection"] = connectionString;
 
             Host = await new HostBuilder()
               .ConfigureWebHost(webBuilder =>

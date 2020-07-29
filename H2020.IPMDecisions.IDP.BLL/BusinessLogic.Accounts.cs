@@ -187,7 +187,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             {
                 throw new Exception("AccessClaims section missing on appsettings.json file");
             }
-            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue));
+            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue.ToLower()));
         }
 
         public async Task<GenericResponse> ConfirmEmail(Guid userId, string token)
