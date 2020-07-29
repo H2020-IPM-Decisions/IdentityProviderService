@@ -1,3 +1,4 @@
+using System;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +20,11 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<ApplicationUser>().ToTable("User");
+            builder.Entity<ApplicationUser>()
+                .ToTable("User")
+                .Property(u => u.RegistrationDate)
+                .HasColumnType("timestamp")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
             builder.Entity<IdentityRole>().ToTable("Role");
             builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaim");
             builder.Entity<IdentityUserRole<string>>().ToTable("UserRole");

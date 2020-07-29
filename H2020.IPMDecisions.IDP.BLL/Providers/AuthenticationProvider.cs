@@ -98,11 +98,11 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
 
-            // if (!user.EmailConfirmed)
-            // {
-            //     response.ResponseMessage = "Email not confirmed";
-            //     return response;
-            // }
+            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddDays(1))
+            {
+                response.ResponseMessage = "Email not confirmed";
+                return response;
+            }
 
             var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
@@ -147,12 +147,11 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
 
-            // ToDo When Email confirmation available
-            // if (!user.EmailConfirmed)
-            // {
-            //     response.ResponseMessage = "Email not confirmed";
-            //     return response;
-            // }
+            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddDays(1))
+            {
+                response.ResponseMessage = "Email not confirmed";
+                return response;
+            }
 
             response.IsSuccessful = true;
             response.ResponseMessage = "";
