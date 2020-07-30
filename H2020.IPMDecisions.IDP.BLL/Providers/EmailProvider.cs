@@ -81,6 +81,33 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }           
         }
 
+        public async Task<bool> ResendConfirmationEmail(RegistrationEmail registrationEmail)
+        {
+            try
+            {
+                using (httpClient)
+                {
+                    StringContent content = CreateEmailJsonObject(registrationEmail);
+
+                    var emailResponse = await httpClient.PostAsync("accounts/ReConfirmEmail", content);
+
+                    if (!emailResponse.IsSuccessStatusCode)
+                    {
+                        var responseContent = await emailResponse.Content.ReadAsStringAsync();
+                        logger.LogWarning(string.Format("Error in Sending Re-ConfirmEmail. Reason: {0}. Response Content: {1}",
+                            emailResponse.ReasonPhrase, responseContent));
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in EmailProvider - Re-ConfirmEmail. {0}", ex.Message));
+                return false;
+            }
+        }
+
         private StringContent CreateEmailJsonObject(Email email)
         {
             try

@@ -130,6 +130,21 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(responseAsIdentityResult.Result);
         }
 
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("resendConfirmationEmail", Name = "api.accounts.post.resendconfirmationemail")]
+        //POST: api/Accounts/resendConfirmationEmail
+        public async Task<IActionResult> ResendConfirmationEmail([FromBody] UserEmailDto userEmail)
+        {
+            var response = await businessLogic.ResendConfirmationEmail(userEmail);
+
+            if (response.IsSuccessful)
+                return Ok();
+            
+            return BadRequest(new { message = response.ErrorMessage });
+        }
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
         public IActionResult Options()
