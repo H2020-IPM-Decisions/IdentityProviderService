@@ -7,6 +7,7 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -177,13 +178,8 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         private async Task AddInitialClaim(ApplicationUser userEntity, string userType)
         {
-            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
-            string userTypeClaimValue = !string.IsNullOrEmpty(userType) ? userType : this.configuration["AccessClaims:DefaultUserAccessLevel"];
-            if (userTypeClaim == null | userTypeClaimValue == null)
-            {
-                throw new Exception("AccessClaims section missing on appsettings.json file");
-            }
-            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue.ToLower()));
+            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];          
+            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userType.ToLower()));
         }
 
         public async Task<GenericResponse> ConfirmEmail(Guid userId, string token)

@@ -57,6 +57,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
             services.AddScoped<IBusinessLogic, BusinessLogic>();
             services.AddScoped<UserAccessingOwnDataActionFilter>();
+            services.AddScoped<IsValidUserClaimValueActionFilter>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(serviceProvider =>

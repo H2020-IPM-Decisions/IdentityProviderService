@@ -59,6 +59,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(responseAsIdentityResult.Result);
         }
 
+        [ServiceFilter(typeof(IsValidUserClaimValueActionFilter))]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
