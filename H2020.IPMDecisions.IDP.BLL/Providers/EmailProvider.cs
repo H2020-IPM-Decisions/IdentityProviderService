@@ -116,7 +116,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 jsonObject.Add("toAddress", email.ToAddress);
                 jsonObject.Add("callbackUrl", email.CallbackUrl.AbsoluteUri);
                 jsonObject.Add("token", email.Token);
-                var customContentType = config["IPMEmailMicroservice:ContentTypeHeader"];
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
 
                 var content = new StringContent(
                     jsonObject.ToString(),

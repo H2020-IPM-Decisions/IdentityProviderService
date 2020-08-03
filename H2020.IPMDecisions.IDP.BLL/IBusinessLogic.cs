@@ -66,5 +66,9 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType);
         Task<GenericResponse> DeleteUser(Guid id);
         #endregion
+
+        #region Internal Call Controller
+        Task<GenericResponse<string>> GetUserId(string userEmail);
+        #endregion
     }
 }
