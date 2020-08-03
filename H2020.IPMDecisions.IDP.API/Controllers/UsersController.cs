@@ -86,7 +86,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // DELETE: api/users/1
         public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
         {
-            var response = await businessLogic.DeleteRole(id);
+            var response = await businessLogic.DeleteUser(id);
 
             if (response.IsSuccessful)
             {
