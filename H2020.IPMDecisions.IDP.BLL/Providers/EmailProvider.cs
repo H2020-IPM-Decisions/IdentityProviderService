@@ -35,7 +35,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 {
                     StringContent content = CreateEmailJsonObject(registrationEmail);
 
-                    var emailResponse = await httpClient.PostAsync("accounts/registrationemail", content);
+                    var emailResponse = await httpClient.PostAsync("internal/registrationemail", content);
 
                     if (!emailResponse.IsSuccessStatusCode)
                     {
@@ -62,7 +62,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 {
                     StringContent content = CreateEmailJsonObject(forgotPasswordEmail);
 
-                    var emailResponse = await httpClient.PostAsync("accounts/forgotpassword", content);
+                    var emailResponse = await httpClient.PostAsync("internal/forgotpassword", content);
 
                     if (!emailResponse.IsSuccessStatusCode)
                     {
@@ -89,7 +89,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 {
                     StringContent content = CreateEmailJsonObject(registrationEmail);
 
-                    var emailResponse = await httpClient.PostAsync("accounts/ReConfirmEmail", content);
+                    var emailResponse = await httpClient.PostAsync("internal/ReConfirmEmail", content);
 
                     if (!emailResponse.IsSuccessStatusCode)
                     {
