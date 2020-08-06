@@ -179,7 +179,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         private async Task AddInitialClaim(ApplicationUser userEntity, string userType)
         {
             var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];          
-            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userType.ToLower()));
+            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim.ToLower(), userType.ToLower()));
         }
 
         public async Task<GenericResponse> ConfirmEmail(Guid userId, string token)
