@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace H2020.IPMDecisions.IDP.API.Filters
             var validClaims = this.configuration["AccessClaims:ValidUserAccessClaims"];
             var listOfValidClaims = validClaims.Split(';').ToList();
 
-            if (!listOfValidClaims.Any(str => str.Contains(userType)))
+            if (!listOfValidClaims.Any(str => str.Contains(userType, StringComparison.OrdinalIgnoreCase)))
             {
                 context.Result = new BadRequestObjectResult($"'{nameof(userType)}' should be one of the following values: '{validClaims}'");
                 return;
