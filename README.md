@@ -50,7 +50,12 @@ dotnet build
 
 ### How to connect and start the database
 
+Run command to start database on Docker:
+
+```console
 'docker run -p 3306:3306 --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:8.0.19'
+```
+
 Open file `H2020.IPMDecisions.IDP.API\appsettings.json` and change the json object `ConnectionStrings\MySqlDbConnection` with your MySql instance.
 The following command will create a database and add all the tables necessary to run the solution.
 The instructions assume that you are in the **API project** of the repository.

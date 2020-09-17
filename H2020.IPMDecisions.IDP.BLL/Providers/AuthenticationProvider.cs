@@ -8,6 +8,7 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
@@ -15,15 +16,19 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
     {
         private readonly IDataService dataService;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly IConfiguration config;
 
         public AuthenticationProvider(
             IDataService dataService,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IConfiguration config)
         {
             this.signInManager = signInManager
-                ?? throw new ArgumentNullException(nameof(signInManager));
+                ?? throw new ArgumentNullException(nameof(signInManager));            
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
+            this.config = config
+                ?? throw new ArgumentNullException(nameof(config));
         }
 
         public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
@@ -81,7 +86,8 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             return response;
         }
 
-        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(UserForAuthenticationDto userDto)
+        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(
+            UserForAuthenticationDto userDto)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -98,7 +104,8 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
 
-            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddDays(1))
+            var registrationTime = double.Parse(config["EmailConfirmationAllowanceHours"]);
+            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
             {
                 response.ResponseMessage = "Email not confirmed";
                 return response;
@@ -147,7 +154,8 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
 
-            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddDays(1))
+            var registrationTime = double.Parse(config["EmailConfirmationAllowanceHours"]);
+            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
             {
                 response.ResponseMessage = "Email not confirmed";
                 return response;
