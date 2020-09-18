@@ -43,7 +43,7 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.ConfigureIdentity();
             services.ConfigureJwtAuthentication(Configuration);
-            services.ConfigureEmailService(Configuration);
+            services.ConfigureInternalCommunicationHttpService(Configuration);
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();

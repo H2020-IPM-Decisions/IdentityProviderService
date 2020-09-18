@@ -27,7 +27,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
                 var emailObject = GenerateEmailLink(identityUser, configKey, token, "email");
                 var passwordEmail = this.mapper.Map<ForgotPasswordEmail>(emailObject);
-                var emailSent = await this.emailProvider.SendForgotPasswordEmail(passwordEmail);
+                var emailSent = await this.internalCommunicationProvider.SendForgotPasswordEmail(passwordEmail);
 
                 if (!emailSent)
                     return GenericResponseBuilder.NoSuccess("Email send failed");
@@ -76,11 +76,14 @@ namespace H2020.IPMDecisions.IDP.BLL
                 {
                     await AddInitialClaim(identityUser, user.UserType);
                     RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
-                    var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmail);
+                    var emailSent = await this.internalCommunicationProvider.SendRegistrationEmail(registrationEmail);
+                    var profileCreated = await this.internalCommunicationProvider.CreateUserProfileAsync(identityUser);
 
                     var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
                     if (!emailSent)
                         userToReturn.EmailSentDuringRegistration = false;
+                    if (!profileCreated)
+                        userToReturn.ProfileCreatedDuringRegistration = false;
 
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
@@ -210,7 +213,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 if (identityUser == null)
                     return GenericResponseBuilder.Success();
                 RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
-                var emailSent = await this.emailProvider.ResendConfirmationEmail(registrationEmail);
+                var emailSent = await this.internalCommunicationProvider.ResendConfirmationEmail(registrationEmail);
 
                 if (!emailSent)
                     return GenericResponseBuilder.NoSuccess("Error resending confirmation email");
