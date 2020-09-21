@@ -133,6 +133,22 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
+        public async Task<GenericResponse<string>> GetUserId(string userEmail)
+        {
+            try
+            {
+                var user = await this.dataService.UserManager.FindByEmailAsync(userEmail);
+                if (user == null) return GenericResponseBuilder.NoSuccess<string>(null, "Not found");
+
+                return GenericResponseBuilder.Success(user.Id);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in BLL - DeleteUser. {0}", ex.Message));
+                return GenericResponseBuilder.NoSuccess<string>(null, ex.Message.ToString());
+            }
+        }
+
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(
             Guid id,

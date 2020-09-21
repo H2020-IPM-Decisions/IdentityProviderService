@@ -52,10 +52,10 @@ services:
             # The following Audience URL is in line 56 in the MySQL_Init_Script/init.sql
             - JwtSettings:ValidAudiences=https://testclient.com
             - AllowedHosts=*
-            - IPMEmailMicroservice:ApiGatewayAddress=whereApiGatewayIsHosted
-            - IPMEmailMicroservice:EmailMicroservice=api/eml/ 
-            - IPMEmailMicroservice:SecurityTokenCustomHeader=ipm-eml-auth
-            - IPMEmailMicroservice:SecurityToken=1234
+            - MicroserviceInternalCommunication:ApiGatewayAddress=whereApiGatewayIsHosted
+            - MicroserviceInternalCommunication:EmailMicroservice=api/eml/ 
+            - MicroserviceInternalCommunication:SecurityTokenCustomHeader=ipm-eml-auth
+            - MicroserviceInternalCommunication:SecurityToken=1234
             - NLog:targets:logfile:fileName=./logs/imp-decisions-IDP-$${shortdate}.log
             - NLog:rules:logfile:minLevel=Info
         volumes:

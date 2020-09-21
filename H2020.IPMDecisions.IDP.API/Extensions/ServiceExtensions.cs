@@ -221,12 +221,12 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
         }
 
-        public static void ConfigureEmailService(this IServiceCollection services, IConfiguration config)
+        public static void ConfigureInternalCommunicationHttpService(this IServiceCollection services, IConfiguration config)
         {
-           services.AddHttpClient<IEmailProvider, EmailProvider>(client =>
+           services.AddHttpClient<IMicroservicesInternalCommunicationHttpProvider, MicroservicesInternalCommunicationHttpProvider>(client =>
            {
-               client.BaseAddress = new Uri(config["IPMEmailMicroservice:ApiGatewayAddress"] + config["IPMEmailMicroservice:EmailMicroservice"]);
-               client.DefaultRequestHeaders.Add(config["IPMEmailMicroservice:SecurityTokenCustomHeader"], config["IPMEmailMicroservice:SecurityToken"]);
+               client.BaseAddress = new Uri(config["MicroserviceInternalCommunication:ApiGatewayAddress"]);
+               client.DefaultRequestHeaders.Add(config["MicroserviceInternalCommunication:SecurityTokenCustomHeader"], config["MicroserviceInternalCommunication:SecurityToken"]);
            });
         }
 

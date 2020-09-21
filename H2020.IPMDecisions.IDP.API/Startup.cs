@@ -43,7 +43,7 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.ConfigureIdentity();
             services.ConfigureJwtAuthentication(Configuration);
-            services.ConfigureEmailService(Configuration);
+            services.ConfigureInternalCommunicationHttpService(Configuration);
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
@@ -57,6 +57,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
             services.AddScoped<IBusinessLogic, BusinessLogic>();
             services.AddScoped<UserAccessingOwnDataActionFilter>();
+            services.AddScoped<IsValidUserClaimValueActionFilter>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(serviceProvider =>

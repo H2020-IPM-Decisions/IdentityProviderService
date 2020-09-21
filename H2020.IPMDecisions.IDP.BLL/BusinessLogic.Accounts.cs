@@ -7,6 +7,7 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -26,7 +27,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
                 var emailObject = GenerateEmailLink(identityUser, configKey, token, "email");
                 var passwordEmail = this.mapper.Map<ForgotPasswordEmail>(emailObject);
-                var emailSent = await this.emailProvider.SendForgotPasswordEmail(passwordEmail);
+                var emailSent = await this.internalCommunicationProvider.SendForgotPasswordEmail(passwordEmail);
 
                 if (!emailSent)
                     return GenericResponseBuilder.NoSuccess("Email send failed");
@@ -74,17 +75,16 @@ namespace H2020.IPMDecisions.IDP.BLL
                 if (identityResult.Succeeded)
                 {
                     await AddInitialClaim(identityUser, user.UserType);
+                    RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
+                    var emailSent = await this.internalCommunicationProvider.SendRegistrationEmail(registrationEmail);
+                    var profileCreated = await this.internalCommunicationProvider.CreateUserProfileAsync(identityUser);
 
-                    var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(identityUser);
-                    var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
-                    var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");                    
-                    var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
-                    var emailSent = await this.emailProvider.SendRegistrationEmail(registrationEmail);
-                    
                     var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
                     if (!emailSent)
                         userToReturn.EmailSentDuringRegistration = false;
-                                           
+                    if (!profileCreated)
+                        userToReturn.ProfileCreatedDuringRegistration = false;
+
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
                 }
@@ -181,13 +181,8 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         private async Task AddInitialClaim(ApplicationUser userEntity, string userType)
         {
-            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
-            string userTypeClaimValue = !string.IsNullOrEmpty(userType) ? userType : this.configuration["AccessClaims:DefaultUserAccessLevel"];
-            if (userTypeClaim == null | userTypeClaimValue == null)
-            {
-                throw new Exception("AccessClaims section missing on appsettings.json file");
-            }
-            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim, userTypeClaimValue));
+            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];          
+            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim.ToLower(), userType.ToLower()));
         }
 
         public async Task<GenericResponse> ConfirmEmail(Guid userId, string token)
@@ -210,9 +205,41 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
+        public async Task<GenericResponse> ResendConfirmationEmail(UserEmailDto userEmailDto)
+        {
+            try
+            {
+                var identityUser = await this.dataService.UserManager.FindByEmailAsync(userEmailDto.Email);
+                if (identityUser == null)
+                    return GenericResponseBuilder.Success();
+                RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
+                var emailSent = await this.internalCommunicationProvider.ResendConfirmationEmail(registrationEmail);
+
+                if (!emailSent)
+                    return GenericResponseBuilder.NoSuccess("Error resending confirmation email");
+
+                return GenericResponseBuilder.Success();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in BLL - ResendConfirmationEmail. {0}", ex.Message));
+                return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
+            }
+        }
+
+        private async Task<RegistrationEmail> CreateRegistrationEmailObject(ApplicationUser identityUser)
+        {
+            var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(identityUser);
+            var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
+            var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");
+            var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
+            return registrationEmail;
+        }
+
+        #region Helpers
         private Email GenerateEmailLink(IdentityUser identityUser, string configKey, string token, string userInformation)
         {
-            var queryString = string.Format("token={0}",HttpUtility.UrlEncode(token));
+            var queryString = string.Format("token={0}", HttpUtility.UrlEncode(token));
             switch (userInformation.ToLower())
             {
                 case "id":
@@ -220,19 +247,21 @@ namespace H2020.IPMDecisions.IDP.BLL
                     break;
                 case "email":
                     queryString = string.Format("{0}&email={1}", queryString, identityUser.Email);
-                    break;                
+                    break;
                 default:
                     break;
             }
             var uiAddress = this.configuration[configKey];
             var link = new Uri(string.Format("{0}?{1}", uiAddress, queryString));
 
-            var email = new Email(){
+            var email = new Email()
+            {
                 CallbackUrl = link,
                 Token = token,
                 ToAddress = identityUser.Email
             };
             return email;
         }
+        #endregion       
     }
 }

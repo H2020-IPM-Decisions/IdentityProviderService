@@ -3,5 +3,6 @@
     public class UserRegistrationReturnDto : UserDto
     {
         public bool EmailSentDuringRegistration { get; set; } = true;
+        public bool ProfileCreatedDuringRegistration { get; set; } = true;
     }
 }

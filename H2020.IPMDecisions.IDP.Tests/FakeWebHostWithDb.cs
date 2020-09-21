@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.API;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
@@ -9,6 +7,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace H2020.IPMDecisions.IDP.Tests
@@ -18,7 +18,6 @@ namespace H2020.IPMDecisions.IDP.Tests
     {
         public IHost Host;
         public bool IsDatabaseInitialized;
-        private string _connectionString;
         private ApplicationDbContext _context;
 
         public readonly Guid DefaultApplicationClientId = Guid.Parse("08d7aa5b-e23c-496e-8946-6d8af6b98dd6");
@@ -39,9 +38,9 @@ namespace H2020.IPMDecisions.IDP.Tests
               .Build();
 
             string _databaseName = Guid.NewGuid().ToString();
-            _connectionString = $"Server=127.0.0.1,3306;Database=H2020.IPMDecisions.IDP.{_databaseName};Uid=root;Pwd=secret;";
+            var connectionString = $"Server=127.0.0.1,3306;Database=H2020.IPMDecisions.IDP.{_databaseName};Uid=root;Pwd=secret;";
 
-            configuration["ConnectionStrings:MySqlDbConnection"] = _connectionString;
+            configuration["ConnectionStrings:MySqlDbConnection"] = connectionString;
 
             Host = await new HostBuilder()
               .ConfigureWebHost(webBuilder =>
@@ -191,7 +190,8 @@ namespace H2020.IPMDecisions.IDP.Tests
                     };
                     _context.Users.Add(failEmailUser);
 
-                    var userRoleAdmin = new IdentityUserRole<string>(){
+                    var userRoleAdmin = new IdentityUserRole<string>()
+                    {
                         UserId = "380f0a69-a009-4c34-8496-9a43c2e069be",
                         RoleId = "dd2f7616-65b7-4456-a6dd-37b25a2c050d"
                     };
