@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
 {
-    public class UserManagerExtensionRepository: IUserManagerExtensionRepository
+    public class UserManagerExtensionRepository : IUserManagerExtensionRepository
     {
         private readonly UserManager<ApplicationUser> userManager;
         private IPropertyMappingService propertyMappingService;
@@ -45,7 +45,6 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                     this.propertyMappingService.GetPropertyMapping<UserDto, ApplicationUser>();
 
                 collection = collection.ApplySort(resourceParameter.OrderBy, propertyMappingDictionary);
-
             }
 
             return await PagedList<ApplicationUser>.CreateAsync(
