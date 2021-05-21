@@ -7,6 +7,8 @@ using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
+using Hangfire;
+using Hangfire.MySql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -223,17 +225,38 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
         public static void ConfigureInternalCommunicationHttpService(this IServiceCollection services, IConfiguration config)
         {
-           services.AddHttpClient<IMicroservicesInternalCommunicationHttpProvider, MicroservicesInternalCommunicationHttpProvider>(client =>
-           {
-               client.BaseAddress = new Uri(config["MicroserviceInternalCommunication:ApiGatewayAddress"]);
-               client.DefaultRequestHeaders.Add(config["MicroserviceInternalCommunication:SecurityTokenCustomHeader"], config["MicroserviceInternalCommunication:SecurityToken"]);
-           });
+            services.AddHttpClient<IMicroservicesInternalCommunicationHttpProvider, MicroservicesInternalCommunicationHttpProvider>(client =>
+            {
+                client.BaseAddress = new Uri(config["MicroserviceInternalCommunication:ApiGatewayAddress"]);
+                client.DefaultRequestHeaders.Add(config["MicroserviceInternalCommunication:SecurityTokenCustomHeader"], config["MicroserviceInternalCommunication:SecurityToken"]);
+            });
         }
 
         public static IEnumerable<string> Audiences(string audiences)
         {
             var listOfAudiences = audiences.Split(';').ToList();
             return listOfAudiences;
+        }
+
+        public static void ConfigureHangfire(this IServiceCollection services, IConfiguration config)
+        {
+            var connectionString = config["ConnectionStrings:MySqlDbConnection"];
+
+            services.AddHangfire(configuration =>
+            {
+                configuration
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UseStorage(
+                    new MySqlStorage(connectionString,
+                        new MySqlStorageOptions
+                        {
+                            PrepareSchemaIfNecessary = true,
+                            TablesPrefix = "Hangfire"
+                        }));
+            });
+
+            services.AddHangfireServer();
         }
     }
 }
