@@ -8,7 +8,7 @@ using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Hangfire;
-using Hangfire.MySql;
+using Hangfire.MySql.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -242,18 +242,22 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
         {
             var connectionString = config["ConnectionStrings:MySqlDbConnection"];
 
+            var options = new MySqlStorageOptions
+            {
+                PrepareSchemaIfNecessary = true,
+                QueuePollInterval = TimeSpan.FromSeconds(15),
+                JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                DashboardJobListLimit = 50000                
+            };
+
             services.AddHangfire(configuration =>
             {
                 configuration
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
                     .UseStorage(
-                    new MySqlStorage(connectionString,
-                        new MySqlStorageOptions
-                        {
-                            PrepareSchemaIfNecessary = true,
-                            TablesPrefix = "Hangfire"
-                        }));
+                    new MySqlStorage(connectionString, options));
             });
 
             services.AddHangfireServer();

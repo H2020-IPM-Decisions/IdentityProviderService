@@ -15,7 +15,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             RecurringJob.RemoveIfExists(nameof(MaintenanceJobs.RemoveInactiveUser));
             RecurringJob.AddOrUpdate<MaintenanceJobs>(nameof(MaintenanceJobs.RemoveInactiveUser),
                 job => job.RemoveInactiveUser(JobCancellationToken.Null),
-                Cron.Weekly(DayOfWeek.Monday,9), TimeZoneInfo.Utc);
+                Cron.Weekly(DayOfWeek.Monday, 9), TimeZoneInfo.Utc);
         }
     }
 }

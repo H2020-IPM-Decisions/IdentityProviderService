@@ -3,6 +3,7 @@ using H2020.IPMDecisions.IDP.API.Extensions;
 using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.BLL.Providers;
+using H2020.IPMDecisions.IDP.BLL.ScheduleTasks;
 using H2020.IPMDecisions.IDP.Core.Profiles;
 using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core;
@@ -68,9 +69,8 @@ namespace H2020.IPMDecisions.IDP.API
                 var factory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
                 return factory.GetUrlHelper(actionContext);
             });
-
-            services.ConfigureMySqlContext(Configuration);
             services.ConfigureHangfire(Configuration);
+            services.ConfigureMySqlContext(Configuration);
             services.ConfigureSwagger();
         }
 
@@ -116,10 +116,12 @@ namespace H2020.IPMDecisions.IDP.API
                 dashboardOptions.IsReadOnlyFunc = (DashboardContext context) => false;
             }
             app.UseHangfireDashboard($"/{apiBasePath}dashboard", dashboardOptions);
+            HangfireJobScheduler.HangfireScheduleJobs();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
 
             app.UseSwagger(c =>

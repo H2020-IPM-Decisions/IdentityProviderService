@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
@@ -8,6 +10,7 @@ using H2020.IPMDecisions.IDP.Core.ResourceParameters;
 using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
 {
@@ -51,6 +54,16 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Repositories
                 collection,
                 resourceParameter.PageNumber,
                 resourceParameter.PageSize);
+        }
+
+        public Task<List<ApplicationUser>> FindAllAsync(Expression<Func<ApplicationUser, bool>> expression)
+        {
+            if (expression is null) return null;
+
+            return userManager
+                .Users
+                .Where(expression)
+                .ToListAsync();
         }
     }
 }
