@@ -114,7 +114,8 @@ CREATE TABLE `User` (
   `LockoutEnabled` tinyint(1) NOT NULL,
   `AccessFailedCount` int NOT NULL,
   `RegistrationDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `LastValidAccess` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `LastValidAccess` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `InactiveEmailsSent` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------

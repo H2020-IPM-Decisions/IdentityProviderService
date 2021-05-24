@@ -7,5 +7,6 @@ namespace H2020.IPMDecisions.IDP.Core.Entities
     {
         public DateTime RegistrationDate { get; set; }
         public DateTime LastValidAccess { get; set; }
+        public int InactiveEmailsSent { get; set; }
     }
 }
