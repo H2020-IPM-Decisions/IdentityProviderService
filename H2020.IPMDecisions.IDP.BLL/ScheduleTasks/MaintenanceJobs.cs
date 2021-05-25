@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
+using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 {
     public interface IMaintenanceJobs
     {
-        void ProcessInactiveUser(IJobCancellationToken token, int weeksInactive, int emailsSent);
+        void ProcessInactiveUser(IJobCancellationToken token, int weeksInactive, int emailsSent, bool deleteUsers);
     }
 
     public class MaintenanceJobs : IMaintenanceJobs
@@ -26,12 +27,12 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 ?? throw new ArgumentNullException(nameof(dataService));
         }
 
-        public void ProcessInactiveUser(IJobCancellationToken token, int weeksInactive, int emailsSent)
+        public void ProcessInactiveUser(IJobCancellationToken token, int weeksInactive, int emailsSent, bool deleteUsers)
         {
             try
             {
                 token.ThrowIfCancellationRequested();
-                Task.Run(() => ProcessInactiveUsersOlderThan(weeksInactive, emailsSent)).Wait();
+                Task.Run(() => ProcessInactiveUsersOlderThan(weeksInactive, emailsSent, deleteUsers)).Wait();
             }
             catch (Exception ex)
             {
@@ -39,7 +40,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             }
         }
 
-        public async Task ProcessInactiveUsersOlderThan(int months, int inactiveEmailsSent = 0)
+        public async Task ProcessInactiveUsersOlderThan(int months, int inactiveEmailsSent = 0, bool deleteUsers = false)
         {
             try
             {
@@ -48,16 +49,30 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                     .UserManagerExtensions
                     .FindAllAsync(u => u.LastValidAccess < DateTime.Now.AddMonths(-months) & u.InactiveEmailsSent == inactiveEmailsSent);
 
+                System.Console.WriteLine(users.Count.ToString());
+
                 foreach (var user in users)
                 {
+                    if (deleteUsers)
+                    {
+                        await this.dataService.UserManager.DeleteAsync(user);
+                        continue;
+                    }
+
+                    var emailToSend = new InactiveUserEmail()
+                    {
+                        ToAddress = user.Email,
+                        InactiveMonths = ((DateTime.Now.Year - user.LastValidAccess.Year) * 12) + DateTime.Now.Month - user.LastValidAccess.Month,
+                        AccountDeletionDate = user.LastValidAccess.AddMonths(12).ToShortDateString()
+                    };
                     user.InactiveEmailsSent = inactiveEmailsSent + 1;
                 }
-
-                await this.dataService.CompleteAsync();
+                // ToDo - Save changes after testing
+                //await this.dataService.CompleteAsync();
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                logger.LogError(string.Format("Error in BLL - Error executing schedule to ProcessInactiveUsersOlderThan method. {0}", ex.Message));
             }
         }
     }

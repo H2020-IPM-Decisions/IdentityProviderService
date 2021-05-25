@@ -120,7 +120,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                     Encoding.UTF8,
                     customContentType);
 
-                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];                
+                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];
                 var emailResponse = await httpClient.PostAsync(userProvisionEndPoint + "internal/userprofile", content);
                 if (!emailResponse.IsSuccessStatusCode)
                 {
@@ -159,6 +159,11 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendForgotPasswordEmail. {0}", ex.Message));
                 throw ex;
             }
+        }
+
+        public Task<bool> SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
+        {
+            throw new NotImplementedException();
         }
     }
 }

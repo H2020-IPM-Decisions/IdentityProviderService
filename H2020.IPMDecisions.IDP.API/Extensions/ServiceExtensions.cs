@@ -245,10 +245,6 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             var options = new MySqlStorageOptions
             {
                 PrepareSchemaIfNecessary = true,
-                QueuePollInterval = TimeSpan.FromSeconds(5),
-                JobExpirationCheckInterval = TimeSpan.FromHours(1),
-                CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                DashboardJobListLimit = 50000                
             };
 
             services.AddHangfire(configuration =>
