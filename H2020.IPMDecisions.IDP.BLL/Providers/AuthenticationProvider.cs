@@ -181,7 +181,9 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
         public async Task UpdateLastValidAccessAsync(ApplicationUser user)
         {
+            // Reset inactive parameters
             user.LastValidAccess = DateTime.Now;
+            user.InactiveEmailsSent = 0;
             await this.dataService.UserManager.UpdateAsync(user);
         }
     }

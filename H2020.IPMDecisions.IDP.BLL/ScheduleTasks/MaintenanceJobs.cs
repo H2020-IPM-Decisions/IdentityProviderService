@@ -9,8 +9,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 {
     public interface IMaintenanceJobs
     {
-        void RemoveInactiveUser(IJobCancellationToken token);
-        void SendEmailToInactiveUser(IJobCancellationToken token);
+        void ProcessInactiveUser(IJobCancellationToken token, int weeksInactive, int emailsSent);
     }
 
     public class MaintenanceJobs : IMaintenanceJobs
@@ -27,13 +26,12 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 ?? throw new ArgumentNullException(nameof(dataService));
         }
 
-        public void SendEmailToInactiveUser(IJobCancellationToken token)
+        public void ProcessInactiveUser(IJobCancellationToken token, int weeksInactive, int emailsSent)
         {
             try
             {
                 token.ThrowIfCancellationRequested();
-                var monthsInactive = 3;
-                Task.Run(() => ProcessInactiveUsersOlderThan(monthsInactive)).Wait();
+                Task.Run(() => ProcessInactiveUsersOlderThan(weeksInactive, emailsSent)).Wait();
             }
             catch (Exception ex)
             {
@@ -41,32 +39,24 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             }
         }
 
-        public void RemoveInactiveUser(IJobCancellationToken token)
-        {
-            try
-            {
-                token.ThrowIfCancellationRequested();
-                // var monthsInactive = 4;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(string.Format("Error in BLL - Error executing schedule to remove inactive users. {0}", ex.Message));
-            }
-        }
-
-        public async Task ProcessInactiveUsersOlderThan(int months)
+        public async Task ProcessInactiveUsersOlderThan(int months, int inactiveEmailsSent = 0)
         {
             try
             {
                 var users = await this
                     .dataService
                     .UserManagerExtensions
-                    .FindAllAsync(u => u.LastValidAccess < DateTime.Now.AddMonths(-months));
+                    .FindAllAsync(u => u.LastValidAccess < DateTime.Now.AddMonths(-months) & u.InactiveEmailsSent == inactiveEmailsSent);
 
+                foreach (var user in users)
+                {
+                    user.InactiveEmailsSent = inactiveEmailsSent + 1;
+                }
+
+                await this.dataService.CompleteAsync();
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }
