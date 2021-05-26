@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
+using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Hangfire;
@@ -17,14 +18,23 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
     {
         private readonly ILogger<MaintenanceJobs> logger;
         private readonly IDataService dataService;
+        private readonly IMicroservicesInternalCommunicationHttpProvider internalCommunicationProvider;
+        private readonly IMapper mapper;
+
         public MaintenanceJobs(
             ILogger<MaintenanceJobs> logger,
-            IDataService dataService)
+            IDataService dataService,
+            IMicroservicesInternalCommunicationHttpProvider internalCommunicationProvider,
+            IMapper mapper)
         {
             this.logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
+            this.internalCommunicationProvider = internalCommunicationProvider
+                ?? throw new ArgumentNullException(nameof(internalCommunicationProvider));
+            this.mapper = mapper
+                ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public void ProcessInactiveUser(IJobCancellationToken token, int weeksInactive, int emailsSent, bool deleteUsers)
@@ -56,19 +66,16 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                     if (deleteUsers)
                     {
                         await this.dataService.UserManager.DeleteAsync(user);
+                        //ToDo: Delete profile on UPR
                         continue;
                     }
 
-                    var emailToSend = new InactiveUserEmail()
-                    {
-                        ToAddress = user.Email,
-                        InactiveMonths = ((DateTime.Now.Year - user.LastValidAccess.Year) * 12) + DateTime.Now.Month - user.LastValidAccess.Month,
-                        AccountDeletionDate = user.LastValidAccess.AddMonths(12).ToShortDateString()
-                    };
-                    user.InactiveEmailsSent = inactiveEmailsSent + 1;
+                    var emailToSend = this.mapper.Map<InactiveUserEmail>(user);
+                    var emailSent = await this.internalCommunicationProvider.SendInactiveUserEmail(emailToSend);
+                    if (emailSent)
+                        user.InactiveEmailsSent = inactiveEmailsSent + 1;
                 }
-                // ToDo - Save changes after testing
-                //await this.dataService.CompleteAsync();
+                await this.dataService.CompleteAsync();
             }
             catch (Exception ex)
             {

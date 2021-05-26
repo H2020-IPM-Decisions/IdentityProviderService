@@ -161,9 +161,37 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
         }
 
-        public Task<bool> SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
+        public async Task<bool> SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var jsonObject = new System.Json.JsonObject();
+                jsonObject.Add("toAddress", inactiveUserEmail.ToAddress);
+                jsonObject.Add("accountDeletionDate", inactiveUserEmail.AccountDeletionDate);
+                jsonObject.Add("inactiveMonths", inactiveUserEmail.InactiveMonths);
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+
+                var content = new StringContent(
+                    jsonObject.ToString(),
+                    Encoding.UTF8,
+                    customContentType);
+
+                var emailEndPoint = config["MicroserviceInternalCommunication:EmailMicroservice"];
+                var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinactiveuser", content);
+                if (!emailResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = await emailResponse.Content.ReadAsStringAsync();
+                    logger.LogWarning(string.Format("Error creating Sending Inactive User Email. Reason: {0}. Response Content: {1}",
+                        emailResponse.ReasonPhrase, responseContent));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendInactiveUserEmail. {0}", ex.Message));
+                throw ex;
+            }
         }
     }
 }
