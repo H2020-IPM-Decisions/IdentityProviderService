@@ -116,7 +116,7 @@ namespace H2020.IPMDecisions.IDP.API
                 dashboardOptions.IsReadOnlyFunc = (DashboardContext context) => false;
             }
             app.UseHangfireDashboard($"/{apiBasePath}dashboard", dashboardOptions);
-            HangfireJobScheduler.HangfireScheduleJobs();
+            HangfireJobScheduler.HangfireScheduleJobs(Configuration);
 
             app.UseEndpoints(endpoints =>
             {

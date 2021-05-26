@@ -59,19 +59,16 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                     .UserManagerExtensions
                     .FindAllAsync(u => u.LastValidAccess < DateTime.Now.AddMonths(-months) & u.InactiveEmailsSent == inactiveEmailsSent);
 
-                System.Console.WriteLine(users.Count.ToString());
-
                 foreach (var user in users)
                 {
                     if (deleteUsers)
                     {
                         await this.dataService.UserManager.DeleteAsync(user);
-                        //ToDo: Delete profile on UPR
+                        this.internalCommunicationProvider.DeleteUserProfileAsync(Guid.Parse(user.Id));
                         continue;
                     }
-
                     var emailToSend = this.mapper.Map<InactiveUserEmail>(user);
-                    var emailSent = await this.internalCommunicationProvider.SendInactiveUserEmail(emailToSend);
+                    var emailSent = this.internalCommunicationProvider.SendInactiveUserEmail(emailToSend);
                     if (emailSent)
                         user.InactiveEmailsSent = inactiveEmailsSent + 1;
                 }
