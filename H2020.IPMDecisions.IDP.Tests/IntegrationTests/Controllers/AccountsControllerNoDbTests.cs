@@ -4,13 +4,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using FluentAssertions;
-using H2020.IPMDecisions.IDP.Core.Dtos;
 using Microsoft.AspNetCore.TestHost;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
 {
+    [Trait("Category", "Docker")]
     public class AccountsControllerNoDbTests : IClassFixture<FakeWebHost>
     {
         private FakeWebHost fakeWebHost;
@@ -37,8 +36,8 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
               .Add("client_secret", "123");
             httpClient
               .DefaultRequestHeaders
-              .Add("grant_type", "Bad"); 
-            
+              .Add("grant_type", "Bad");
+
             var jsonObject = new System.Json.JsonObject();
             const string userEmail = "newuser@test.com";
             jsonObject.Add("email", userEmail);
@@ -200,7 +199,7 @@ namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
-        
+
         [Fact]
         public async void PostAuthenticate_MissingUserPassword_BadRequest()
         {

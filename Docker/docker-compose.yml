@@ -68,6 +68,11 @@ services:
       - NLog:rules:logfile:minLevel=Info
       - UIPageAddresses:ResetPasswordFormPageAddress=https://fakewebsite.com"
       - UIPageAddresses:ConfirmUserFormPageAddress=https://localhost:5001/api/accounts/confirmemail
+      - EmailConfirmationAllowanceHours=24
+      - InactiveUsers:FirstEmailMonthInactive=6
+      - InactiveUsers:SecondEmailMonthInactive=10
+      - InactiveUsers:LastEmailMonthInactive=11
+      - InactiveUsers:DeleteAccountMonthInactive=12
     volumes:
       - logsvolume:/app/logs
       # Path certificate in Host machine. Uncomment the following line once you have a valid certificate
