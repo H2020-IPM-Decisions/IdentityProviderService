@@ -3,10 +3,13 @@ using H2020.IPMDecisions.IDP.API.Extensions;
 using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.BLL.Providers;
+using H2020.IPMDecisions.IDP.BLL.ScheduleTasks;
 using H2020.IPMDecisions.IDP.Core.Profiles;
 using H2020.IPMDecisions.IDP.Core.Services;
 using H2020.IPMDecisions.IDP.Data.Core;
 using H2020.IPMDecisions.IDP.Data.Persistence;
+using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -49,7 +52,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
 
             services.AddAutoMapper(typeof(MainProfile));
-            
+
             services.ConfigureLogger(Configuration);
             services.AddScoped<IDataService, DataService>();
             services.AddTransient<IAuthenticationProvider, AuthenticationProvider>();
@@ -66,15 +69,14 @@ namespace H2020.IPMDecisions.IDP.API
                 var factory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
                 return factory.GetUrlHelper(actionContext);
             });
-
+            services.ConfigureHangfire(Configuration);
             services.ConfigureMySqlContext(Configuration);
-
             services.ConfigureSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
-            IApplicationBuilder app, 
+            IApplicationBuilder app,
             IWebHostEnvironment env,
             IHostApplicationLifetime applicationLifetime)
         {
@@ -105,21 +107,31 @@ namespace H2020.IPMDecisions.IDP.API
             app.UseAuthentication();
             app.UseAuthorization();
 
+            var apiBasePath = Configuration["MicroserviceInternalCommunication:IdentityProviderMicroservice"];
+
+            var dashboardOptions = new DashboardOptions();
+            if (!CurrentEnvironment.IsDevelopment())
+            {
+                dashboardOptions.Authorization = new[] { new IsAdminFilter() }; ;
+                dashboardOptions.IsReadOnlyFunc = (DashboardContext context) => false;
+            }
+            app.UseHangfireDashboard($"/{apiBasePath}dashboard", dashboardOptions);
+            HangfireJobScheduler.HangfireScheduleJobs(Configuration);
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
-
-            var swaggerBasePath = Configuration["MicroserviceInternalCommunication:IdentityProviderMicroservice"];
 
             app.UseSwagger(c =>
             {
-                c.RouteTemplate = swaggerBasePath+ "swagger/{documentName}/swagger.json";
+                c.RouteTemplate = apiBasePath + "swagger/{documentName}/swagger.json";
             });
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint($"/{swaggerBasePath}swagger/v1/swagger.json", "H2020 IPM Decisions - Identity Provider API");
-                c.RoutePrefix = $"{swaggerBasePath}swagger";
+                c.SwaggerEndpoint($"/{apiBasePath}swagger/v1/swagger.json", "H2020 IPM Decisions - Identity Provider API");
+                c.RoutePrefix = $"{apiBasePath}swagger";
             });
 
             applicationLifetime.ApplicationStopping.Register(OnShutdown);

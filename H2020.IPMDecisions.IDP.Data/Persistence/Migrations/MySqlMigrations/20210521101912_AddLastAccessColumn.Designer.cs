@@ -3,18 +3,20 @@ using System;
 using H2020.IPMDecisions.IDP.Data.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210521101912_AddLastAccessColumn")]
+    partial class AddLastAccessColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.14")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("H2020.IPMDecisions.IDP.Core.Entities.ApplicationClient", b =>
@@ -69,9 +71,6 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("InactiveEmailsSent")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("LastValidAccess")
                         .ValueGeneratedOnAdd()

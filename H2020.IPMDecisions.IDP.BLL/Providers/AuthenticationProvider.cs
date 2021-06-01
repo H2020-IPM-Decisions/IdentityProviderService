@@ -24,7 +24,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             IConfiguration config)
         {
             this.signInManager = signInManager
-                ?? throw new ArgumentNullException(nameof(signInManager));            
+                ?? throw new ArgumentNullException(nameof(signInManager));
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.config = config
@@ -115,6 +115,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
             if (result.Succeeded)
             {
+                await UpdateLastValidAccessAsync(user);
                 response.IsSuccessful = true;
                 response.Result = user;
                 return response;
@@ -161,12 +162,13 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return response;
             }
 
+            await UpdateLastValidAccessAsync(user);
             response.IsSuccessful = true;
             response.ResponseMessage = "";
             response.Result = user;
             return response;
         }
-        
+
         public async Task<IList<string>> GetUserRolesAsync(ApplicationUser user)
         {
             return await this.dataService.UserManager.GetRolesAsync(user);
@@ -175,6 +177,14 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         public async Task<IList<Claim>> GetUserClaimsAsync(ApplicationUser user)
         {
             return await this.dataService.UserManager.GetClaimsAsync(user);
+        }
+
+        public async Task UpdateLastValidAccessAsync(ApplicationUser user)
+        {
+            // Reset inactive parameters
+            user.LastValidAccess = DateTime.Now;
+            user.InactiveEmailsSent = 0;
+            await this.dataService.UserManager.UpdateAsync(user);
         }
     }
 }

@@ -120,13 +120,13 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                     Encoding.UTF8,
                     customContentType);
 
-                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];                
-                var emailResponse = await httpClient.PostAsync(userProvisionEndPoint + "internal/userprofile", content);
-                if (!emailResponse.IsSuccessStatusCode)
+                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];
+                var response = await httpClient.PostAsync(userProvisionEndPoint + "internal/userprofile", content);
+                if (!response.IsSuccessStatusCode)
                 {
-                    var responseContent = await emailResponse.Content.ReadAsStringAsync();
+                    var responseContent = await response.Content.ReadAsStringAsync();
                     logger.LogWarning(string.Format("Error creating UserProfile. Reason: {0}. Response Content: {1}",
-                        emailResponse.ReasonPhrase, responseContent));
+                        response.ReasonPhrase, responseContent));
                     return false;
                 }
                 return true;
@@ -158,6 +158,64 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             {
                 logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendForgotPasswordEmail. {0}", ex.Message));
                 throw ex;
+            }
+        }
+
+        public bool SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
+        {
+            try
+            {
+                var jsonObject = new System.Json.JsonObject();
+                jsonObject.Add("toAddress", inactiveUserEmail.ToAddress);
+                jsonObject.Add("accountDeletionDate", inactiveUserEmail.AccountDeletionDate);
+                jsonObject.Add("inactiveMonths", inactiveUserEmail.InactiveMonths);
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+
+                var content = new StringContent(
+                    jsonObject.ToString(),
+                    Encoding.UTF8,
+                    customContentType);
+
+                var emailEndPoint = config["MicroserviceInternalCommunication:EmailMicroservice"];
+                var emailResponse = httpClient.PostAsync(emailEndPoint + "internal/sendinactiveuser", content).Result;
+                if (!emailResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
+                    logger.LogWarning(string.Format("Error creating Sending Inactive User Email. Reason: {0}. Response Content: {1}",
+                        emailResponse.ReasonPhrase, responseContent));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendInactiveUserEmail. {0}", ex.Message));
+                throw ex;
+            }
+        }
+
+        public bool DeleteUserProfileAsync(Guid userId)
+        {
+            try
+            {
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];
+                var content = string.Format(userProvisionEndPoint + "internal/userprofile/{0}", userId);
+                var response = httpClient.DeleteAsync(content).Result;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var responseContent = response.Content.ReadAsStringAsync().Result;
+                    logger.LogWarning(string.Format("Error deleting User profile. Reason: {0}. Response Content: {1}",
+                        response.ReasonPhrase, responseContent));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - DeleteUserProfileAsync. {0}", ex.Message));
+                return false;
             }
         }
     }
