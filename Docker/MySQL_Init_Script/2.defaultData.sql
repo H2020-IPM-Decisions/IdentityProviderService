@@ -22,4 +22,6 @@ INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`) VALUES
 ('20200213102409_fixingMissingColum', '3.1.1'),
 ('20200213132720_addExpireRefreshToken', '3.1.1'),
 ('20200604151512_ChangeColumnName', '3.1.1'),
-('20200729155000_AddRegistrationDateToUser', '3.1.1');
+('20200729155000_AddRegistrationDateToUser', '3.1.1'),
+('20210521101912_AddLastAccessColumn', '3.1.1'),
+('20210524140407_InactiveEmailsColumn', '3.1.14');

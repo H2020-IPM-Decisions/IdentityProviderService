@@ -33,7 +33,7 @@ USE `H2020.IPMDecisions.IDP`;
 
 CREATE USER `ipm_idp_user`@`%` IDENTIFIED BY 'user_password';
 GRANT USAGE ON *.* TO `ipm_idp_user`@`%`;
-GRANT SELECT, INSERT, UPDATE, DELETE ON `H2020.IPMDecisions.IDP`.* TO `ipm_idp_user`@`%`;
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, REFERENCES ON `H2020.IPMDecisions.IDP`.* TO `ipm_idp_user`@`%`;
 
 -- --------------------------------------------------------
 
