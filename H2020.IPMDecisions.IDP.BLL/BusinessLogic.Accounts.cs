@@ -233,6 +233,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
             var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");
             var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
+            registrationEmail.HoursToConfirmEmail = int.Parse(this.configuration["EmailConfirmationAllowanceHours"]);
             return registrationEmail;
         }
 

@@ -46,6 +46,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("resetpassword", Name = "ResetPassword")]
+        // POST: api/Accounts/resetpassword
         public async Task<IActionResult> ResetPassword(
             [FromBody] ResetPasswordDto resetPasswordDto)
         {
@@ -142,7 +143,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
             if (response.IsSuccessful)
                 return Ok();
-            
+
             return BadRequest(new { message = response.ErrorMessage });
         }
 
