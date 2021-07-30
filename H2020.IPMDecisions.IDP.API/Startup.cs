@@ -44,7 +44,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.ConfigureCors(Configuration);
             services.ConfigureContentNegotiation();
 
-            services.ConfigureIdentity();
+            services.ConfigureIdentity(Configuration);
             services.ConfigureJwtAuthentication(Configuration);
             services.ConfigureInternalCommunicationHttpService(Configuration);
 
