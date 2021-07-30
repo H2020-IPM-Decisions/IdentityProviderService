@@ -68,7 +68,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             });
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
-                 options.TokenLifespan = TimeSpan.FromHours(int.Parse(config["EmailConfirmationAllowanceHours"])));
+                options.TokenLifespan = TimeSpan.FromHours(int.Parse(config["EmailConfirmationAllowanceHours"])));
         }
 
         public static void ConfigureJwtAuthentication(this IServiceCollection services, IConfiguration config)
