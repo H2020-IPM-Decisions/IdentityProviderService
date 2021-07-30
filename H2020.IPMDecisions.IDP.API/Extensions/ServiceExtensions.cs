@@ -41,7 +41,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 });
         }
 
-        public static void ConfigureIdentity(this IServiceCollection services)
+        public static void ConfigureIdentity(this IServiceCollection services, IConfiguration config)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -66,6 +66,9 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
                 options.User.RequireUniqueEmail = true;
             });
+
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+                 options.TokenLifespan = TimeSpan.FromHours(int.Parse(config["EmailConfirmationAllowanceHours"])));
         }
 
         public static void ConfigureJwtAuthentication(this IServiceCollection services, IConfiguration config)
