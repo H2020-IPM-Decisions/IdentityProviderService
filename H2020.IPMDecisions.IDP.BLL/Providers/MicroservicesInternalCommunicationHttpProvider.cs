@@ -162,7 +162,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
         }
 
-        public bool SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
+        public async Task<bool> SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
         {
             try
             {
@@ -178,7 +178,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                     customContentType);
 
                 var emailEndPoint = config["MicroserviceInternalCommunication:EmailMicroservice"];
-                var emailResponse = httpClient.PostAsync(emailEndPoint + "internal/sendinactiveuser", content).Result;
+                var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinactiveuser", content);
                 if (!emailResponse.IsSuccessStatusCode)
                 {
                     var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
