@@ -61,6 +61,7 @@ namespace H2020.IPMDecisions.IDP.API
             services.AddScoped<IBusinessLogic, BusinessLogic>();
             services.AddScoped<UserAccessingOwnDataActionFilter>();
             services.AddScoped<IsValidUserClaimValueActionFilter>();
+            services.AddScoped<AddLanguageToContextFilter>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(serviceProvider =>
