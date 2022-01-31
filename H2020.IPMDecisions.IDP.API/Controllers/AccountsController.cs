@@ -35,7 +35,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> ForgotPassword(
             [FromBody] UserEmailDto userEmailDto)
         {
-            var response = await businessLogic.ForgotPassword(userEmailDto);
+            var response = await businessLogic.ForgotPassword(userEmailDto, HttpContext.Items["language"].ToString());
 
             if (response.IsSuccessful)
                 return Ok();
@@ -140,7 +140,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         //POST: api/Accounts/resendConfirmationEmail
         public async Task<IActionResult> ResendConfirmationEmail([FromBody] UserEmailDto userEmail)
         {
-            var response = await businessLogic.ResendConfirmationEmail(userEmail);
+            var response = await businessLogic.ResendConfirmationEmail(userEmail, HttpContext.Items["language"].ToString());
 
             if (response.IsSuccessful)
                 return Ok();
