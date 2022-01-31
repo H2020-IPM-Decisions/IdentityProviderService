@@ -147,6 +147,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 jsonObject.Add("callbackUrl", email.CallbackUrl.AbsoluteUri);
                 jsonObject.Add("hoursToConfirmEmail", email.HoursToConfirmEmail);
                 jsonObject.Add("token", email.Token);
+                jsonObject.Add("language", email.Language);
                 var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
 
                 var content = new StringContent(

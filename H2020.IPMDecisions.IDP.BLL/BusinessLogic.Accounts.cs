@@ -65,7 +65,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user)
+        public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user, string language = "en")
         {
             try
             {
@@ -76,9 +76,9 @@ namespace H2020.IPMDecisions.IDP.BLL
                 {
                     await AddInitialClaim(identityUser, user.UserType);
                     RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
+                    registrationEmail.AddLanguage(language);
                     var emailSent = await this.internalCommunicationProvider.SendRegistrationEmail(registrationEmail);
                     var profileCreated = await this.internalCommunicationProvider.CreateUserProfileAsync(identityUser);
-
                     var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
                     if (!emailSent)
                         userToReturn.EmailSentDuringRegistration = false;
@@ -181,7 +181,7 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         private async Task AddInitialClaim(ApplicationUser userEntity, string userType)
         {
-            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];          
+            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
             await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim.ToLower(), userType.ToLower()));
         }
 

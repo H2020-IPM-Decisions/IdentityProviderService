@@ -70,7 +70,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // POST: api/Accounts/register
         public async Task<IActionResult> Register([FromBody] UserForRegistrationDto userForRegistration)
         {
-            var response = await businessLogic.AddNewUser(userForRegistration);
+            var response = await businessLogic.AddNewUser(userForRegistration, HttpContext.Items["language"].ToString());
             if (response.IsSuccessful)
             {
                 var responseAsUser = (GenericResponse<UserDto>)response;

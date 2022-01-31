@@ -13,7 +13,7 @@ namespace H2020.IPMDecisions.IDP.BLL
     public interface IBusinessLogic
     {
         #region Accounts Controller
-        Task<GenericResponse> AddNewUser(UserForRegistrationDto user);
+        Task<GenericResponse> AddNewUser(UserForRegistrationDto user, string language = "en");
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(HttpRequest request);
         Task<GenericResponse> ConfirmEmail(Guid userId, string token);

@@ -8,5 +8,11 @@ namespace H2020.IPMDecisions.IDP.Core.Models
         public Uri CallbackUrl { get; set; }
         public string Token { get; set; }
         public int HoursToConfirmEmail { get; set; } = 24;
-    }
+        public string Language { get; set; } = "en";
+
+        public void AddLanguage(string language = "en")
+        {
+            Language = language;
+        }
+    }    
 }
