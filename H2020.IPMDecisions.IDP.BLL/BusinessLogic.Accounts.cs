@@ -30,7 +30,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var emailSent = await this.internalCommunicationProvider.SendForgotPasswordEmail(passwordEmail);
 
                 if (!emailSent)
-                    return GenericResponseBuilder.NoSuccess("Email send failed");
+                    return GenericResponseBuilder.NoSuccess(this.jsonStringLocalizer["general.email_error"].ToString());
 
                 return GenericResponseBuilder.Success();
             }
@@ -88,6 +88,14 @@ namespace H2020.IPMDecisions.IDP.BLL
                     return successResponse;
                 }
 
+                foreach (var error in identityResult.Errors)
+                {
+                    var code = error.Code.ToLower();
+                    var textFromJson = this.jsonStringLocalizer[$"registration.{code}", user.Email].ToString();
+
+                    if (!string.IsNullOrEmpty(textFromJson)) error.Description = textFromJson;
+                }
+
                 var failResponse = GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
                 return failResponse;
             }
@@ -103,7 +111,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             try
             {
                 if (request.Headers["grant_type"].ToString().ToLower() != "password")
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
 
                 var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
                 if (!isValidClient.IsSuccessful)
@@ -131,7 +139,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             try
             {
                 if (request.Headers["grant_type"].ToString().ToLower() != "refresh_token")
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
 
                 var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
                 if (!isValidClient.IsSuccessful)
@@ -189,7 +197,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             try
             {
                 var userToConfirm = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-                if (userToConfirm == null) return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Not found");
+                if (userToConfirm == null) return GenericResponseBuilder.NoSuccess<IdentityResult>(null, this.jsonStringLocalizer["general.not_found"].ToString());
 
                 var identityResult = await this.dataService.UserManager.ConfirmEmailAsync(userToConfirm, token);
                 if (identityResult.Succeeded)
@@ -215,7 +223,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var emailSent = await this.internalCommunicationProvider.ResendConfirmationEmail(registrationEmail);
 
                 if (!emailSent)
-                    return GenericResponseBuilder.NoSuccess("Error resending confirmation email");
+                    return GenericResponseBuilder.NoSuccess(this.jsonStringLocalizer["general.email_error"].ToString());
 
                 return GenericResponseBuilder.Success();
             }

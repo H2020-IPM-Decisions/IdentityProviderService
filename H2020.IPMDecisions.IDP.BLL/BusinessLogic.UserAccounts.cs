@@ -23,7 +23,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                     applicationUser, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
 
                 if (!identityResult.Succeeded)
-                    return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult, "Password change request unsuccessfully");
+                    return GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult, this.jsonStringLocalizer["accounts.change_password_error"].ToString());
 
                 return GenericResponseBuilder.Success();
             }
