@@ -18,7 +18,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/users/{userId:guid}/accounts")]
     [ServiceFilter(typeof(UserAccessingOwnDataActionFilter))]
-    [ServiceFilter(typeof(AddLanguageToContextFilter))]
     public class UserAccountsController : ControllerBase
     {
         private readonly IBusinessLogic businessLogic;
