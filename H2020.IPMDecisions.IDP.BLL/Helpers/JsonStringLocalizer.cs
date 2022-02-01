@@ -34,7 +34,17 @@ namespace H2020.IPMDecisions.IDP.BLL.Helpers
             }
         }
 
-        public LocalizedString this[string name, params object[] arguments] => throw new System.NotImplementedException();
+        public LocalizedString this[string name, params object[] arguments]
+        {
+            get
+            {
+                var value = this[name];
+
+                return !value.ResourceNotFound
+                    ? new LocalizedString(name, string.Format(value.Value, arguments), false)
+                    : value;
+            }
+        }
 
 
         private string GetLocalizedString(string key)
