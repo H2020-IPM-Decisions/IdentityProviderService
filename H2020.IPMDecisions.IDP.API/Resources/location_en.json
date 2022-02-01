@@ -1,0 +1,16 @@
+{
+  "accounts": {
+    "change_password_error": "Password change request unsuccessfully"
+  },
+  "authentification": {
+    "grant_type_error": "Wrong grant type access"
+  },
+  "general": {
+    "email_error": "Has been an error sending the email. Please try again later.",
+    "not_found": "Not found"
+  },
+  "registration": {
+    "duplicate_username": "User Name {0} is already taken.",
+    "duplicate_email": "Email {0} is already taken."
+  }
+}

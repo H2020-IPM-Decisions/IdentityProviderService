@@ -50,14 +50,14 @@ namespace H2020.IPMDecisions.IDP.BLL
                ?? throw new ArgumentNullException(nameof(propertyCheckerService));
             this.propertyMappingService = propertyMappingService
                 ?? throw new ArgumentNullException(nameof(propertyMappingService));
-            this.url = url 
+            this.url = url
                 ?? throw new ArgumentNullException(nameof(url));
-            this.configuration = configuration 
+            this.configuration = configuration
                 ?? throw new ArgumentNullException(nameof(configuration));
             this.logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
             this.internalCommunicationProvider = internalCommunicationProvider
                 ?? throw new ArgumentNullException(nameof(internalCommunicationProvider));
-        }        
+        }
     }
 }

@@ -1,0 +1,16 @@
+{
+  "accounts": {
+    "change_password_error": "aaaa"
+  },
+  "authentification": {
+    "grant_type_error": "bbbb"
+  },
+  "general": {
+    "email_error": "ccccc",
+    "not_found": "ddddd"
+  },
+  "registration": {
+    "duplicate_username": "eeeee {0} eeeee.",
+    "duplicate_email": "tttttt {0} dddddd."
+  }
+}
