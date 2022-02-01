@@ -1,4 +1,5 @@
 {
+  "test" : "test",
   "accounts": {
     "change_password_error": "Password change request unsuccessfully"
   },

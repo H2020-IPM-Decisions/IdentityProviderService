@@ -15,7 +15,6 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
     [ApiController]
     [AllowAnonymous]
     [Route("api/accounts")]
-    [ServiceFilter(typeof(AddLanguageToContextFilter))]
     public class AccountsController : ControllerBase
     {
         private readonly IBusinessLogic businessLogic;

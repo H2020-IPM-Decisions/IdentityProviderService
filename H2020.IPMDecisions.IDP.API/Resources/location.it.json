@@ -1,4 +1,5 @@
 {
+  "test" : "testit",
   "accounts": {
     "change_password_error": "aaaa"
   },

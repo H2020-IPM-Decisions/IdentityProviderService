@@ -1,4 +1,5 @@
-{
+{  
+  "test" : "testse",
   "accounts": {
     "change_password_error": "Begäran om lösenordsändring utan framgång"
   },

@@ -6,6 +6,7 @@ using H2020.IPMDecisions.IDP.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using H2020.IPMDecisions.IDP.BLL.Helpers;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
@@ -22,6 +23,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         private readonly ILogger<BusinessLogic> logger;
         private readonly IMicroservicesInternalCommunicationHttpProvider internalCommunicationProvider;
         private readonly IPropertyMappingService propertyMappingService;
+        private readonly IJsonStringLocalizer jsonStringLocalizer;
 
         public BusinessLogic(
             IMapper mapper,
@@ -34,7 +36,8 @@ namespace H2020.IPMDecisions.IDP.BLL
             IUrlHelper url,
             IConfiguration configuration,
             ILogger<BusinessLogic> logger,
-            IMicroservicesInternalCommunicationHttpProvider internalCommunicationProvider)
+            IMicroservicesInternalCommunicationHttpProvider internalCommunicationProvider,
+            IJsonStringLocalizer jsonStringLocalizer)
         {
             this.mapper = mapper
                 ?? throw new ArgumentNullException(nameof(mapper));
@@ -58,6 +61,8 @@ namespace H2020.IPMDecisions.IDP.BLL
                 ?? throw new ArgumentNullException(nameof(logger));
             this.internalCommunicationProvider = internalCommunicationProvider
                 ?? throw new ArgumentNullException(nameof(internalCommunicationProvider));
+            this.jsonStringLocalizer = jsonStringLocalizer
+                ?? throw new ArgumentNullException(nameof(jsonStringLocalizer));
         }
     }
 }

@@ -7,7 +7,6 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
-using System.Linq;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {

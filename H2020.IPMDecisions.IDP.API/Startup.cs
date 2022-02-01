@@ -2,6 +2,7 @@ using AutoMapper;
 using H2020.IPMDecisions.IDP.API.Extensions;
 using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL;
+using H2020.IPMDecisions.IDP.BLL.Helpers;
 using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.BLL.ScheduleTasks;
 using H2020.IPMDecisions.IDP.Core.Profiles;
@@ -55,9 +56,13 @@ namespace H2020.IPMDecisions.IDP.API
 
             services.ConfigureLogger(Configuration);
             services.AddScoped<IDataService, DataService>();
+            services.AddSingleton<LocationMiddleware>();
             services.AddTransient<IAuthenticationProvider, AuthenticationProvider>();
             services.AddTransient<IJWTProvider, JWTProvider>();
             services.AddTransient<IRefreshTokenProvider, RefreshTokenProvider>();
+            services.AddDistributedMemoryCache();
+            services.AddSingleton<IJsonStringLocalizer, JsonStringLocalizer>();
+            services.AddSingleton<IJsonStringLocalizerProvider, JsonStringLocalizerProvider>();
             services.AddScoped<IBusinessLogic, BusinessLogic>();
             services.AddScoped<UserAccessingOwnDataActionFilter>();
             services.AddScoped<IsValidUserClaimValueActionFilter>();
@@ -107,6 +112,7 @@ namespace H2020.IPMDecisions.IDP.API
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<LocationMiddleware>();
 
             var apiBasePath = Configuration["MicroserviceInternalCommunication:IdentityProviderMicroservice"];
 
