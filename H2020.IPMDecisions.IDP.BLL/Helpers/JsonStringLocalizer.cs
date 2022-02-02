@@ -51,21 +51,27 @@ namespace H2020.IPMDecisions.IDP.BLL.Helpers
         {
             string relativeFilePath = $"Resources/location.{Thread.CurrentThread.CurrentCulture.Name}.json";
             string fullFilePath = Path.GetFullPath(relativeFilePath);
+
+            if (!File.Exists(fullFilePath))
+            {
+                relativeFilePath = $"Resources/location.en.json";
+                fullFilePath = Path.GetFullPath(relativeFilePath);
+            }
+
             if (File.Exists(fullFilePath))
             {
                 string cacheKey = $"locale_{Thread.CurrentThread.CurrentCulture.Name}_{key}";
                 string cacheValue = distributedCache.GetString(cacheKey);
                 if (!string.IsNullOrEmpty(cacheValue)) return cacheValue;
 
-                string result = GetJsonValue(key, filePath: Path.GetFullPath(relativeFilePath));
+                string result = GetJsonValue(key, fullFilePath);
                 if (!string.IsNullOrEmpty(result)) distributedCache.SetString(cacheKey, result);
-
                 return result;
             }
             return default;
         }
 
-        private string GetJsonValue(string propertyName, string filePath)
+        private string GetJsonValue(string propertyName, string filePath, bool isDefaultFile = false)
         {
             if (propertyName == null) return default;
             if (filePath == null) return default;
@@ -81,7 +87,14 @@ namespace H2020.IPMDecisions.IDP.BLL.Helpers
                         return jsonSerializer.Deserialize<string>(reader);
                     }
                 }
-                return default;
+                if (isDefaultFile) return default;
+
+                // try again with default language
+                filePath = $"Resources/location.en.json";
+                string fullFilePath = Path.GetFullPath(filePath);
+                if (!File.Exists(fullFilePath)) return default;
+
+                return GetJsonValue(propertyName, fullFilePath, true);
             }
         }
     }
