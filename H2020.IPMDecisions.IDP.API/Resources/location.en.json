@@ -7,7 +7,7 @@
     "username_password_error": "Username or password are incorrect",
     "email_not_confirmed": "Email not confirmed",
     "user_lockout": "User is lockout",
-    "unauthorized_user": "Unauthorized"
+    "unauthorized_user": "Unauthorized user"
   },
   "general": {
     "email_error": "Has been an error sending the email. Please try again later.",

@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
@@ -9,12 +6,6 @@ using Newtonsoft.Json;
 
 namespace H2020.IPMDecisions.IDP.BLL.Helpers
 {
-    public interface IJsonStringLocalizer
-    {
-        LocalizedString this[string name] { get; }
-        LocalizedString this[string name, params object[] arguments] { get; }
-    }
-
     public class JsonStringLocalizer : IJsonStringLocalizer
     {
         private readonly JsonSerializer jsonSerializer = new JsonSerializer();
