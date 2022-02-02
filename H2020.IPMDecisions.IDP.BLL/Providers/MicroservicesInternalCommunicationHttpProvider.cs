@@ -220,5 +220,29 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 return false;
             }
         }
+
+        public async Task<bool> UserHasDssAsync(Guid userId)
+        {
+            try
+            {
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];
+                var content = string.Format(userProvisionEndPoint + "internal/hasDss/{0}", userId);
+                var response = await httpClient.GetAsync(content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    logger.LogWarning(string.Format("Error getting user's DSS. Reason: {0}",
+                        response.ReasonPhrase));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - UserHasDssAsync. {0}", ex.Message));
+                return false;
+            }
+        }
     }
 }

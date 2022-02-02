@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using H2020.IPMDecisions.IDP.BLL.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
@@ -17,11 +18,13 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         private readonly IDataService dataService;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IConfiguration config;
+        private readonly IJsonStringLocalizer jsonStringLocalizer;
 
         public AuthenticationProvider(
             IDataService dataService,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration config)
+            IConfiguration config, 
+            IJsonStringLocalizer jsonStringLocalizer)
         {
             this.signInManager = signInManager
                 ?? throw new ArgumentNullException(nameof(signInManager));
@@ -29,6 +32,8 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.config = config
                 ?? throw new ArgumentNullException(nameof(config));
+            this.jsonStringLocalizer = jsonStringLocalizer 
+                ?? throw new ArgumentNullException(nameof(jsonStringLocalizer));
         }
 
         public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
@@ -100,14 +105,14 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
             if (user == null)
             {
-                response.ResponseMessage = "Username or password is incorrect";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.username_password_error"].ToString();
                 return response;
             }
 
             var registrationTime = double.Parse(config["EmailConfirmationAllowanceHours"]);
             if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
             {
-                response.ResponseMessage = "Email not confirmed";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
                 return response;
             }
 
@@ -122,12 +127,12 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
             else if (result.IsLockedOut)
             {
-                response.ResponseMessage = "User is lockout";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
                 return response;
             }
             else
             {
-                response.ResponseMessage = "Username or password is incorrect";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout"].ToString();
                 return response;
             }
         }
@@ -142,7 +147,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             };
 
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            response.ResponseMessage = "Unauthorized";
+            response.ResponseMessage = this.jsonStringLocalizer["authentification.unauthorized_user"].ToString();
             if (user == null)
                 return response;
 
@@ -151,14 +156,14 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
             if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
             {
-                response.ResponseMessage = "User is lockout";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout"].ToString();
                 return response;
             }
 
             var registrationTime = double.Parse(config["EmailConfirmationAllowanceHours"]);
             if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
             {
-                response.ResponseMessage = "Email not confirmed";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
                 return response;
             }
 

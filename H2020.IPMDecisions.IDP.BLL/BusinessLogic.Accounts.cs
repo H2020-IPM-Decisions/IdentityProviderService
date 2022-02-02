@@ -121,9 +121,6 @@ namespace H2020.IPMDecisions.IDP.BLL
                 if (!isAuthorize.IsSuccessful)
                     return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
 
-                var userClaims = await this.dataService.UserManager.GetClaimsAsync(isAuthorize.Result);
-                var userRoles = await this.dataService.UserManager.GetRolesAsync(isAuthorize.Result);
-
                 AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
                 return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
             }
@@ -173,15 +170,18 @@ namespace H2020.IPMDecisions.IDP.BLL
             var claims = await this.jWTProvider.GetValidClaims(isAuthorize.Result, userRoles, userClaims);
             var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.JWTAudienceCategory);
             var refreshToken = await this.refreshTokenProvider.GenerateRefreshToken(isAuthorize.Result, isValidClient.Result);
+            var userId = Guid.Parse(isAuthorize.Result.Id);
+            var hasDss = await this.internalCommunicationProvider.UserHasDssAsync(userId);
 
             var bearerToken = new AuthenticationDto()
             {
-                Id = Guid.Parse(isAuthorize.Result.Id),
+                Id = userId,
                 Email = isAuthorize.Result.Email,
                 Roles = userRoles,
                 Claims = userClaims,
                 Token = token,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                HasDss = hasDss
             };
             return bearerToken;
         }
