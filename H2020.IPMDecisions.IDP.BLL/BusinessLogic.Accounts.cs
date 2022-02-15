@@ -7,14 +7,13 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
-using System.Linq;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
     public partial class BusinessLogic : IBusinessLogic
     {
 
-        public async Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto)
+        public async Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto, string language = "en")
         {
             try
             {
@@ -27,10 +26,11 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
                 var emailObject = GenerateEmailLink(identityUser, configKey, token, "email");
                 var passwordEmail = this.mapper.Map<ForgotPasswordEmail>(emailObject);
+                passwordEmail.AddLanguage(language);
                 var emailSent = await this.internalCommunicationProvider.SendForgotPasswordEmail(passwordEmail);
 
                 if (!emailSent)
-                    return GenericResponseBuilder.NoSuccess("Email send failed");
+                    return GenericResponseBuilder.NoSuccess(this.jsonStringLocalizer["general.email_error"].ToString());
 
                 return GenericResponseBuilder.Success();
             }
@@ -65,7 +65,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user)
+        public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user, string language = "en")
         {
             try
             {
@@ -75,10 +75,9 @@ namespace H2020.IPMDecisions.IDP.BLL
                 if (identityResult.Succeeded)
                 {
                     await AddInitialClaim(identityUser, user.UserType);
-                    RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
+                    RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser, language);
                     var emailSent = await this.internalCommunicationProvider.SendRegistrationEmail(registrationEmail);
                     var profileCreated = await this.internalCommunicationProvider.CreateUserProfileAsync(identityUser);
-
                     var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
                     if (!emailSent)
                         userToReturn.EmailSentDuringRegistration = false;
@@ -87,6 +86,14 @@ namespace H2020.IPMDecisions.IDP.BLL
 
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
+                }
+
+                foreach (var error in identityResult.Errors)
+                {
+                    var code = error.Code.ToLower();
+                    var textFromJson = this.jsonStringLocalizer[$"registration.{code}", user.Email].ToString();
+
+                    if (!string.IsNullOrEmpty(textFromJson)) error.Description = textFromJson;
                 }
 
                 var failResponse = GenericResponseBuilder.NoSuccess<IdentityResult>(identityResult);
@@ -104,7 +111,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             try
             {
                 if (request.Headers["grant_type"].ToString().ToLower() != "password")
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
 
                 var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
                 if (!isValidClient.IsSuccessful)
@@ -113,9 +120,6 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var isAuthorize = await this.authenticationProvider.ValidateUserAuthenticationAsync(user);
                 if (!isAuthorize.IsSuccessful)
                     return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
-
-                var userClaims = await this.dataService.UserManager.GetClaimsAsync(isAuthorize.Result);
-                var userRoles = await this.dataService.UserManager.GetRolesAsync(isAuthorize.Result);
 
                 AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
                 return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
@@ -132,7 +136,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             try
             {
                 if (request.Headers["grant_type"].ToString().ToLower() != "refresh_token")
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, "Wrong grant type");
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
 
                 var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
                 if (!isValidClient.IsSuccessful)
@@ -166,22 +170,25 @@ namespace H2020.IPMDecisions.IDP.BLL
             var claims = await this.jWTProvider.GetValidClaims(isAuthorize.Result, userRoles, userClaims);
             var token = this.jWTProvider.GenerateToken(claims, isValidClient.Result.JWTAudienceCategory);
             var refreshToken = await this.refreshTokenProvider.GenerateRefreshToken(isAuthorize.Result, isValidClient.Result);
+            var userId = Guid.Parse(isAuthorize.Result.Id);
+            var hasDss = await this.internalCommunicationProvider.UserHasDssAsync(userId);
 
             var bearerToken = new AuthenticationDto()
             {
-                Id = Guid.Parse(isAuthorize.Result.Id),
+                Id = userId,
                 Email = isAuthorize.Result.Email,
                 Roles = userRoles,
                 Claims = userClaims,
                 Token = token,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                HasDss = hasDss
             };
             return bearerToken;
         }
 
         private async Task AddInitialClaim(ApplicationUser userEntity, string userType)
         {
-            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];          
+            var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
             await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim.ToLower(), userType.ToLower()));
         }
 
@@ -190,7 +197,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             try
             {
                 var userToConfirm = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-                if (userToConfirm == null) return GenericResponseBuilder.NoSuccess<IdentityResult>(null, "Not found");
+                if (userToConfirm == null) return GenericResponseBuilder.NoSuccess<IdentityResult>(null, this.jsonStringLocalizer["general.not_found"].ToString());
 
                 var identityResult = await this.dataService.UserManager.ConfirmEmailAsync(userToConfirm, token);
                 if (identityResult.Succeeded)
@@ -205,18 +212,18 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        public async Task<GenericResponse> ResendConfirmationEmail(UserEmailDto userEmailDto)
+        public async Task<GenericResponse> ResendConfirmationEmail(UserEmailDto userEmailDto, string language = "en")
         {
             try
             {
                 var identityUser = await this.dataService.UserManager.FindByEmailAsync(userEmailDto.Email);
                 if (identityUser == null)
                     return GenericResponseBuilder.Success();
-                RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
+                RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser, language);
                 var emailSent = await this.internalCommunicationProvider.ResendConfirmationEmail(registrationEmail);
 
                 if (!emailSent)
-                    return GenericResponseBuilder.NoSuccess("Error resending confirmation email");
+                    return GenericResponseBuilder.NoSuccess(this.jsonStringLocalizer["general.email_error"].ToString());
 
                 return GenericResponseBuilder.Success();
             }
@@ -227,13 +234,14 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        private async Task<RegistrationEmail> CreateRegistrationEmailObject(ApplicationUser identityUser)
+        private async Task<RegistrationEmail> CreateRegistrationEmailObject(ApplicationUser identityUser, string language)
         {
             var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(identityUser);
             var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
             var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");
             var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
             registrationEmail.HoursToConfirmEmail = int.Parse(this.configuration["EmailConfirmationAllowanceHours"]);
+            registrationEmail.AddLanguage(language);
             return registrationEmail;
         }
 

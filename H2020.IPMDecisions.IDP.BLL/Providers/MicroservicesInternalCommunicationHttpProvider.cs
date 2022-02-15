@@ -147,6 +147,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 jsonObject.Add("callbackUrl", email.CallbackUrl.AbsoluteUri);
                 jsonObject.Add("hoursToConfirmEmail", email.HoursToConfirmEmail);
                 jsonObject.Add("token", email.Token);
+                jsonObject.Add("language", email.Language);
                 var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
 
                 var content = new StringContent(
@@ -162,7 +163,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
         }
 
-        public bool SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
+        public async Task<bool> SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
         {
             try
             {
@@ -178,7 +179,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                     customContentType);
 
                 var emailEndPoint = config["MicroserviceInternalCommunication:EmailMicroservice"];
-                var emailResponse = httpClient.PostAsync(emailEndPoint + "internal/sendinactiveuser", content).Result;
+                var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinactiveuser", content);
                 if (!emailResponse.IsSuccessStatusCode)
                 {
                     var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
@@ -216,6 +217,30 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             catch (Exception ex)
             {
                 logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - DeleteUserProfileAsync. {0}", ex.Message));
+                return false;
+            }
+        }
+
+        public async Task<bool> UserHasDssAsync(Guid userId)
+        {
+            try
+            {
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];
+                var content = string.Format(userProvisionEndPoint + "internal/hasDss/{0}", userId);
+                var response = await httpClient.GetAsync(content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    logger.LogWarning(string.Format("Error getting user's DSS. Reason: {0}",
+                        response.ReasonPhrase));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - UserHasDssAsync. {0}", ex.Message));
                 return false;
             }
         }

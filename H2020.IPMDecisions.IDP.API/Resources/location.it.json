@@ -1,0 +1,16 @@
+{
+  "accounts": {
+    "change_password_error": "Richiesta di modifica della password senza successo."
+  },
+  "authentification": {
+    "grant_type_error": "Accesso di tipo di concessione errato"
+  },
+  "general": {
+    "email_error": "Si è verificato un errore durante l'invio dell'e-mail. Riprova più tardi.",
+    "not_found": "Non trovato"
+  },
+  "registration": {
+    "duplicateusername": "Nome utente {0} è già stato preso.",
+    "duplicateemail": "Il {0} e-mail è già stato preso."
+  }
+}

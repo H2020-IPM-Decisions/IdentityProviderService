@@ -1,0 +1,20 @@
+{
+  "accounts": {
+    "change_password_error": "Password change request unsuccessfully"
+  },
+  "authentification": {
+    "grant_type_error": "Wrong grant type access",
+    "username_password_error": "Username or password are incorrect",
+    "email_not_confirmed": "Email not confirmed",
+    "user_lockout": "User is lockout",
+    "unauthorized_user": "Unauthorized user"
+  },
+  "general": {
+    "email_error": "Has been an error sending the email. Please try again later.",
+    "not_found": "Not found"
+  },
+  "registration": {
+    "duplicateusername": "User Name {0} is already taken.",
+    "duplicateemail": "Email {0} is already taken."
+  }
+}

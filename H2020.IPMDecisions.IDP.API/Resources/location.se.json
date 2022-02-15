@@ -1,0 +1,16 @@
+{
+  "accounts": {
+    "change_password_error": "Begäran om lösenordsändring utan framgång"
+  },
+  "authentification": {
+    "grant_type_error": "Felaktig åtkomst av bidragstyp"
+  },
+  "general": {
+    "email_error": "Det har varit ett fel att skicka e-postmeddelandet. Försök igen senare.",
+    "not_found": "Hittades inte"
+  },
+  "registration": {
+    "duplicateusername": "Användarnamnet {0} har redan tagits.",
+    "duplicateemail": "E-post {0} har redan tagits."
+  }
+}
