@@ -13,7 +13,7 @@ namespace H2020.IPMDecisions.IDP.API.Filters
 
         public IsValidUserClaimValueActionFilter(IConfiguration configuration)
         {
-            this.configuration = configuration 
+            this.configuration = configuration
                 ?? throw new System.ArgumentNullException(nameof(configuration));
         }
 
@@ -23,16 +23,19 @@ namespace H2020.IPMDecisions.IDP.API.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var data = (UserForRegistrationDto)context.ActionArguments["userForRegistration"];            
-            var userType = data.UserType.ToString();
+            var data = (UserForRegistrationDto)context.ActionArguments["userForRegistration"];
+            var userTypes = data.UserType;
 
             var validClaims = this.configuration["AccessClaims:ValidUserAccessClaims"];
             var listOfValidClaims = validClaims.Split(';').ToList();
 
-            if (!listOfValidClaims.Any(str => str.Contains(userType, StringComparison.OrdinalIgnoreCase)))
+            foreach (var userType in userTypes)
             {
-                context.Result = new BadRequestObjectResult($"'{nameof(userType)}' should be one of the following values: '{validClaims}'");
-                return;
+                if (!listOfValidClaims.Any(str => str.Contains(userType, StringComparison.OrdinalIgnoreCase)))
+                {
+                    context.Result = new BadRequestObjectResult($"'{nameof(userType)}' should be one of the following values: '{validClaims}'");
+                    return;
+                }
             }
         }
     }
