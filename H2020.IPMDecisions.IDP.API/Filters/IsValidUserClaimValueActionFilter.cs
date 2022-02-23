@@ -26,7 +26,7 @@ namespace H2020.IPMDecisions.IDP.API.Filters
             var data = (UserForRegistrationDto)context.ActionArguments["userForRegistration"];
             var userTypes = data.UserType;
 
-            var validClaims = this.configuration["AccessClaims:ValidUserAccessClaims"];
+            var validClaims = this.configuration["AccessClaims:UserAccessLevels"];
             var listOfValidClaims = validClaims.Split(';').ToList();
 
             foreach (var userType in userTypes)
