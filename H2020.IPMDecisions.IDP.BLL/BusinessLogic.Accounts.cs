@@ -7,13 +7,15 @@ using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace H2020.IPMDecisions.IDP.BLL
 {
     public partial class BusinessLogic : IBusinessLogic
     {
 
-        public async Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto, string language = "en")
+        public async Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto)
         {
             try
             {
@@ -26,7 +28,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var configKey = "UIPageAddresses:ResetPasswordFormPageAddress";
                 var emailObject = GenerateEmailLink(identityUser, configKey, token, "email");
                 var passwordEmail = this.mapper.Map<ForgotPasswordEmail>(emailObject);
-                passwordEmail.AddLanguage(language);
+                passwordEmail.AddLanguage(Thread.CurrentThread.CurrentCulture.Name);
                 var emailSent = await this.internalCommunicationProvider.SendForgotPasswordEmail(passwordEmail);
 
                 if (!emailSent)
@@ -65,7 +67,7 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user, string language = "en")
+        public async Task<GenericResponse> AddNewUser(UserForRegistrationDto user)
         {
             try
             {
@@ -75,7 +77,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 if (identityResult.Succeeded)
                 {
                     await AddInitialClaim(identityUser, user.UserType);
-                    RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser, language);
+                    RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
                     var emailSent = await this.internalCommunicationProvider.SendRegistrationEmail(registrationEmail);
                     var profileCreated = await this.internalCommunicationProvider.CreateUserProfileAsync(identityUser);
                     var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
@@ -186,10 +188,13 @@ namespace H2020.IPMDecisions.IDP.BLL
             return bearerToken;
         }
 
-        private async Task AddInitialClaim(ApplicationUser userEntity, string userType)
+        private async Task AddInitialClaim(ApplicationUser userEntity, List<string> userTypes)
         {
             var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
-            await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim.ToLower(), userType.ToLower()));
+            foreach (var userType in userTypes)
+            {
+                await this.dataService.UserManager.AddClaimAsync(userEntity, CreateClaim(userTypeClaim.ToLower(), userType.ToLower()));
+            }
         }
 
         public async Task<GenericResponse> ConfirmEmail(Guid userId, string token)
@@ -212,14 +217,14 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        public async Task<GenericResponse> ResendConfirmationEmail(UserEmailDto userEmailDto, string language = "en")
+        public async Task<GenericResponse> ResendConfirmationEmail(UserEmailDto userEmailDto)
         {
             try
             {
                 var identityUser = await this.dataService.UserManager.FindByEmailAsync(userEmailDto.Email);
                 if (identityUser == null)
                     return GenericResponseBuilder.Success();
-                RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser, language);
+                RegistrationEmail registrationEmail = await CreateRegistrationEmailObject(identityUser);
                 var emailSent = await this.internalCommunicationProvider.ResendConfirmationEmail(registrationEmail);
 
                 if (!emailSent)
@@ -234,14 +239,14 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
-        private async Task<RegistrationEmail> CreateRegistrationEmailObject(ApplicationUser identityUser, string language)
+        private async Task<RegistrationEmail> CreateRegistrationEmailObject(ApplicationUser identityUser)
         {
             var token = await dataService.UserManager.GenerateEmailConfirmationTokenAsync(identityUser);
             var configKey = "UIPageAddresses:ConfirmUserFormPageAddress";
             var emailObject = GenerateEmailLink(identityUser, configKey, token, "id");
             var registrationEmail = this.mapper.Map<RegistrationEmail>(emailObject);
             registrationEmail.HoursToConfirmEmail = int.Parse(this.configuration["EmailConfirmationAllowanceHours"]);
-            registrationEmail.AddLanguage(language);
+            registrationEmail.AddLanguage(Thread.CurrentThread.CurrentCulture.Name);
             return registrationEmail;
         }
 
