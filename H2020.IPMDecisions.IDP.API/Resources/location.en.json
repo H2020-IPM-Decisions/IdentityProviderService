@@ -1,12 +1,12 @@
 {
   "accounts": {
-    "change_password_error": "Password change request unsuccessfully"
+    "change_password_error": "Password change request unsuccessful."
   },
   "authentification": {
     "grant_type_error": "Wrong grant type access",
-    "username_password_error": "Username or password are incorrect",
-    "email_not_confirmed": "Email not confirmed",
-    "user_lockout": "User is lockout",
+    "username_password_error": "Username or password are incorrect. Your account will be lockout for {0} minutes after {1} attempts.",
+    "email_not_confirmed": "Your email is not confirmed. Please confirm your email before continuing.",
+    "user_lockout": "Account lockout for {0} minutes after multiple failed logon attempts. Please try again after {1}",
     "unauthorized_user": "Unauthorized user"
   },
   "general": {

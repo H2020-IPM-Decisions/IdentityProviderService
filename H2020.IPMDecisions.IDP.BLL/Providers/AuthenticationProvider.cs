@@ -23,7 +23,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         public AuthenticationProvider(
             IDataService dataService,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration config, 
+            IConfiguration config,
             IJsonStringLocalizer jsonStringLocalizer)
         {
             this.signInManager = signInManager
@@ -32,7 +32,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 ?? throw new ArgumentNullException(nameof(dataService));
             this.config = config
                 ?? throw new ArgumentNullException(nameof(config));
-            this.jsonStringLocalizer = jsonStringLocalizer 
+            this.jsonStringLocalizer = jsonStringLocalizer
                 ?? throw new ArgumentNullException(nameof(jsonStringLocalizer));
         }
 
@@ -127,12 +127,16 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
             else if (result.IsLockedOut)
             {
-                response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
+                var minutesLockout = int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]);
+                var newLoginTime = DateTime.Now.AddMinutes(minutesLockout).ToShortTimeString();
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout", minutesLockout, newLoginTime].ToString();
                 return response;
             }
             else
             {
-                response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout"].ToString();
+                var attempts = int.Parse(config["IdentityOptions:MaxFailedAccessAttempts"]);
+                var minutes = int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]);
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.username_password_error", minutes, attempts].ToString();
                 return response;
             }
         }
