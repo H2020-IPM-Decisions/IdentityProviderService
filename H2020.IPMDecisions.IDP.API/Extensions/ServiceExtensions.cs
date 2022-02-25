@@ -49,8 +49,8 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
             services.Configure<IdentityOptions>(options =>
             {
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]));
+                options.Lockout.MaxFailedAccessAttempts = int.Parse(config["IdentityOptions:MaxFailedAccessAttempts"]);
                 options.Lockout.AllowedForNewUsers = true;
 
                 options.Password.RequireDigit = true;
