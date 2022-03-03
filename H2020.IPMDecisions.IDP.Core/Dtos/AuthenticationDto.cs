@@ -15,5 +15,6 @@ namespace H2020.IPMDecisions.IDP.Core.Dtos
         public string TokenType => "Bearer";
         public string RefreshToken { get; set; }
         public bool HasDss { get; set; } = false;
+        public string IdentityErrorType { get; set; }
     }
 }

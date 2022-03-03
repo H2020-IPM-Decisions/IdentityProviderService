@@ -112,18 +112,22 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             try
             {
+                AuthenticationDto authentificationDto = new AuthenticationDto();
                 if (request.Headers["grant_type"].ToString().ToLower() != "password")
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(authentificationDto, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
 
                 var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
                 if (!isValidClient.IsSuccessful)
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidClient.ResponseMessage);
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(authentificationDto, isValidClient.ResponseMessage);
 
                 var isAuthorize = await this.authenticationProvider.ValidateUserAuthenticationAsync(user);
                 if (!isAuthorize.IsSuccessful)
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
+                {
+                    authentificationDto.IdentityErrorType = isAuthorize.IdentityErrorType;
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(authentificationDto, isAuthorize.ResponseMessage);
+                }
 
-                AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
+                authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
                 return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
             }
             catch (Exception ex)
@@ -137,23 +141,27 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             try
             {
+                AuthenticationDto authentificationDto = new AuthenticationDto();
                 if (request.Headers["grant_type"].ToString().ToLower() != "refresh_token")
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(authentificationDto, this.jsonStringLocalizer["authentification.grant_type_error"].ToString());
 
                 var isValidClient = await this.authenticationProvider.ValidateApplicationClientAsync(request);
                 if (!isValidClient.IsSuccessful)
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidClient.ResponseMessage);
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(authentificationDto, isValidClient.ResponseMessage);
 
                 var refreshTokenFromHeader = request.Headers["refresh_token"].ToString();
                 var isValidRefreshToken = await this.refreshTokenProvider.ValidateRefreshToken(isValidClient.Result, refreshTokenFromHeader);
                 if (!isValidRefreshToken.IsSuccessful)
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isValidRefreshToken.ResponseMessage);
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(authentificationDto, isValidRefreshToken.ResponseMessage);
 
                 var isAuthorize = await this.authenticationProvider.ValidateUserAsync(isValidRefreshToken.Result.UserId);
                 if (!isAuthorize.IsSuccessful)
-                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(null, isAuthorize.ResponseMessage);
+                {
+                    authentificationDto.IdentityErrorType = isAuthorize.IdentityErrorType;
+                    return GenericResponseBuilder.NoSuccess<AuthenticationDto>(authentificationDto, isAuthorize.ResponseMessage);
+                }
 
-                AuthenticationDto authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
+                authentificationDto = await CreateAuthentificationDto(isValidClient, isAuthorize);
                 return GenericResponseBuilder.Success<AuthenticationDto>(authentificationDto);
             }
             catch (Exception ex)
