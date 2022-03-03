@@ -91,11 +91,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
         {
             var tokenResponse = await businessLogic.AuthenticateUser(userDto, Request);
-
             if (tokenResponse.IsSuccessful)
                 return Ok(tokenResponse.Result);
 
-            return BadRequest(new { message = tokenResponse.ErrorMessage });
+            return BadRequest(new { message = tokenResponse.ErrorMessage, identityErrorType = tokenResponse.Result.IdentityErrorType });
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
@@ -108,11 +107,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> AuthenticateToken()
         {
             var tokenResponse = await businessLogic.AuthenticateUser(Request);
-
             if (tokenResponse.IsSuccessful)
                 return Ok(tokenResponse.Result);
 
-            return BadRequest(new { message = tokenResponse.ErrorMessage });
+            return BadRequest(new { message = tokenResponse.ErrorMessage, identityErrorType = tokenResponse.Result.IdentityErrorType });
         }
 
         [Produces(MediaTypeNames.Application.Json)]

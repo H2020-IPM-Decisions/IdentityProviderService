@@ -103,9 +103,13 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
             var user = await this.dataService.UserManager.FindByEmailAsync(userDto.Email);
 
+
+            var attempts = int.Parse(config["IdentityOptions:MaxFailedAccessAttempts"]);
+            var minutes = int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]);
             if (user == null)
             {
-                response.ResponseMessage = this.jsonStringLocalizer["authentification.username_password_error"].ToString();
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.username_password_error", minutes, attempts].ToString();
+                response.IdentityErrorType = "ErrorUserNameOrPassword";
                 return response;
             }
 
@@ -113,6 +117,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
             {
                 response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
+                response.IdentityErrorType = "EmailNotConfirmed";
                 return response;
             }
 
@@ -130,13 +135,13 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 var minutesLockout = int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]);
                 var newLoginTime = DateTime.Now.AddMinutes(minutesLockout).ToShortTimeString();
                 response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout", minutesLockout, newLoginTime].ToString();
+                response.IdentityErrorType = "UserLockedOut";
                 return response;
             }
             else
             {
-                var attempts = int.Parse(config["IdentityOptions:MaxFailedAccessAttempts"]);
-                var minutes = int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]);
                 response.ResponseMessage = this.jsonStringLocalizer["authentification.username_password_error", minutes, attempts].ToString();
+                response.IdentityErrorType = "ErrorUserNameOrPassword";
                 return response;
             }
         }
@@ -161,6 +166,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
             {
                 response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout"].ToString();
+                response.IdentityErrorType = "UserLockedOut";
                 return response;
             }
 
@@ -168,6 +174,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
             {
                 response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
+                response.IdentityErrorType = "EmailNotConfirmed";
                 return response;
             }
 
