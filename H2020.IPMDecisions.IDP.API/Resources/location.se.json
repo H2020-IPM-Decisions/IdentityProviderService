@@ -1,16 +1,20 @@
 {
-  "accounts": {
-    "change_password_error": "Begäran om lösenordsändring utan framgång"
-  },
-  "authentification": {
-    "grant_type_error": "Felaktig åtkomst av bidragstyp"
-  },
-  "general": {
-    "email_error": "Det har varit ett fel att skicka e-postmeddelandet. Försök igen senare.",
-    "not_found": "Hittades inte"
-  },
-  "registration": {
-    "duplicateusername": "Användarnamnet {0} har redan tagits.",
-    "duplicateemail": "E-post {0} har redan tagits."
-  }
+    "registration": {
+        "duplicateusername": "Användarnamn {0} används redan.", 
+        "duplicateemail": "E-post {0} används redan."
+    }, 
+    "general": {
+        "email_error": "Ett fel när e-postmeddelandet skickades. Försök igen senare.", 
+        "not_found": "Hittades inte"
+    }, 
+    "accounts": {
+        "change_password_error": "Begäran om lösenordsändring misslyckades"
+    }, 
+    "authentification": {
+        "unauthorized_user": "Obehörig användare", 
+        "email_not_confirmed": "Din e-postadress är inte bekräftad. Bekräfta din e-post innan du fortsätter.", 
+        "username_password_error": "Användarnamn eller lösenord är felaktiga. Ditt konto kommer att vara låst i {0} minuter efter {1} försök.", 
+        "grant_type_error": "Felaktig åtkomst", 
+        "user_lockout": "Låsning av konto {0} minuter efter flera misslyckade inloggningsförsök. Försök igen efter {1}"
+    }
 }

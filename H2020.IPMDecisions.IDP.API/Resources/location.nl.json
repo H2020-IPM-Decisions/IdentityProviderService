@@ -1,0 +1,20 @@
+{
+  "accounts": {
+    "change_password_error": ""
+  },
+  "authentification": {
+    "grant_type_error": "",
+    "username_password_error": "",
+    "email_not_confirmed": "",
+    "user_lockout": "",
+    "unauthorized_user": ""
+  },
+  "general": {
+    "email_error": "",
+    "not_found": ""
+  },
+  "registration": {
+    "duplicateusername": "",
+    "duplicateemail": ""
+  }
+}
