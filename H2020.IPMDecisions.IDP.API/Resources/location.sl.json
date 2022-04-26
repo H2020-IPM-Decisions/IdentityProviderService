@@ -1,0 +1,20 @@
+{
+    "registration": {
+        "duplicateusername": "Uporabniško ime {0} je že zasedeno.", 
+        "duplicateemail": "E-naslov {0} je že uporabljen."
+    }, 
+    "general": {
+        "email_error": "Pri pošiljanju e-poštnega sporočila je prišlo do napake. Prosimo, poskusite znova pozneje.", 
+        "not_found": "Ni najdeno"
+    }, 
+    "accounts": {
+        "change_password_error": "Zahteva za spremembo gesla je neuspešna"
+    }, 
+    "authentification": {
+        "unauthorized_user": "Nepooblaščeni uporabnik", 
+        "email_not_confirmed": "Vaš e-poštni naslov ni potrjen. Pred nadaljevanjem potrdite svoj e-poštni naslov.", 
+        "username_password_error": "Uporabniško ime ali geslo sta napačna. Vaš račun bo po {1} poskusih zaklenjen za {0} minut.", 
+        "grant_type_error": "Nepačno dodeljen dostop", 
+        "user_lockout": "Račun se zaklene za {0} minut po več neuspešnih poskusih prijave. Prosimo poskusite ponovno čez {1} minut."
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "registration": {
+        "duplicateusername": "Brugernavnet {0} er allerede taget.", 
+        "duplicateemail": "E-mail {0} er allerede taget."
+    }, 
+    "general": {
+        "email_error": "Der har været en fejl ved afsendelse af e-mailen. Prøv igen senere.", 
+        "not_found": "Ikke fundet"
+    }, 
+    "accounts": {
+        "change_password_error": "Anmodning om ændring af adgangskode mislykkedes"
+    }, 
+    "authentification": {
+        "unauthorized_user": "Uautoriseret bruger", 
+        "email_not_confirmed": "Din e-mail er ikke bekræftet. Bekræft venligst din e-mail, før du fortsætter.", 
+        "username_password_error": "Brugernavn eller adgangskode er forkert. Din konto vil blive spærret i {0} minutter efter {1} forsøg.", 
+        "grant_type_error": "Forkert støtte type adgang", 
+        "user_lockout": "Kontolåsning i {0} minutter efter flere mislykkede loginforsøg. Prøv venligst igen efter {1}"
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "registration": {
+        "duplicateusername": "Benutzername {0} ist bereits vergeben.", 
+        "duplicateemail": "E-Mail {0} ist bereits vergeben."
+    }, 
+    "general": {
+        "email_error": "Beim Senden der E-Mail ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.", 
+        "not_found": "Nicht gefunden"
+    }, 
+    "accounts": {
+        "change_password_error": "Anfrage zur Passwortänderung erfolglos"
+    }, 
+    "authentification": {
+        "unauthorized_user": "Unbefugter Benutzer", 
+        "email_not_confirmed": "Ihre E-Mail ist nicht bestätigt. Bitte bestätigen Sie Ihre E-Mail, bevor Sie fortfahren.", 
+        "username_password_error": "Benutzername oder Passwort sind falsch. Ihr Konto wird für {0} Minuten nach {1} Versuchen gesperrt.", 
+        "grant_type_error": "Falscher Zugang zum Beihilfetyp", 
+        "user_lockout": "Kontosperre für {0} Minuten nach mehreren fehlgeschlagenen Anmeldeversuchen. Bitte versuchen Sie es nach {1} erneut."
+    }
+}
