@@ -24,7 +24,7 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
             CreateMap<ApplicationUser, InactiveUserEmail>()
                 .ForMember(dest => dest.ToAddress, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.InactiveMonths, opt => opt.MapFrom(src => (((DateTime.Now.Year - src.LastValidAccess.Year) * 12) + DateTime.Now.Month - src.LastValidAccess.Month)))
-                .ForMember(dest => dest.AccountDeletionDate, opt => opt.MapFrom(src => src.LastValidAccess.AddMonths(12).ToShortDateString()));
+                .ForMember(dest => dest.AccountDeletionDate, opt => opt.MapFrom(src => src.LastValidAccess.AddMonths(12).ToString("dd/MM/yyyy")));
         }
     }
 }

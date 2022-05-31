@@ -32,7 +32,10 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var emailSent = await this.internalCommunicationProvider.SendForgotPasswordEmail(passwordEmail);
 
                 if (!emailSent)
+                {
+                    logger.LogWarning(string.Format("Error while sending forgot password email to {0}", userEmailDto.Email));
                     return GenericResponseBuilder.NoSuccess(this.jsonStringLocalizer["general.email_error"].ToString());
+                }
 
                 return GenericResponseBuilder.Success();
             }
@@ -82,9 +85,15 @@ namespace H2020.IPMDecisions.IDP.BLL
                     var profileCreated = await this.internalCommunicationProvider.CreateUserProfileAsync(identityUser);
                     var userToReturn = this.mapper.Map<UserRegistrationReturnDto>(identityUser);
                     if (!emailSent)
+                    {
+                        logger.LogWarning(string.Format("Error while sending registration email to {0}", registrationEmail));
                         userToReturn.EmailSentDuringRegistration = false;
+                    }
                     if (!profileCreated)
+                    {
+                        logger.LogWarning(string.Format("Error while creating user profile on UPR: {0}", registrationEmail));
                         userToReturn.ProfileCreatedDuringRegistration = false;
+                    }
 
                     var successResponse = GenericResponseBuilder.Success<UserDto>(userToReturn);
                     return successResponse;
@@ -236,7 +245,10 @@ namespace H2020.IPMDecisions.IDP.BLL
                 var emailSent = await this.internalCommunicationProvider.ResendConfirmationEmail(registrationEmail);
 
                 if (!emailSent)
+                {
+                    logger.LogWarning(string.Format("Error while sending forgot password email to {0}", userEmailDto.Email));
                     return GenericResponseBuilder.NoSuccess(this.jsonStringLocalizer["general.email_error"].ToString());
+                }
 
                 return GenericResponseBuilder.Success();
             }
