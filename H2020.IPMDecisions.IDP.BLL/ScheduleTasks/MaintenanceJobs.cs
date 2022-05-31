@@ -57,7 +57,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 var users = await this
                     .dataService
                     .UserManagerExtensions
-                    .FindAllAsync(u => u.LastValidAccess < DateTime.Now.AddMonths(-months) & u.InactiveEmailsSent == inactiveEmailsSent);
+                    .FindAllAsync(u => u.LastValidAccess < DateTime.Now.AddMonths(-months) && u.InactiveEmailsSent == inactiveEmailsSent);
 
                 foreach (var user in users)
                 {
