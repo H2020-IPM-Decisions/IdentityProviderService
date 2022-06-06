@@ -72,7 +72,7 @@ namespace H2020.IPMDecisions.IDP.BLL
                 return GenericResponseBuilder.NoSuccess<IDictionary<string, object>>(null, ex.Message.ToString());
             }
         }
-        
+
         public async Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType)
         {
             try
@@ -149,6 +149,31 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
         }
 
+        public async Task<GenericResponse> UpdateUser(Guid id, UserForPartialUpdateDto userForUpdate)
+        {
+            try
+            {
+                var user = await this.dataService.UserManager.FindByIdAsync(id.ToString());
+                if (user == null) return GenericResponseBuilder.NoSuccess("Not found");
+
+                // Default is true
+                user.EmailConfirmed = userForUpdate.EmailConfirmed;
+                if (!string.IsNullOrEmpty(userForUpdate.Password))
+                {
+                    var removePasswordResult = await this.dataService.UserManager.RemovePasswordAsync(user);
+                    if (!removePasswordResult.Succeeded) return GenericResponseBuilder.NoSuccess(string.Format("Error removing password: {0}: ", removePasswordResult.Errors.FirstOrDefault().Description));
+                    var addPasswordResult = await this.dataService.UserManager.AddPasswordAsync(user, userForUpdate.Password);
+                    if (!addPasswordResult.Succeeded) return GenericResponseBuilder.NoSuccess(string.Format("Error adding password: {0}", addPasswordResult.Errors.FirstOrDefault().Description));
+                }
+                await this.dataService.CompleteAsync();
+                return GenericResponseBuilder.Success();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in BLL - DeleteUser. {0}", ex.Message));
+                return GenericResponseBuilder.NoSuccess(ex.Message.ToString());
+            }
+        }
         #region Helpers
         private IEnumerable<LinkDto> CreateLinksForUser(
             Guid id,
