@@ -50,7 +50,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             }
         }
 
-        public async Task ProcessInactiveUsersOlderThan(int months, int inactiveEmailsSent = 0, bool deleteUsers = false)
+        private async Task ProcessInactiveUsersOlderThan(int months, int inactiveEmailsSent = 0, bool deleteUsers = false)
         {
             try
             {

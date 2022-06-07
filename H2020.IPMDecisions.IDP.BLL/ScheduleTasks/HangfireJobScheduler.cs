@@ -30,6 +30,10 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Remove Inactive User After {0} Months", deleteAccount),
                 job => job.ProcessInactiveUser(JobCancellationToken.Null, deleteAccount, 3, true),
                 Cron.Weekly(DayOfWeek.Monday, 9), TimeZoneInfo.Utc);
+
+            RecurringJob.AddOrUpdate<ReportJobs>(string.Format("Run Total Accounts Report", deleteAccount),
+                job => job.TotalAccountsReport(JobCancellationToken.Null),
+                Cron.Weekly(DayOfWeek.Sunday, 23, 59), TimeZoneInfo.Utc);
         }
     }
 }
