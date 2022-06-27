@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
@@ -242,6 +244,36 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             {
                 logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - UserHasDssAsync. {0}", ex.Message));
                 return false;
+            }
+        }
+
+        public Task<bool> SendReport()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<ReportData>> GetDataFromUPRForReportsAsync()
+        {
+            try
+            {
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];
+                var content = userProvisionEndPoint + "internal/report";
+                var response = await httpClient.GetAsync(content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    logger.LogWarning(string.Format("Error getting report data. Reason: {0}",
+                        response.ReasonPhrase));
+                    return null; ;
+                }
+                var responseText = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<ReportData>>(responseText);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - GetDataFromUPRForReports. {0}", ex.Message));
+                return null;
             }
         }
     }

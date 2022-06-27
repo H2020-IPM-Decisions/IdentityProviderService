@@ -56,6 +56,17 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             }
         }
 
+        // Priorities
+        // •	Weekly report, as a csv file?
+        // •	Total number of accounts, listed by user type and by country
+        // •	Total number of accounts accessed in last(7) days, listed by user type and by country
+        // •	Date of account set up per account
+
+        // Nice to have
+        // •	Total number of accounts which have selected each DSS, by country
+        // •	Total amount of time spent per ser over last 7 days on the platform
+        // •	Total number of locations selected per user, listed by user type and by country
+
         private async Task ProcessTotalAccountsReport()
         {
             try
@@ -67,6 +78,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 var reportEmails = this.configuration.GetSection("Reports:ReportReceiversEmails")?.GetChildren()?.Select(x => x.Value)?.ToList();
 
                 // Get data from UPR, userID, all farms coordinates and DSS selected
+                var data = await this.internalCommunicationProvider.GetDataFromUPRForReportsAsync();
 
                 foreach (var claimValue in listOfValidClaims)
                 {
