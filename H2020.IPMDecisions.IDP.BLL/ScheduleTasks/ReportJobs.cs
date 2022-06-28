@@ -1,13 +1,19 @@
 using System;
+using System.Data;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Data.Core;
+using H2020.IPMDecisions.IDP.Core.Models;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.IO;
+using System.Reflection;
 
 namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 {
@@ -78,7 +84,8 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 var reportEmails = this.configuration.GetSection("Reports:ReportReceiversEmails")?.GetChildren()?.Select(x => x.Value)?.ToList();
 
                 // Get data from UPR, userID, all farms coordinates and DSS selected
-                var data = await this.internalCommunicationProvider.GetDataFromUPRForReportsAsync();
+                var reportData = await this.internalCommunicationProvider.GetDataFromUPRForReportsAsync();
+                var allUsers = new List<ReportUserDataJoined>();
 
                 foreach (var claimValue in listOfValidClaims)
                 {
@@ -88,13 +95,38 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                         .UserManager
                         .GetUsersForClaimAsync(claimAsClaim);
 
-                    var userAccessedLast7Days = users
-                         .Where(u => u.LastValidAccess > DateTime.Now.AddDays(-lastValidAccessDay));
-
-                    System.Console.WriteLine(claimValue);
-                    System.Console.WriteLine(users.Count().ToString());
-                    System.Console.WriteLine(userAccessedLast7Days.Count().ToString());
+                    var result = from user in users
+                                 join reportRecord in reportData on user.Id equals reportRecord.UserId into userReportData
+                                 from userData in userReportData.DefaultIfEmpty()
+                                 select new ReportUserDataJoined()
+                                 {
+                                     User = this.mapper.Map<ApplicationUserForReport>(user, opt =>
+                                        {
+                                            opt.Items["userType"] = claimValue.ToLower();
+                                        }),
+                                     FarmData = userData?.Farm
+                                 };
+                    allUsers.AddRange(result);
                 }
+
+                string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string jsonReportsFolder = Path.Combine(assemblyFolder, "reports");
+                Directory.CreateDirectory(jsonReportsFolder);
+                string jsonFileName = Path.Combine(jsonReportsFolder, string.Format("report_{0}.json", DateTime.Today.ToString("yyyy_MM_dd")));
+
+                using (StreamWriter file = File.CreateText(jsonFileName))
+                {
+                    JsonSerializer serializer = new JsonSerializer()
+                    {
+                        Formatting = Formatting.Indented,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        StringEscapeHandling = StringEscapeHandling.Default,
+                    };
+                    serializer.Serialize(file, allUsers);
+                }
+                // SEND EMAIL
+
+                // DELETE FILE
             }
             catch (Exception ex)
             {
