@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
@@ -247,9 +249,41 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
         }
 
-        public Task<bool> SendReport()
+        public async Task<bool> SendReportAsync(string reportFilePath)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var jsonObject = new System.Json.JsonObject();
+                var reportEmails = config.GetSection("Reports:ReportReceiversEmails")?.GetChildren()?.Select(x => x.Value)?.ToList();
+                var reportEmailsAsString = string.Join(";", reportEmails);
+                jsonObject.Add("toAddresses", reportEmailsAsString);
+
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+
+                var fileName = Path.GetFileName(reportFilePath);
+                using var fileStream = File.OpenRead(reportFilePath);
+
+                var content = new StringContent(
+                    jsonObject.ToString(),
+                    Encoding.UTF8,
+                    customContentType);
+
+                var emailEndPoint = config["MicroserviceInternalCommunication:EmailMicroservice"];
+                var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinternalreport", content);
+                if (!emailResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
+                    logger.LogWarning(string.Format("Error creating Sending Internal Report. Reason: {0}. Response Content: {1}",
+                        emailResponse.ReasonPhrase, responseContent));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendInactiveUserEmail. {0}", ex.Message));
+                throw ex;
+            }
         }
 
         public async Task<List<ReportData>> GetDataFromUPRForReportsAsync()

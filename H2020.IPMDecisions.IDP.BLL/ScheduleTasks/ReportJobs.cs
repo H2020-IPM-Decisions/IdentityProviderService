@@ -81,7 +81,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 var listOfValidClaims = validClaims.Split(';').ToList();
                 var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
                 var lastValidAccessDay = int.Parse(this.configuration["Reports:LastValidAccessDays"]);
-                var reportEmails = this.configuration.GetSection("Reports:ReportReceiversEmails")?.GetChildren()?.Select(x => x.Value)?.ToList();
+
 
                 // Get data from UPR, userID, all farms coordinates and DSS selected
                 var reportData = await this.internalCommunicationProvider.GetDataFromUPRForReportsAsync();
@@ -112,9 +112,9 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string jsonReportsFolder = Path.Combine(assemblyFolder, "reports");
                 Directory.CreateDirectory(jsonReportsFolder);
-                string jsonFileName = Path.Combine(jsonReportsFolder, string.Format("report_{0}.json", DateTime.Today.ToString("yyyy_MM_dd")));
+                string jsonFilePath = Path.Combine(jsonReportsFolder, string.Format("report_{0}.json.txt", DateTime.Today.ToString("yyyy_MM_dd")));
 
-                using (StreamWriter file = File.CreateText(jsonFileName))
+                using (StreamWriter file = File.CreateText(jsonFilePath))
                 {
                     JsonSerializer serializer = new JsonSerializer()
                     {
@@ -124,9 +124,12 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                     };
                     serializer.Serialize(file, allUsers);
                 }
-                // SEND EMAIL
 
-                // DELETE FILE
+                var emailSent = await this.internalCommunicationProvider.SendReportAsync(jsonFilePath);
+                if (emailSent)
+                    File.Delete(jsonFilePath);
+                else
+                    throw new Exception(string.Format("Error sending report! {0}", DateTime.Today.ToString("yyyy_MM_dd")));
             }
             catch (Exception ex)
             {
