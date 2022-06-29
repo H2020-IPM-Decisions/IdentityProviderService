@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Mail;
@@ -249,7 +248,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
         }
 
-        public async Task<bool> SendReportAsync(string reportFilePath)
+        public async Task<bool> SendReportAsync(string reportAsJson)
         {
             try
             {
@@ -257,13 +256,11 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 var reportEmails = config.GetSection("Reports:ReportReceiversEmails")?.GetChildren()?.Select(x => x.Value)?.ToList();
                 var reportEmailsAsString = string.Join(";", reportEmails);
                 jsonObject.Add("toAddresses", reportEmailsAsString);
+                jsonObject.Add("reportData", reportAsJson);
 
-                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];                
 
-                var fileName = Path.GetFileName(reportFilePath);
-                using var fileStream = File.OpenRead(reportFilePath);
-
-                var content = new StringContent(
+                HttpContent content = new StringContent(
                     jsonObject.ToString(),
                     Encoding.UTF8,
                     customContentType);

@@ -15,7 +15,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         Task<bool> CreateUserProfileAsync(ApplicationUser user);
         bool DeleteUserProfileAsync(Guid userId);
         Task<bool> UserHasDssAsync(Guid userId);
-        Task<bool> SendReportAsync(string reportFilePath);
+        Task<bool> SendReportAsync(string reportAsJson);
         Task<List<ReportData>> GetDataFromUPRForReportsAsync();
     }
 }

@@ -82,8 +82,6 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
                 var lastValidAccessDay = int.Parse(this.configuration["Reports:LastValidAccessDays"]);
 
-
-                // Get data from UPR, userID, all farms coordinates and DSS selected
                 var reportData = await this.internalCommunicationProvider.GetDataFromUPRForReportsAsync();
                 var allUsers = new List<ReportUserDataJoined>();
 
@@ -109,26 +107,9 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                     allUsers.AddRange(result);
                 }
 
-                string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string jsonReportsFolder = Path.Combine(assemblyFolder, "reports");
-                Directory.CreateDirectory(jsonReportsFolder);
-                string jsonFilePath = Path.Combine(jsonReportsFolder, string.Format("report_{0}.json.txt", DateTime.Today.ToString("yyyy_MM_dd")));
-
-                using (StreamWriter file = File.CreateText(jsonFilePath))
-                {
-                    JsonSerializer serializer = new JsonSerializer()
-                    {
-                        Formatting = Formatting.Indented,
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        StringEscapeHandling = StringEscapeHandling.Default,
-                    };
-                    serializer.Serialize(file, allUsers);
-                }
-
-                var emailSent = await this.internalCommunicationProvider.SendReportAsync(jsonFilePath);
-                if (emailSent)
-                    File.Delete(jsonFilePath);
-                else
+                var reportAsJson = JsonConvert.SerializeObject(allUsers);
+                var emailSent = await this.internalCommunicationProvider.SendReportAsync(reportAsJson);
+                if (!emailSent)
                     throw new Exception(string.Format("Error sending report! {0}", DateTime.Today.ToString("yyyy_MM_dd")));
             }
             catch (Exception ex)
