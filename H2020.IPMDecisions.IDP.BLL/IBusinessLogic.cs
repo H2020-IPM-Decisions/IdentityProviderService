@@ -17,7 +17,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(UserForAuthenticationDto user, HttpRequest request);
         Task<GenericResponse<AuthenticationDto>> AuthenticateUser(HttpRequest request);
         Task<GenericResponse> ConfirmEmail(Guid userId, string token);
-       Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto);
+        Task<GenericResponse> ForgotPassword(UserEmailDto userEmailDto);
         Task<GenericResponse> ResendConfirmationEmail(UserEmailDto userEmailDto);
         Task<GenericResponse> ResetPassword(ResetPasswordDto resetPasswordDto);
         #endregion
@@ -65,6 +65,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         Task<GenericResponse<IDictionary<string, object>>> GetUser(Guid id, string fields, string mediaType);
         Task<GenericResponse<ShapedDataWithLinks>> GetUsers(ApplicationUserResourceParameter resourceParameter, string mediaType);
         Task<GenericResponse> DeleteUser(Guid id);
+        Task<GenericResponse> UpdateUser(Guid id, UserForPartialUpdateDto userForUpdate);
         #endregion
 
         #region Internal Call Controller

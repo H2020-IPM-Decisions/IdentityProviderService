@@ -10,6 +10,7 @@ using System.Net.Mime;
 using H2020.IPMDecisions.IDP.BLL;
 using H2020.IPMDecisions.IDP.Core.Models;
 using Microsoft.AspNetCore.Identity;
+using H2020.IPMDecisions.IDP.Core.Dtos;
 
 namespace H2020.IPMDecisions.IDP.API.Controllers
 {
@@ -78,6 +79,22 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return NotFound();
 
             return Ok(response.Result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [HttpPut("{id:guid}", Name = "UpdateUser")]
+        // PUT: api/users/1
+        public async Task<IActionResult> UpdateUser(
+            [FromRoute] Guid id,
+            [FromBody] UserForPartialUpdateDto userForUpdate)
+        {
+            var response = await this.businessLogic.UpdateUser(id, userForUpdate);
+
+            if (!response.IsSuccessful)
+                return BadRequest(new { message = response.ErrorMessage });
+            return NoContent();
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]

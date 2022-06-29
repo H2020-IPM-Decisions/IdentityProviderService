@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
@@ -14,5 +15,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         Task<bool> CreateUserProfileAsync(ApplicationUser user);
         bool DeleteUserProfileAsync(Guid userId);
         Task<bool> UserHasDssAsync(Guid userId);
+        Task<bool> SendReportAsync(string reportAsJson);
+        Task<List<ReportData>> GetDataFromUPRForReportsAsync();
     }
 }

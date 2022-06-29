@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
@@ -242,6 +245,66 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             {
                 logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - UserHasDssAsync. {0}", ex.Message));
                 return false;
+            }
+        }
+
+        public async Task<bool> SendReportAsync(string reportAsJson)
+        {
+            try
+            {
+                var jsonObject = new System.Json.JsonObject();
+                var reportEmails = config.GetSection("Reports:ReportReceiversEmails")?.GetChildren()?.Select(x => x.Value)?.ToList();
+                var reportEmailsAsString = string.Join(";", reportEmails);
+                jsonObject.Add("toAddresses", reportEmailsAsString);
+                jsonObject.Add("reportData", reportAsJson);
+
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];                
+
+                HttpContent content = new StringContent(
+                    jsonObject.ToString(),
+                    Encoding.UTF8,
+                    customContentType);
+
+                var emailEndPoint = config["MicroserviceInternalCommunication:EmailMicroservice"];
+                var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinternalreport", content);
+                if (!emailResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
+                    logger.LogWarning(string.Format("Error creating Sending Internal Report. Reason: {0}. Response Content: {1}",
+                        emailResponse.ReasonPhrase, responseContent));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendInactiveUserEmail. {0}", ex.Message));
+                throw ex;
+            }
+        }
+
+        public async Task<List<ReportData>> GetDataFromUPRForReportsAsync()
+        {
+            try
+            {
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
+                var userProvisionEndPoint = config["MicroserviceInternalCommunication:UserProvisionMicroservice"];
+                var content = userProvisionEndPoint + "internal/report";
+                var response = await httpClient.GetAsync(content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    logger.LogWarning(string.Format("Error getting report data. Reason: {0}",
+                        response.ReasonPhrase));
+                    return null; ;
+                }
+                var responseText = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<ReportData>>(responseText);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - GetDataFromUPRForReports. {0}", ex.Message));
+                return null;
             }
         }
     }
