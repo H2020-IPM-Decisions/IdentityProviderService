@@ -253,9 +253,8 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             try
             {
                 var jsonObject = new System.Json.JsonObject();
-                var reportEmails = config.GetSection("Reports:ReportReceiversEmails")?.GetChildren()?.Select(x => x.Value)?.ToList();
-                var reportEmailsAsString = string.Join(";", reportEmails);
-                jsonObject.Add("toAddresses", reportEmailsAsString);
+                var reportEmails = this.config["Reports:ReportReceiversEmails"];
+                jsonObject.Add("toAddresses", reportEmails);
                 jsonObject.Add("reportData", reportAsJson);
 
                 var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];                
