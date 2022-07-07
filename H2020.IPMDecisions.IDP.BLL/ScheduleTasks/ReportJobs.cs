@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -12,8 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.IO;
-using System.Reflection;
 
 namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 {
@@ -58,20 +55,9 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             }
             catch (Exception ex)
             {
-                logger.LogError(string.Format("Error in BLL - Error executing schedule to send emails to inactive users. {0}", ex.Message));
+                logger.LogError(string.Format("Error in BLL - Error executing schedule to send reports. {0}", ex.Message));
             }
         }
-
-        // Priorities
-        // •	Weekly report, as a csv file?
-        // •	Total number of accounts, listed by user type and by country
-        // •	Total number of accounts accessed in last(7) days, listed by user type and by country
-        // •	Date of account set up per account
-
-        // Nice to have
-        // •	Total number of accounts which have selected each DSS, by country
-        // •	Total amount of time spent per ser over last 7 days on the platform
-        // •	Total number of locations selected per user, listed by user type and by country
 
         private async Task ProcessTotalAccountsReport()
         {
@@ -80,7 +66,6 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                 var validClaims = this.configuration["AccessClaims:UserAccessLevels"];
                 var listOfValidClaims = validClaims.Split(';').ToList();
                 var userTypeClaim = this.configuration["AccessClaims:ClaimTypeName"];
-                var lastValidAccessDay = int.Parse(this.configuration["Reports:LastValidAccessDays"]);
 
                 var reportData = await this.internalCommunicationProvider.GetDataFromUPRForReportsAsync();
                 var allUsers = new List<ReportUserDataJoined>();
