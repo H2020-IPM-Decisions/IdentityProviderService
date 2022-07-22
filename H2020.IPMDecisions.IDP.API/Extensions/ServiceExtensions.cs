@@ -57,7 +57,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
-                options.Password.RequiredLength = 6;
+                options.Password.RequiredLength = 12;
                 options.Password.RequiredUniqueChars = 1;
 
                 // ToDo When Email confirmation available
