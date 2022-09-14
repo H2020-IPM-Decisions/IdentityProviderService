@@ -1,20 +1,20 @@
 {
-    "registration": {
-        "duplicateusername": "Användarnamn {0} används redan.", 
-        "duplicateemail": "E-post {0} används redan."
-    }, 
-    "general": {
-        "email_error": "Ett fel när e-postmeddelandet skickades. Försök igen senare.", 
-        "not_found": "Hittades inte"
-    }, 
     "accounts": {
         "change_password_error": "Begäran om lösenordsändring misslyckades"
-    }, 
+    },
     "authentification": {
-        "unauthorized_user": "Obehörig användare", 
-        "email_not_confirmed": "Din e-postadress är inte bekräftad. Bekräfta din e-post innan du fortsätter.", 
-        "username_password_error": "Användarnamn eller lösenord är felaktiga. Ditt konto kommer att vara låst i {0} minuter efter {1} försök.", 
-        "grant_type_error": "Felaktig åtkomst", 
-        "user_lockout": "Låsning av konto {0} minuter efter flera misslyckade inloggningsförsök. Försök igen efter {1}"
+        "email_not_confirmed": "Din e-postadress är inte bekräftad. Bekräfta din e-post innan du fortsätter.",
+        "grant_type_error": "Felaktig åtkomst",
+        "unauthorized_user": "Obehörig användare",
+        "user_lockout": "Låsning av konto {0} minuter efter flera misslyckade inloggningsförsök. Försök igen efter {1}",
+        "username_password_error": "Användarnamn eller lösenord är felaktiga. Ditt konto kommer att vara låst i {0} minuter efter {1} försök."
+    },
+    "general": {
+        "email_error": "Ett fel när e-postmeddelandet skickades. Försök igen senare.",
+        "not_found": "Hittades inte"
+    },
+    "registration": {
+        "duplicateemail": "E-post {0} används redan.",
+        "duplicateusername": "Användarnamn {0} används redan."
     }
 }

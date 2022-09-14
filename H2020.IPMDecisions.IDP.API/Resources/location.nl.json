@@ -1,20 +1,20 @@
 {
-  "accounts": {
-    "change_password_error": ""
-  },
-  "authentification": {
-    "grant_type_error": "",
-    "username_password_error": "",
-    "email_not_confirmed": "",
-    "user_lockout": "",
-    "unauthorized_user": ""
-  },
-  "general": {
-    "email_error": "",
-    "not_found": ""
-  },
-  "registration": {
-    "duplicateusername": "",
-    "duplicateemail": ""
-  }
+    "accounts": {
+        "change_password_error": "Password change request unsuccessful"
+    },
+    "authentification": {
+        "email_not_confirmed": "Your email is not confirmed. Please confirm your email before continuing.",
+        "grant_type_error": "Wrong grant type access",
+        "unauthorized_user": "Unauthorized user",
+        "user_lockout": "Account lockout for {0} minutes after multiple failed logon attempts. Please try again after {1}",
+        "username_password_error": "Username or password are incorrect. Your account will be lockout for {0} minutes after {1} attempts."
+    },
+    "general": {
+        "email_error": "Has been an error sending the email. Please try again later.",
+        "not_found": "Not found"
+    },
+    "registration": {
+        "duplicateemail": "Email {0} is already taken.",
+        "duplicateusername": "User Name {0} is already taken."
+    }
 }

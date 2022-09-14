@@ -1,20 +1,20 @@
 {
-    "registration": {
-        "duplicateusername": "Naudotojo vardas {0} jau užimtas.", 
-        "duplicateemail": "Elektroninio pašto adresas  {0} jau užimtas."
-    }, 
-    "general": {
-        "email_error": "Siunčiant el. laišką įvyko klaida. Pabandykite dar kartą vėliau", 
-        "not_found": "Nerasta"
-    }, 
     "accounts": {
         "change_password_error": "Slaptažodžio keitimo užklausa nepavyko"
-    }, 
+    },
     "authentification": {
-        "unauthorized_user": "Neautorizuotas vartotojas", 
-        "email_not_confirmed": "Jūsų el. paštas nepatvirtintas. Prieš tęsdami patvirtinkite savo el. pašto adresą.", 
-        "username_password_error": "Vartotojo vardas arba slaptažodis neteisingas. Jūsų paskyra bus užblokuota {0} minutes po {1} bandymų.", 
-        "grant_type_error": "Neteisingo tipo  prieiga", 
-        "user_lockout": "Paskyra užrakinta {0} minučių po kelių nesėkmingų prisijungimo bandymų. Bandykite dar kartą po {1}"
+        "email_not_confirmed": "Jūsų el. paštas nepatvirtintas. Prieš tęsdami patvirtinkite savo el. pašto adresą.",
+        "grant_type_error": "Neteisingo tipo  prieiga",
+        "unauthorized_user": "Neautorizuotas vartotojas",
+        "user_lockout": "Paskyra užrakinta {0} minučių po kelių nesėkmingų prisijungimo bandymų. Bandykite dar kartą po {1}",
+        "username_password_error": "Vartotojo vardas arba slaptažodis neteisingas. Jūsų paskyra bus užblokuota {0} minutes po {1} bandymų."
+    },
+    "general": {
+        "email_error": "Siunčiant el. laišką įvyko klaida. Pabandykite dar kartą vėliau",
+        "not_found": "Nerasta"
+    },
+    "registration": {
+        "duplicateemail": "Elektroninio pašto adresas  {0} jau užimtas.",
+        "duplicateusername": "Naudotojo vardas {0} jau užimtas."
     }
 }
