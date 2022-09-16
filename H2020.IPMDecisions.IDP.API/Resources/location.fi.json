@@ -1,20 +1,20 @@
 {
-    "registration": {
-        "duplicateusername": "Käyttäjätunnus {0} on jo käytössä.", 
-        "duplicateemail": "Sähköpostiosoite  {0} on jo käytössä."
-    }, 
-    "general": {
-        "email_error": "Sähköpostin lähetys ei onnistunut. Ole hyvä ja yritä myöhemmin uudelleen.", 
-        "not_found": "Kohdetta ei löydy"
-    }, 
     "accounts": {
         "change_password_error": "Salasanan vaihto ei onnistunut"
-    }, 
+    },
     "authentification": {
-        "unauthorized_user": "Käyttäjällä ei ole oikeuksia.", 
-        "email_not_confirmed": "Sähköpostiosoitetta ei ole vielä vahvistettu. Ole hyvä ja vahvista se ensin.", 
-        "username_password_error": "Käyttäjänimi tai salasana eivät ole oikein. Käyttäjätili lukittuu {0} minuutiksi {1} yrityksen jälkeen.", 
-        "grant_type_error": "Väärä lupatyyppi", 
-        "user_lockout": "Käyttäjätilin lukitus {0} minuuttia, useita epäonnistuneita kirjautumisia. Ole hyvä ja yritä myöhemmin uudestaan."
+        "email_not_confirmed": "Sähköpostiosoitetta ei ole vielä vahvistettu. Ole hyvä ja vahvista se ensin.",
+        "grant_type_error": "Väärä lupatyyppi",
+        "unauthorized_user": "Käyttäjällä ei ole oikeuksia.",
+        "user_lockout": "Käyttäjätilin lukitus {0} minuuttia, useita epäonnistuneita kirjautumisia. Ole hyvä ja yritä myöhemmin uudestaan.",
+        "username_password_error": "Käyttäjänimi tai salasana eivät ole oikein. Käyttäjätili lukittuu {0} minuutiksi {1} yrityksen jälkeen."
+    },
+    "general": {
+        "email_error": "Sähköpostin lähetys ei onnistunut. Ole hyvä ja yritä myöhemmin uudelleen.",
+        "not_found": "Kohdetta ei löydy"
+    },
+    "registration": {
+        "duplicateemail": "Sähköpostiosoite  {0} on jo käytössä.",
+        "duplicateusername": "Käyttäjätunnus {0} on jo käytössä."
     }
 }
