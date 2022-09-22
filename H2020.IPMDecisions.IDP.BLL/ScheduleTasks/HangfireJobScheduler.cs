@@ -33,7 +33,8 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 
             RecurringJob.AddOrUpdate<ReportJobs>(string.Format("Run Total Accounts Report", deleteAccount),
                 job => job.TotalAccountsReport(JobCancellationToken.Null),
-                Cron.Weekly(DayOfWeek.Sunday, 23, 59), TimeZoneInfo.Utc);
+                // Cron.Weekly(DayOfWeek.Sunday, 23, 59), TimeZoneInfo.Utc);
+                Cron.MinuteInterval(1), TimeZoneInfo.Utc);
         }
     }
 }
