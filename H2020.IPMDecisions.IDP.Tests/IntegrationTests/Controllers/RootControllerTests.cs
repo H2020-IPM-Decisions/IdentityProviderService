@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.TestHost;
 namespace H2020.IPMDecisions.IDP.Tests.IntegrationTests.Controllers
 {
     [Collection("FakeWebHost")]
+    [Trait("Category", "Docker")]
     public class RootControllerTests
     {
         private readonly FakeWebHost fakeWebHost;

@@ -16,5 +16,6 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAsync(Guid userId);
         Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request);
         Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(UserForAuthenticationDto userDto);
+        Task UpdateLastValidAccessAsync(ApplicationUser user);
     }
 }

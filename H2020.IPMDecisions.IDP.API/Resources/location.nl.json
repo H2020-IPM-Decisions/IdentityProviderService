@@ -1,0 +1,20 @@
+{
+    "accounts": {
+        "change_password_error": "Verzoek aanpassen wachtwoord niet gelukt"
+    },
+    "authentification": {
+        "email_not_confirmed": "Uw e-mail adres is nog niet bevestigd. Bevestig aub uw e-mail voordat u verder gaat.",
+        "grant_type_error": "Verkeerde type toegang",
+        "unauthorized_user": "Niet ge-authoriseerde gebruiker",
+        "user_lockout": "Account geblokkeerd voor {0} minuten na aantal keren foutieve pogingen om in te loggen. Probeer opnieuw na {1}",
+        "username_password_error": "Gebruikersnaam of wachtwoord incorrect. Uw account wordt geblokkeerd voor {0} minuten na {1} pogingen."
+    },
+    "general": {
+        "email_error": "Er is een fout opgetreden bij versturen van het e-mailbericht. Probeer aub later nog een keer",
+        "not_found": "Niet gevonden"
+    },
+    "registration": {
+        "duplicateemail": "Mailadres {0} is al in gebruik.",
+        "duplicateusername": "Gebruikersnaam {0} is al in gebruik."
+    }
+}

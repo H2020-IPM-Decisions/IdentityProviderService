@@ -5,5 +5,6 @@ namespace H2020.IPMDecisions.IDP.Core.Models
         public bool IsSuccessful { get; set; }
         public string ResponseMessage { get; set; }
         public T Result { get; set; }
+        public string IdentityErrorType { get; set; }
     }
 }

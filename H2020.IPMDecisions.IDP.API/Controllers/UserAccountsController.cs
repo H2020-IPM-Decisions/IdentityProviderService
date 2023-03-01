@@ -35,10 +35,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("changepassword", Name = "ChangePassword")]
         //POST: api/users/1/Accounts/changepassword
-        public async Task<IActionResult> ChangePassword([FromRoute] Guid userId,[FromBody] ChangePasswordDto changePassword)
+        public async Task<IActionResult> ChangePassword([FromRoute] Guid userId, [FromBody] ChangePasswordDto changePassword)
         {
             var response = await businessLogic.ChangePassword(userId, changePassword);
-            
+
             if (response.IsSuccessful)
                 return Ok();
 
@@ -49,7 +49,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
                 return NotFound();
 
             return BadRequest(responseAsIdentityResult.Result);
-        }       
+        }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]

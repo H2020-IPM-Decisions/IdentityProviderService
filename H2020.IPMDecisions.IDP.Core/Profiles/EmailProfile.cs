@@ -9,6 +9,6 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
             // Models to Models
             CreateMap<Email, RegistrationEmail>();
             CreateMap<Email, ForgotPasswordEmail>();
-        }       
+        }
     }
 }

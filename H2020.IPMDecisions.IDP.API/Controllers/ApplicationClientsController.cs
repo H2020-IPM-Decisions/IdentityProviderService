@@ -34,7 +34,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("", Name = "GetApplicationClients")]
         [HttpHead]
-        // GET: api/applicationclients
+        //GET: api/applicationclients
         public async Task<IActionResult> GetApplicationClients(
             [FromQuery] ApplicationClientResourceParameter resourceParameter,
             [FromHeader(Name = "Accept")] string mediaType)
@@ -65,7 +65,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpPost]
         [Route("")]
-        // POST: api/applicationclients
+        //POST: api/applicationclients
         public async Task<ActionResult<ApplicationClientDto>> Post(
             [FromBody] ApplicationClientForCreationDto clientForCreationDto,
             [FromHeader(Name = "Accept")] string mediaType)
@@ -82,8 +82,9 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("{id:guid}", Name = "DeleteApplicationClient")]
-        //DELETE :  api/applicationclients/1
+        //DELETE: api/applicationclients/1
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var response = await this.businessLogic.DeleteApplicationClient(id);
@@ -100,7 +101,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPatch("{id:guid}", Name = "PartialUpdateApplicationClient")]
-        //PATCH :  api/applicationclients/1
+        //PATCH: api/applicationclients/1
         public async Task<IActionResult> PartialUpdate(
             [FromRoute] Guid id,
             JsonPatchDocument<ApplicationClientForUpdateDto> patchDocument)
@@ -145,7 +146,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces(MediaTypeNames.Application.Json, "application/vnd.h2020ipmdecisions.hateoas+json")]
         [HttpGet("{id:guid}", Name = "GetApplicationClient")]
-        // GET: api/applicationclients/1
+        //GET: api/applicationclients/1
         public async Task<IActionResult> Get(
             [FromRoute] Guid id,
             [FromQuery] string fields,
@@ -164,7 +165,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpOptions]
-        // OPTIONS: api/applicationclients
+        //OPTIONS: api/applicationclients
         public IActionResult Options()
         {
             Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE,PATCH");

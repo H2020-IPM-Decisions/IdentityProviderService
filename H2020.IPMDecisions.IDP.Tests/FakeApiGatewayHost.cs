@@ -21,10 +21,10 @@ namespace H2020.IPMDecisions.IDP.Tests
 
             stub.Given(
                 Request.Create()
-                    .WithPath("/api/eml/accounts/registrationemail")                    
-                    .WithHeader("ipm-eml-auth", "1234")
+                    .WithPath("/api/eml/internal/registrationemail")                    
+                    .WithHeader("ipm-internal-auth", "1234")
                     //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
-                    .WithBody(new WildcardMatcher("*newuser@test.com*"))
+                    .WithBody(new WildcardMatcher("*newuser*"))
                     .UsingPost())
                 .RespondWith(Response.Create()
                     .WithStatusCode(200)
@@ -32,8 +32,8 @@ namespace H2020.IPMDecisions.IDP.Tests
 
             stub.Given(
                 Request.Create()
-                    .WithPath("/api/eml/accounts/registrationemail")
-                    .WithHeader("ipm-eml-auth", "1234")
+                    .WithPath("/api/eml/internal/registrationemail")
+                    .WithHeader("ipm-internal-auth", "1234")
                     //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
                     .WithBody(new WildcardMatcher("*emailservicedown*"))
                     .UsingPost())
@@ -44,8 +44,8 @@ namespace H2020.IPMDecisions.IDP.Tests
 
             stub.Given(
                 Request.Create()
-                    .WithPath("/api/eml/accounts/forgotpassword")
-                    .WithHeader("ipm-eml-auth", "1234")
+                    .WithPath("/api/eml/internal/forgotpassword")
+                    .WithHeader("ipm-internal-auth", "1234")
                     //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
                     .WithBody(new WildcardMatcher("*"))
                     .UsingPost())
@@ -56,8 +56,8 @@ namespace H2020.IPMDecisions.IDP.Tests
 
             stub.Given(
                 Request.Create()
-                    .WithPath("/api/eml/accounts/forgotpassword")
-                    .WithHeader("ipm-eml-auth", "1234")
+                    .WithPath("/api/eml/internal/forgotpassword")
+                    .WithHeader("ipm-internal-auth", "1234")
                     //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
                     .WithBody(new WildcardMatcher("*failemail*"))
                     .UsingPost())
@@ -66,6 +66,16 @@ namespace H2020.IPMDecisions.IDP.Tests
                     .WithStatusCode(400)
                     .WithHeader("Content-Type", "application/json")
                     .WithBody(@"{ ""message"": ""No connection could be made because the target machine actively refused it."" }"));
+
+            stub.Given(
+                Request.Create()
+                    .WithPath("/api/upr/internal/userprofile")                    
+                    .WithHeader("ipm-internal-auth", "1234")
+                    //.WithHeader("Content-Type", "application/vnd.h2020ipmdecisions.email+json")
+                    .WithBody(new WildcardMatcher("*"))
+                    .UsingPost())
+                .RespondWith(Response.Create()
+                    .WithStatusCode(200));
         }
 
         public void Dispose()
