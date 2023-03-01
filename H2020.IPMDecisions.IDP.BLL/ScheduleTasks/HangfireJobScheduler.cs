@@ -15,26 +15,25 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             var lastEmail = emailConfirmationAllowanceHours.LastEmailMonthInactive;
             var deleteAccount = emailConfirmationAllowanceHours.DeleteAccountMonthInactive;
 
-            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send Initial Inactive Email After {0} Months", firstEmail),
+            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send-Initial-Inactive-Email"),
                 job => job.ProcessInactiveUser(JobCancellationToken.Null, firstEmail, 0, false),
                 Cron.Weekly(DayOfWeek.Wednesday, 10), TimeZoneInfo.Utc);
 
-            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send Second Inactive Email After {0} Months", secondEmail),
+            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send-Second-Inactive-Email"),
                 job => job.ProcessInactiveUser(JobCancellationToken.Null, secondEmail, 1, false),
                 Cron.Weekly(DayOfWeek.Tuesday, 10), TimeZoneInfo.Utc);
 
-            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send Last Inactive Email After {0} Months", lastEmail),
+            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send-Last-Inactive-Email"),
                 job => job.ProcessInactiveUser(JobCancellationToken.Null, lastEmail, 2, false),
                 Cron.Weekly(DayOfWeek.Monday, 10), TimeZoneInfo.Utc);
 
-            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Remove Inactive User After {0} Months", deleteAccount),
+            RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Remove-Inactive-Accounts"),
                 job => job.ProcessInactiveUser(JobCancellationToken.Null, deleteAccount, 3, true),
                 Cron.Weekly(DayOfWeek.Monday, 9), TimeZoneInfo.Utc);
 
-            RecurringJob.AddOrUpdate<ReportJobs>(string.Format("Run Total Accounts Report", deleteAccount),
+            RecurringJob.AddOrUpdate<ReportJobs>("Run-Accounts-Report",
                 job => job.TotalAccountsReport(JobCancellationToken.Null),
-                // Cron.Weekly(DayOfWeek.Sunday, 23, 59), TimeZoneInfo.Utc);
-                Cron.MinuteInterval(5), TimeZoneInfo.Utc);
+                Cron.Weekly(DayOfWeek.Sunday, 23, 00), TimeZoneInfo.Utc);
         }
     }
 }
