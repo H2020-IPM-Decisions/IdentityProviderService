@@ -9,11 +9,11 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
     {
         public static void HangfireScheduleJobs(IConfiguration configuration)
         {
-            var emailConfirmationAllowanceHours = configuration.GetSection(nameof(InactiveUsers)).Get<InactiveUsers>();
-            var firstEmail = emailConfirmationAllowanceHours.FirstEmailMonthInactive;
-            var secondEmail = emailConfirmationAllowanceHours.SecondEmailMonthInactive;
-            var lastEmail = emailConfirmationAllowanceHours.LastEmailMonthInactive;
-            var deleteAccount = emailConfirmationAllowanceHours.DeleteAccountMonthInactive;
+            var emailInactiveUsers = configuration.GetSection(nameof(InactiveUsers)).Get<InactiveUsers>();
+            var firstEmail = emailInactiveUsers.FirstEmailMonthInactive;
+            var secondEmail = emailInactiveUsers.SecondEmailMonthInactive;
+            var lastEmail = emailInactiveUsers.LastEmailMonthInactive;
+            var deleteAccount = emailInactiveUsers.DeleteAccountMonthInactive;
 
             RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send-Initial-Inactive-Email"),
                 job => job.ProcessInactiveUser(JobCancellationToken.Null, firstEmail, 0, false),

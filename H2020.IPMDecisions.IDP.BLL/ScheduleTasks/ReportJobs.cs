@@ -78,6 +78,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                         .UserManager
                         .GetUsersForClaimAsync(claimAsClaim);
 
+                    if (users == null || users.Count == 0) continue;
                     var result = from user in users
                                  join reportRecord in reportData on user.Id equals reportRecord.UserId into userReportData
                                  from userData in userReportData.DefaultIfEmpty()
