@@ -68,10 +68,9 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                         continue;
                     }
                     var emailToSend = this.mapper.Map<InactiveUserEmail>(user);
-                    logger.LogWarning("debug email: ", emailToSend);
-                    // var emailSent = await this.internalCommunicationProvider.SendInactiveUserEmail(emailToSend);
-                    // if (emailSent)
-                    //     user.InactiveEmailsSent = inactiveEmailsSent + 1;
+                    var emailSent = await this.internalCommunicationProvider.SendInactiveUserEmail(emailToSend);
+                    if (emailSent)
+                        user.InactiveEmailsSent = inactiveEmailsSent + 1;
                 }
                 await this.dataService.CompleteAsync();
             }
