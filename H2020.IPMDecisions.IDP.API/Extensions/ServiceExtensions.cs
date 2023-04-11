@@ -248,6 +248,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             var options = new MySqlStorageOptions
             {
                 PrepareSchemaIfNecessary = true,
+                TransactionTimeout = TimeSpan.FromMinutes(30)                
             };
 
             services.AddHangfire(configuration =>
