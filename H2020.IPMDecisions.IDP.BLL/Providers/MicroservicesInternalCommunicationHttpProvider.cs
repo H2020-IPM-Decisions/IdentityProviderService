@@ -268,7 +268,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinternalreport", content);
                 if (!emailResponse.IsSuccessStatusCode)
                 {
-                    logger.LogInformation("Report:", reportAsJson);
+                    logger.LogError("Report:", reportAsJson);
                     var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
                     logger.LogWarning(string.Format("Error creating Sending Internal Report. Reason: {0}. Response Content: {1}",
                         emailResponse.ReasonPhrase, responseContent));
