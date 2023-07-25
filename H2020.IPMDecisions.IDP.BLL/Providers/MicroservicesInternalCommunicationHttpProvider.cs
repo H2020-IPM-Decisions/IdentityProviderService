@@ -257,7 +257,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 jsonObject.Add("toAddresses", reportEmails);
                 jsonObject.Add("reportData", reportAsJson);
 
-                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];                
+                var customContentType = config["MicroserviceInternalCommunication:ContentTypeHeader"];
 
                 HttpContent content = new StringContent(
                     jsonObject.ToString(),
@@ -268,6 +268,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinternalreport", content);
                 if (!emailResponse.IsSuccessStatusCode)
                 {
+                    logger.LogInformation("Report:", reportAsJson);
                     var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
                     logger.LogWarning(string.Format("Error creating Sending Internal Report. Reason: {0}. Response Content: {1}",
                         emailResponse.ReasonPhrase, responseContent));
@@ -277,7 +278,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             }
             catch (Exception ex)
             {
-                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendInactiveUserEmail. {0}", ex.Message));
+                logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendReport. {0}", ex.Message));
                 throw ex;
             }
         }

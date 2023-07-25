@@ -115,6 +115,16 @@ namespace H2020.IPMDecisions.IDP.API
 
             var apiBasePath = Configuration["MicroserviceInternalCommunication:IdentityProviderMicroservice"];
 
+            app.UseSwagger(c =>
+                        {
+                            c.RouteTemplate = apiBasePath + "swagger/{documentName}/swagger.json";
+                        });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint($"/{apiBasePath}swagger/v1/swagger.json", "H2020 IPM Decisions - Identity Provider API");
+                c.RoutePrefix = $"{apiBasePath}swagger";
+            });
+
             var dashboardOptions = new DashboardOptions();
             if (!CurrentEnvironment.IsDevelopment())
             {
@@ -128,16 +138,6 @@ namespace H2020.IPMDecisions.IDP.API
             {
                 endpoints.MapControllers();
                 endpoints.MapHangfireDashboard();
-            });
-
-            app.UseSwagger(c =>
-            {
-                c.RouteTemplate = apiBasePath + "swagger/{documentName}/swagger.json";
-            });
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint($"/{apiBasePath}swagger/v1/swagger.json", "H2020 IPM Decisions - Identity Provider API");
-                c.RoutePrefix = $"{apiBasePath}swagger";
             });
 
             applicationLifetime.ApplicationStopping.Register(OnShutdown);
