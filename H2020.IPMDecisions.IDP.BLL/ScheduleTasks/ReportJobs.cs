@@ -11,6 +11,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.IO;
+using CsvHelper;
+using System.Globalization;
+using System.Reflection;
 
 namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 {
@@ -92,15 +96,57 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                                  };
                     allUsers.AddRange(result);
                 }
-
                 var reportAsJson = JsonConvert.SerializeObject(allUsers);
                 var emailSent = await this.internalCommunicationProvider.SendReportAsync(reportAsJson);
                 if (!emailSent)
+                {
+                    SaveReportAsCSV(allUsers, DateTime.Today.ToString("yyyy_MM_dd"));
                     throw new Exception(string.Format("Error sending report! {0}", DateTime.Today.ToString("yyyy_MM_dd")));
+                }
+
             }
             catch (Exception ex)
             {
                 logger.LogError(string.Format("Error in BLL - Error executing schedule to ProcessTotalAccountsReport method. {0}", ex.Message));
+            }
+        }
+
+        private void SaveReportAsCSV(List<ReportUserDataJoined> allUsers, string reportName)
+        {
+            var dataAsCsv = ConvertToCsv(allUsers);
+
+            string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string csvReportsFolder = Path.Combine(assemblyFolder, "reports");
+            Directory.CreateDirectory(csvReportsFolder);
+            string csvFilePath = Path.Combine(csvReportsFolder, string.Format("report_{0}.csv", reportName));
+
+            File.WriteAllText(csvFilePath, dataAsCsv);
+        }
+
+        private string ConvertToCsv(List<ReportUserDataJoined> allUsers)
+        {
+            List<ReportUserDataJoinedFlat> flatDataList = new List<ReportUserDataJoinedFlat>();
+            foreach (var userData in allUsers)
+            {
+                foreach (var dssModel in userData.FarmData.DssModels)
+                {
+                    flatDataList.Add(new ReportUserDataJoinedFlat
+                    {
+                        Country = userData.FarmData.Country,
+                        FirstCharactersUserId = userData.User.FirstCharactersUserId,
+                        RegistrationDate = userData.User.RegistrationDate,
+                        LastValidAccess = userData.User.LastValidAccess,
+                        UserType = userData.User.UserType,
+                        ModelName = dssModel.ModelName,
+                        ModelId = dssModel.ModelId
+                    });
+                }
+            }
+            using (var writer = new StringWriter())
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.WriteRecords(flatDataList);
+                return writer.ToString();
             }
         }
     }
