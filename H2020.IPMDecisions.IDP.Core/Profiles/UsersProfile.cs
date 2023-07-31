@@ -28,11 +28,11 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
 
             CreateMap<ApplicationUser, ApplicationUserForReport>()
                 .ForMember(dest => dest.FirstCharactersUserId, opt => opt.MapFrom(src => src.Id.Substring(0, 6)))
-                .ForMember(dest => dest.RegistrationDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.RegistrationDate, opt => opt.MapFrom(src => src.RegistrationDate))
                 .ForMember(dest => dest.LastValidAccess, opt => opt.MapFrom(src => src.LastValidAccess))
                 .AfterMap((src, dest, context) =>
                 {
-                   dest.UserType = context.Options.Items["userType"].ToString();
+                    dest.UserType = context.Options.Items["userType"].ToString();
                 });
         }
     }
