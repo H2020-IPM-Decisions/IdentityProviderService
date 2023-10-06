@@ -58,7 +58,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                     .dataService
                     .UserManagerExtensions
                     .FindAllAsync(u => u.LastValidAccess < DateTime.Now.AddMonths(-months) && u.InactiveEmailsSent == inactiveEmailsSent);
-
+                var count = 0;
                 foreach (var user in users)
                 {
                     if (deleteUsers)
@@ -71,6 +71,8 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
                     var emailSent = await this.internalCommunicationProvider.SendInactiveUserEmail(emailToSend);
                     if (emailSent)
                         user.InactiveEmailsSent = inactiveEmailsSent + 1;
+                    count++;
+                    if (count % 50 == 0) await this.dataService.CompleteAsync();
                 }
                 await this.dataService.CompleteAsync();
             }
