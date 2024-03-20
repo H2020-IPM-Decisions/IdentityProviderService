@@ -13,7 +13,7 @@ namespace H2020.IPMDecisions.IDP.Tests
         private WireMockServer stub;
         public FakeApiGatewayHost()
         {
-            stub = FluentMockServer.Start(new FluentMockServerSettings
+            stub = WireMockServer.Start(new WireMockServerSettings
             {
                 Urls = new[] { "http://+:5003" },
                 StartAdminInterface = true
