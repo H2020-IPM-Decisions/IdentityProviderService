@@ -37,7 +37,7 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 .AddDbContext<ApplicationDbContext>(options =>
                 {
                     options.UseMySql(connectionString,
-                        b => b.MigrationsAssembly("H2020.IPMDecisions.IDP.Data"));
+                         new MySqlServerVersion(new Version()), b => b.MigrationsAssembly("H2020.IPMDecisions.IDP.Data"));
                 });
         }
 
