@@ -32,7 +32,7 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
                 .ForMember(dest => dest.LastValidAccess, opt => opt.MapFrom(src => src.LastValidAccess))
                 .AfterMap((src, dest, context) =>
                 {
-                    dest.UserType = context.Options.Items["userType"].ToString();
+                    dest.UserType = context.Items["userType"].ToString();
                 });
         }
     }
