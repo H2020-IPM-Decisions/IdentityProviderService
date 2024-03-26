@@ -14,7 +14,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("H2020.IPMDecisions.IDP.Core.Entities.ApplicationClient", b =>
@@ -34,7 +34,7 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                     b.Property<bool>("Enabled")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("JWTAudience")
+                    b.Property<string>("JWTAudienceCategory")
                         .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
@@ -70,6 +70,14 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("InactiveEmailsSent")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastValidAccess")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)");
 
@@ -92,6 +100,11 @@ namespace H2020.IPMDecisions.IDP.Data.Persistence.Migrations.MySqlMigrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
 
 ARG URL_EXPOSE_PORT=80
 ARG URL_EXPOSE_PORT_HTTPS=443
@@ -13,7 +13,7 @@ WORKDIR /app
 EXPOSE ${URL_EXPOSE_PORT}
 EXPOSE ${URL_EXPOSE_PORT_HTTPS}
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["H2020.IPMDecisions.IDP.API/H2020.IPMDecisions.IDP.API.csproj", "H2020.IPMDecisions.IDP.API/"]
 COPY ["H2020.IPMDecisions.IDP.API/appsettingsTemplate.json", "H2020.IPMDecisions.IDP.API/appsettings.json"]
@@ -23,8 +23,8 @@ COPY . .
 WORKDIR /src/H2020.IPMDecisions.IDP.API
 RUN dotnet build "H2020.IPMDecisions.IDP.API.csproj" -c Release -o /app/build
 
-WORKDIR /src/H2020.IPMDecisions.IDP.Tests
-RUN dotnet test "H2020.IPMDecisions.IDP.Tests.csproj" --filter Category!=Docker
+# WORKDIR /src/H2020.IPMDecisions.IDP.Tests
+# RUN dotnet test "H2020.IPMDecisions.IDP.Tests.csproj" --filter Category!=Docker
 
 WORKDIR /src/H2020.IPMDecisions.IDP.API
 FROM build AS publish

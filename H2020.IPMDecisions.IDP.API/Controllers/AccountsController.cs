@@ -46,6 +46,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("resetpassword", Name = "ResetPassword")]
+        // POST: api/Accounts/resetpassword
         public async Task<IActionResult> ResetPassword(
             [FromBody] ResetPasswordDto resetPasswordDto)
         {
@@ -59,6 +60,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             return BadRequest(responseAsIdentityResult.Result);
         }
 
+        [ServiceFilter(typeof(IsValidUserClaimValueActionFilter))]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -89,11 +91,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
         {
             var tokenResponse = await businessLogic.AuthenticateUser(userDto, Request);
-
             if (tokenResponse.IsSuccessful)
                 return Ok(tokenResponse.Result);
 
-            return BadRequest(new { message = tokenResponse.ErrorMessage });
+            return BadRequest(new { message = tokenResponse.ErrorMessage, identityErrorType = tokenResponse.Result.IdentityErrorType });
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
@@ -106,11 +107,10 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         public async Task<IActionResult> AuthenticateToken()
         {
             var tokenResponse = await businessLogic.AuthenticateUser(Request);
-
             if (tokenResponse.IsSuccessful)
                 return Ok(tokenResponse.Result);
 
-            return BadRequest(new { message = tokenResponse.ErrorMessage });
+            return BadRequest(new { message = tokenResponse.ErrorMessage, identityErrorType = tokenResponse.Result.IdentityErrorType });
         }
 
         [Produces(MediaTypeNames.Application.Json)]
@@ -128,6 +128,21 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             var responseAsIdentityResult = (GenericResponse<IdentityResult>)response;
             if (responseAsIdentityResult.Result == null) return BadRequest(new { message = response.ErrorMessage });
             return BadRequest(responseAsIdentityResult.Result);
+        }
+
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("resendConfirmationEmail", Name = "api.accounts.post.resendconfirmationemail")]
+        //POST: api/Accounts/resendConfirmationEmail
+        public async Task<IActionResult> ResendConfirmationEmail([FromBody] UserEmailDto userEmail)
+        {
+            var response = await businessLogic.ResendConfirmationEmail(userEmail);
+
+            if (response.IsSuccessful)
+                return Ok();
+
+            return BadRequest(new { message = response.ErrorMessage });
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

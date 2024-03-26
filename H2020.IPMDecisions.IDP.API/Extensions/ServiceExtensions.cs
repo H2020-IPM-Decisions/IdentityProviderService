@@ -7,6 +7,8 @@ using H2020.IPMDecisions.IDP.API.Filters;
 using H2020.IPMDecisions.IDP.BLL.Providers;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Data.Persistence;
+using Hangfire;
+using Hangfire.MySql.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -35,11 +37,11 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
                 .AddDbContext<ApplicationDbContext>(options =>
                 {
                     options.UseMySql(connectionString,
-                        b => b.MigrationsAssembly("H2020.IPMDecisions.IDP.Data"));
+                         new MySqlServerVersion(new Version(8, 0, 19)), b => b.MigrationsAssembly("H2020.IPMDecisions.IDP.Data"));
                 });
         }
 
-        public static void ConfigureIdentity(this IServiceCollection services)
+        public static void ConfigureIdentity(this IServiceCollection services, IConfiguration config)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -47,15 +49,15 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
             services.Configure<IdentityOptions>(options =>
             {
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]));
+                options.Lockout.MaxFailedAccessAttempts = int.Parse(config["IdentityOptions:MaxFailedAccessAttempts"]);
                 options.Lockout.AllowedForNewUsers = true;
 
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
-                options.Password.RequiredLength = 6;
+                options.Password.RequiredLength = 12;
                 options.Password.RequiredUniqueChars = 1;
 
                 // ToDo When Email confirmation available
@@ -64,6 +66,9 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
 
                 options.User.RequireUniqueEmail = true;
             });
+
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+                options.TokenLifespan = TimeSpan.FromHours(int.Parse(config["EmailConfirmationAllowanceHours"])));
         }
 
         public static void ConfigureJwtAuthentication(this IServiceCollection services, IConfiguration config)
@@ -221,19 +226,41 @@ namespace H2020.IPMDecisions.IDP.API.Extensions
             LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
         }
 
-        public static void ConfigureEmailService(this IServiceCollection services, IConfiguration config)
+        public static void ConfigureInternalCommunicationHttpService(this IServiceCollection services, IConfiguration config)
         {
-           services.AddHttpClient<IEmailProvider, EmailProvider>(client =>
-           {
-               client.BaseAddress = new Uri(config["IPMEmailMicroservice:ApiGatewayAddress"] + config["IPMEmailMicroservice:EmailMicroservice"]);
-               client.DefaultRequestHeaders.Add(config["IPMEmailMicroservice:SecurityTokenCustomHeader"], config["IPMEmailMicroservice:SecurityToken"]);
-           });
+            services.AddHttpClient<IMicroservicesInternalCommunicationHttpProvider, MicroservicesInternalCommunicationHttpProvider>(client =>
+            {
+                client.BaseAddress = new Uri(config["MicroserviceInternalCommunication:ApiGatewayAddress"]);
+                client.DefaultRequestHeaders.Add(config["MicroserviceInternalCommunication:SecurityTokenCustomHeader"], config["MicroserviceInternalCommunication:SecurityToken"]);
+            });
         }
 
         public static IEnumerable<string> Audiences(string audiences)
         {
             var listOfAudiences = audiences.Split(';').ToList();
             return listOfAudiences;
+        }
+
+        public static void ConfigureHangfire(this IServiceCollection services, IConfiguration config)
+        {
+            var connectionString = config["ConnectionStrings:MySqlDbConnection"];
+
+            var options = new MySqlStorageOptions
+            {
+                PrepareSchemaIfNecessary = true,
+                TransactionTimeout = TimeSpan.FromMinutes(120),
+            };
+
+            services.AddHangfire(configuration =>
+            {
+                configuration
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UseStorage(
+                    new MySqlStorage(connectionString, options));
+            });
+
+            services.AddHangfireServer();
         }
     }
 }

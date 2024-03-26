@@ -1,0 +1,20 @@
+{
+    "accounts": {
+        "change_password_error": "La demande de changement de mot de passe n'a pas abouti"
+    },
+    "authentification": {
+        "email_not_confirmed": "Votre adresse électronique n'est pas confirmée. Veuillez confirmer votre adresse e-mail avant de continuer.",
+        "grant_type_error": "Mauvais type d'accès",
+        "unauthorized_user": "Utilisateur non autorisé",
+        "user_lockout": "Le compte sera verrouillé pendant {0} minutes après plusieurs tentatives de connexion infructueuses. Veuillez réessayer après {1} tentatives.",
+        "username_password_error": "Le nom d'utilisateur ou le mot de passe sont incorrects. Votre compte sera verrouillé pendant {0} minutes après {1} tentatives."
+    },
+    "general": {
+        "email_error": "Une erreur s'est produite lors de l'envoi de l'e-mail. Veuillez réessayer plus tard.",
+        "not_found": "Non trouvé"
+    },
+    "registration": {
+        "duplicateemail": "L'email {0} est déjà pris.",
+        "duplicateusername": "Le nom d'utilisateur {0} est déjà pris."
+    }
+}

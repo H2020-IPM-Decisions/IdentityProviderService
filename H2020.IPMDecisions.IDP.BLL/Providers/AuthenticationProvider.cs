@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using H2020.IPMDecisions.IDP.BLL.Helpers;
 using H2020.IPMDecisions.IDP.Core.Dtos;
 using H2020.IPMDecisions.IDP.Core.Entities;
 using H2020.IPMDecisions.IDP.Core.Models;
 using H2020.IPMDecisions.IDP.Data.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace H2020.IPMDecisions.IDP.BLL.Providers
 {
@@ -15,15 +17,23 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
     {
         private readonly IDataService dataService;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly IConfiguration config;
+        private readonly IJsonStringLocalizer jsonStringLocalizer;
 
         public AuthenticationProvider(
             IDataService dataService,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IConfiguration config,
+            IJsonStringLocalizer jsonStringLocalizer)
         {
             this.signInManager = signInManager
                 ?? throw new ArgumentNullException(nameof(signInManager));
             this.dataService = dataService
                 ?? throw new ArgumentNullException(nameof(dataService));
+            this.config = config
+                ?? throw new ArgumentNullException(nameof(config));
+            this.jsonStringLocalizer = jsonStringLocalizer
+                ?? throw new ArgumentNullException(nameof(jsonStringLocalizer));
         }
 
         public async Task<AuthenticationProviderResult<ApplicationClient>> ValidateApplicationClientAsync(HttpRequest request)
@@ -81,7 +91,8 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             return response;
         }
 
-        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(UserForAuthenticationDto userDto)
+        public async Task<AuthenticationProviderResult<ApplicationUser>> ValidateUserAuthenticationAsync(
+            UserForAuthenticationDto userDto)
         {
             var response = new AuthenticationProviderResult<ApplicationUser>()
             {
@@ -92,34 +103,45 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
             var user = await this.dataService.UserManager.FindByEmailAsync(userDto.Email);
 
+
+            var attempts = int.Parse(config["IdentityOptions:MaxFailedAccessAttempts"]);
+            var minutes = int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]);
             if (user == null)
             {
-                response.ResponseMessage = "Username or password is incorrect";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.username_password_error", minutes, attempts].ToString();
+                response.IdentityErrorType = "ErrorUserNameOrPassword";
                 return response;
             }
 
-            // if (!user.EmailConfirmed)
-            // {
-            //     response.ResponseMessage = "Email not confirmed";
-            //     return response;
-            // }
+            var registrationTime = double.Parse(config["EmailConfirmationAllowanceHours"]);
+            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
+            {
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
+                response.IdentityErrorType = "EmailNotConfirmed";
+                return response;
+            }
 
             var result = await this.signInManager.PasswordSignInAsync(user.UserName, userDto.Password, false, true);
 
             if (result.Succeeded)
             {
+                await UpdateLastValidAccessAsync(user);
                 response.IsSuccessful = true;
                 response.Result = user;
                 return response;
             }
             else if (result.IsLockedOut)
             {
-                response.ResponseMessage = "User is lockout";
+                var minutesLockout = int.Parse(config["IdentityOptions:DefaultLockoutTimeSpan"]);
+                var newLoginTime = DateTime.Now.AddMinutes(minutesLockout).ToShortTimeString();
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout", minutesLockout, newLoginTime].ToString();
+                response.IdentityErrorType = "UserLockedOut";
                 return response;
             }
             else
             {
-                response.ResponseMessage = "Username or password is incorrect";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.username_password_error", minutes, attempts].ToString();
+                response.IdentityErrorType = "ErrorUserNameOrPassword";
                 return response;
             }
         }
@@ -134,7 +156,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
             };
 
             var user = await this.dataService.UserManager.FindByIdAsync(userId.ToString());
-            response.ResponseMessage = "Unauthorized";
+            response.ResponseMessage = this.jsonStringLocalizer["authentification.unauthorized_user"].ToString();
             if (user == null)
                 return response;
 
@@ -143,23 +165,26 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
 
             if (this.dataService.UserManager.SupportsUserLockout && await this.dataService.UserManager.IsLockedOutAsync(user))
             {
-                response.ResponseMessage = "User is lockout";
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.user_lockout"].ToString();
+                response.IdentityErrorType = "UserLockedOut";
                 return response;
             }
 
-            // ToDo When Email confirmation available
-            // if (!user.EmailConfirmed)
-            // {
-            //     response.ResponseMessage = "Email not confirmed";
-            //     return response;
-            // }
+            var registrationTime = double.Parse(config["EmailConfirmationAllowanceHours"]);
+            if (!user.EmailConfirmed && DateTime.Now > user.RegistrationDate.AddHours(registrationTime))
+            {
+                response.ResponseMessage = this.jsonStringLocalizer["authentification.email_not_confirmed"].ToString();
+                response.IdentityErrorType = "EmailNotConfirmed";
+                return response;
+            }
 
+            await UpdateLastValidAccessAsync(user);
             response.IsSuccessful = true;
             response.ResponseMessage = "";
             response.Result = user;
             return response;
         }
-        
+
         public async Task<IList<string>> GetUserRolesAsync(ApplicationUser user)
         {
             return await this.dataService.UserManager.GetRolesAsync(user);
@@ -168,6 +193,14 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         public async Task<IList<Claim>> GetUserClaimsAsync(ApplicationUser user)
         {
             return await this.dataService.UserManager.GetClaimsAsync(user);
+        }
+
+        public async Task UpdateLastValidAccessAsync(ApplicationUser user)
+        {
+            // Reset inactive parameters
+            user.LastValidAccess = DateTime.Now;
+            user.InactiveEmailsSent = 0;
+            await this.dataService.UserManager.UpdateAsync(user);
         }
     }
 }
