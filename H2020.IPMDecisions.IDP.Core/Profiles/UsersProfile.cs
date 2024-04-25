@@ -13,6 +13,7 @@ namespace H2020.IPMDecisions.IDP.Core.Profiles
             CreateMap<ApplicationUser, UserDto>();
             CreateMap<ApplicationUser, UserWithRolesClaimsDto>();
             CreateMap<ApplicationUser, UserRegistrationReturnDto>();
+            CreateMap<ApplicationUser, UserInternalCallDto>();
 
             // Dtos to Entities
             CreateMap<UserDto, ApplicationUser>();
