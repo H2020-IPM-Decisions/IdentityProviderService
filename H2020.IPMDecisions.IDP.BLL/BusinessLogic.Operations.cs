@@ -10,7 +10,7 @@ namespace H2020.IPMDecisions.IDP.BLL
         {
             try
             {
-                RecurringJob.Trigger("Run-Accounts-Report");
+                RecurringJob.TriggerJob("Run-Accounts-Report");
                 return true;
             }
             catch (Exception ex)

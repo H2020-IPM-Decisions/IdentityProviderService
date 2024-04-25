@@ -45,7 +45,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
             if (response.Result == null)
                 return NotFound();
 
-            Response.Headers.Add("X-Pagination",
+            Response.Headers.Append("X-Pagination",
                 JsonSerializer.Serialize(response.Result.PaginationMetaData));
 
             return Ok(

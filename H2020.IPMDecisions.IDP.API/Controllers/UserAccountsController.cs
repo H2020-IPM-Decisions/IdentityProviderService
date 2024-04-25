@@ -55,7 +55,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpOptions]
         public IActionResult Options()
         {
-            Response.Headers.Add("Allow", "OPTIONS,POST");
+            Response.Headers.Append("Allow", "OPTIONS,POST");
             return Ok();
         }
     }
