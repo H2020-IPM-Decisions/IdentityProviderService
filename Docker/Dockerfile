@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 
 ARG URL_EXPOSE_PORT=80
 ARG URL_EXPOSE_PORT_HTTPS=443
