@@ -70,6 +70,7 @@ namespace H2020.IPMDecisions.IDP.BLL
 
         #region Internal Call Controller
         Task<GenericResponse<string>> GetUserId(string userEmail);
+        Task<GenericResponse<UserInternalCallDto>> GetUserInformation(string email);
         #endregion
 
         #region Operations Controller

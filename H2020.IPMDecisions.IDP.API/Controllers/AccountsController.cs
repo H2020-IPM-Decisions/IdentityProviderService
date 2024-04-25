@@ -149,7 +149,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [HttpOptions]
         public IActionResult Options()
         {
-            Response.Headers.Add("Allow", "GET,OPTIONS,POST");
+            Response.Headers.Append("Allow", "GET,OPTIONS,POST");
             return Ok();
         }
     }

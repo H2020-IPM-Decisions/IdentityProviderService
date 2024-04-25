@@ -144,10 +144,30 @@ namespace H2020.IPMDecisions.IDP.BLL
             }
             catch (Exception ex)
             {
-                logger.LogError(string.Format("Error in BLL - DeleteUser. {0}", ex.Message));
+                logger.LogError(string.Format("Error in BLL - GetUserId. {0}", ex.Message));
                 return GenericResponseBuilder.NoSuccess<string>(null, ex.Message.ToString());
             }
         }
+
+        public async Task<GenericResponse<UserInternalCallDto>> GetUserInformation(string userEmail)
+        {
+            try
+            {
+                var user = await this.dataService.UserManager.FindByEmailAsync(userEmail);
+                if (user == null) return GenericResponseBuilder.NoSuccess<UserInternalCallDto>(null, "Not found");
+
+                var userToReturn = this.mapper.Map<UserInternalCallDto>(user);
+                userToReturn.Claims = await this.dataService.UserManager.GetClaimsAsync(user);
+
+                return GenericResponseBuilder.Success(userToReturn);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(string.Format("Error in BLL - GetUserInformation. {0}", ex.Message));
+                return GenericResponseBuilder.NoSuccess<UserInternalCallDto>(null, ex.Message.ToString());
+            }
+        }
+
 
         public async Task<GenericResponse> UpdateUser(Guid id, UserForPartialUpdateDto userForUpdate)
         {

@@ -168,7 +168,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         //OPTIONS: api/applicationclients
         public IActionResult Options()
         {
-            Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE,PATCH");
+            Response.Headers.Append("Allow", "OPTIONS,POST,GET,DELETE,PATCH");
             return Ok();
         }
     }

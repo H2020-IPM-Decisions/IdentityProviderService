@@ -27,12 +27,28 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpPost("getuserid", Name = "api.post.internal.email")]
+        [HttpPost("getuserid", Name = "api.post.internal.id")]
         // POST: api/internalcall/getuserid
         public async Task<IActionResult> Post(
             [FromBody] UserEmailDto userEmailDto)
         {
             var response = await businessLogic.GetUserId(userEmailDto.Email);
+
+            if (response.IsSuccessful)
+                return Ok(response.Result);
+
+            return BadRequest(new { message = response.ErrorMessage });
+        }
+
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("get-user-information", Name = "api.post.internal.information")]
+        // POST: api/internalcall/getuserinformation
+        public async Task<IActionResult> PostInformation(
+            [FromBody] UserEmailDto userEmailDto)
+        {
+            var response = await businessLogic.GetUserInformation(userEmailDto.Email);
 
             if (response.IsSuccessful)
                 return Ok(response.Result);

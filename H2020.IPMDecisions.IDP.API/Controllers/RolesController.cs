@@ -123,7 +123,7 @@ namespace H2020.IPMDecisions.IDP.API.Controllers
         // OPTIONS: api/Roles
         public IActionResult Options()
         {
-            Response.Headers.Add("Allow", "OPTIONS,POST,GET,DELETE");
+            Response.Headers.Append("Allow", "OPTIONS,POST,GET,DELETE");
             return Ok();
         }
     }
