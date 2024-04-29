@@ -33,7 +33,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 
             RecurringJob.AddOrUpdate<ReportJobs>("Run-Accounts-Report",
                 job => job.TotalAccountsReport(JobCancellationToken.Null),
-                Cron.Weekly(DayOfWeek.Sunday, 23, 00));
+                Cron.Weekly(DayOfWeek.Sunday, 21, 00));
         }
     }
 }
