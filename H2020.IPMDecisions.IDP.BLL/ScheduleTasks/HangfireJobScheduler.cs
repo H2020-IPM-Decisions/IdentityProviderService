@@ -14,6 +14,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
             var secondEmail = emailInactiveUsers.SecondEmailMonthInactive;
             var lastEmail = emailInactiveUsers.LastEmailMonthInactive;
             var deleteAccount = emailInactiveUsers.DeleteAccountMonthInactive;
+            var reportHour = int.Parse(configuration["Reports:HourToSendReport"]);
 
             RecurringJob.AddOrUpdate<MaintenanceJobs>(string.Format("Send-Initial-Inactive-Email"),
                 job => job.ProcessInactiveUser(JobCancellationToken.Null, firstEmail, 0, false),
@@ -33,7 +34,7 @@ namespace H2020.IPMDecisions.IDP.BLL.ScheduleTasks
 
             RecurringJob.AddOrUpdate<ReportJobs>("Run-Accounts-Report",
                 job => job.TotalAccountsReport(JobCancellationToken.Null),
-                Cron.Weekly(DayOfWeek.Sunday, 20, 00));
+                Cron.Weekly(DayOfWeek.Sunday, reportHour, 00));
         }
     }
 }
