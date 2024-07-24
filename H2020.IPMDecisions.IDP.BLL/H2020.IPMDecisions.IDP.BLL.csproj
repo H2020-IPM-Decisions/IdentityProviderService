@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="automapper" Version="13.0.1" />
-    <PackageReference Include="CsvHelper" Version="30.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
     <PackageReference Include="System.Json" Version="4.7.1" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.11" />
-    <PackageReference Include="Hangfire" Version="1.8.11" />
-    <PackageReference Include="System.Text.Json" Version="6.0.4" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.14" />
+    <PackageReference Include="Hangfire" Version="1.8.14" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\H2020.IPMDecisions.IDP.Data\H2020.IPMDecisions.IDP.Data.csproj" />
@@ -16,9 +15,9 @@
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>1.24.1.0</Version>
-    <AssemblyVersion>1.24.1.0</AssemblyVersion>
-    <FileVersion>1.24.1.0</FileVersion>
+    <Version>1.24.2.0</Version>
+    <AssemblyVersion>1.24.2.0</AssemblyVersion>
+    <FileVersion>1.24.2.0</FileVersion>
     <Authors>ADAS Modelling and Informatics Team</Authors>
     <Company>RSK ADAS Ltd</Company>
     <Product>H2020 IPM Decisions Identity Provider Service</Product>
