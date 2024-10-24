@@ -165,8 +165,16 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 throw ex;
             }
         }
+        public async Task<bool> AddEmailToQueue(InactiveUserEmail inactiveUserEmail)
+        {
+            return await SendEmailToEndpoint(inactiveUserEmail, "AddEmailToQueue");
+        }
 
         public async Task<bool> SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail)
+        {
+            return await SendEmailToEndpoint(inactiveUserEmail, "SendInactiveUserEmail");
+        }
+        private async Task<bool> SendEmailToEndpoint(InactiveUserEmail inactiveUserEmail, string endpoint)
         {
             try
             {
@@ -182,8 +190,8 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                     customContentType);
 
                 var emailEndPoint = config["MicroserviceInternalCommunication:EmailMicroservice"];
-                var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/sendinactiveuser", content);
-                if (!emailResponse.IsSuccessStatusCode)
+                var emailResponse = await httpClient.PostAsync(emailEndPoint + "internal/" + endpoint, content);
+                if(!emailResponse.IsSuccessStatusCode)
                 {
                     var responseContent = emailResponse.Content.ReadAsStringAsync().Result;
                     logger.LogWarning(string.Format("Error creating Sending Inactive User Email. Reason: {0}. Response Content: {1}",
@@ -192,13 +200,12 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 logger.LogError(string.Format("Error in MicroservicesInternalCommunicationHttpProvider - SendInactiveUserEmail. {0}", ex.Message));
                 throw ex;
             }
         }
-
         public bool DeleteUserProfileAsync(Guid userId)
         {
             try
