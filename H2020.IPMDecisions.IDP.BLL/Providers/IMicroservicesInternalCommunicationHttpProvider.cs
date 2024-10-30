@@ -12,6 +12,7 @@ namespace H2020.IPMDecisions.IDP.BLL.Providers
         Task<bool> SendForgotPasswordEmail(ForgotPasswordEmail forgotPasswordEmail);
         Task<bool> ResendConfirmationEmail(RegistrationEmail registrationEmail);
         Task<bool> SendInactiveUserEmail(InactiveUserEmail inactiveUserEmail);
+        Task<bool> AddEmailToQueue(InactiveUserEmail email);
         Task<bool> CreateUserProfileAsync(ApplicationUser user);
         bool DeleteUserProfileAsync(Guid userId);
         Task<bool> UserHasDssAsync(Guid userId);
